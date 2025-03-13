@@ -1,8 +1,7 @@
-
 import { useState } from "react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameMonth, isSameDay, addMonths, subMonths } from "date-fns";
 import { Button } from "@/components/ui/button";
-import { Calendar, ChevronLeft, ChevronRight, Check, X } from "lucide-react";
+import { Calendar, ChevronLeft, ChevronRight, Check, X, CircleCheck } from "lucide-react";
 import { Entry } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -18,20 +17,16 @@ interface MonthViewProps {
 const MonthView = ({ entries, selectedDate, setSelectedDate }: MonthViewProps) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   
-  // Get days in current month
   const firstDayOfMonth = startOfMonth(currentMonth);
   const lastDayOfMonth = endOfMonth(currentMonth);
   const daysInMonth = eachDayOfInterval({ start: firstDayOfMonth, end: lastDayOfMonth });
   
-  // Navigation
   const previousMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
   const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
   const goToday = () => setCurrentMonth(new Date());
   
-  // Get day of week names
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   
-  // Get entries for a specific date
   const getEntriesForDay = (day: Date) => {
     return entries.filter(entry => {
       const entryDate = new Date(entry.date);
@@ -39,13 +34,11 @@ const MonthView = ({ entries, selectedDate, setSelectedDate }: MonthViewProps) =
     });
   };
   
-  // Get the first entry type (for the indicator)
   const getFirstEntryType = (day: Date) => {
     const dayEntries = getEntriesForDay(day);
     return dayEntries.length > 0 ? dayEntries[0].type : null;
   };
   
-  // Check if a day has an entry of a specific type
   const hasEntryType = (day: Date, type: Entry['type']) => {
     return entries.some(entry => {
       const entryDate = new Date(entry.date);
@@ -53,7 +46,6 @@ const MonthView = ({ entries, selectedDate, setSelectedDate }: MonthViewProps) =
     });
   };
   
-  // Get class for date cell
   const getDateClasses = (day: Date) => {
     const isToday = isSameDay(day, new Date());
     const isSelected = isSameDay(day, selectedDate);
@@ -67,11 +59,7 @@ const MonthView = ({ entries, selectedDate, setSelectedDate }: MonthViewProps) =
       isToday && "calendar-day-today",
       isSelected && "calendar-day-active",
       !isCurrentMonth && "calendar-day-disabled",
-      isWeekend && "text-muted-foreground",
-      hasEntryType(day, 'office-visit') && "calendar-day-office-visit",
-      hasEntryType(day, 'sick') && "calendar-day-sick",
-      hasEntryType(day, 'pto') && "calendar-day-pto",
-      (hasEntryType(day, 'event') || hasEntryType(day, 'holiday')) && "calendar-day-event"
+      isWeekend && "text-muted-foreground"
     );
   };
   
@@ -108,6 +96,9 @@ const MonthView = ({ entries, selectedDate, setSelectedDate }: MonthViewProps) =
             const dayEntries = getEntriesForDay(day);
             const dayNumber = format(day, 'd');
             const isWeekend = day.getDay() === 0 || day.getDay() === 6;
+            const hasEntry = dayEntries.length > 0;
+            
+            const entryType = getFirstEntryType(day);
             
             return (
               <Tooltip key={i} delayDuration={300}>
@@ -120,14 +111,17 @@ const MonthView = ({ entries, selectedDate, setSelectedDate }: MonthViewProps) =
                   >
                     <span className="absolute top-1 right-2 text-xs">{dayNumber}</span>
                     
-                    {dayEntries.length > 0 && !isWeekend && (
-                      <div className="absolute top-2 left-1/2 transform -translate-x-1/2">
-                        {hasEntryType(day, 'office-visit') && (
-                          <Check className="h-3 w-3 text-green-500" />
-                        )}
-                        {hasEntryType(day, 'sick') && (
-                          <X className="h-3 w-3 text-amber-500" />
-                        )}
+                    {hasEntry && !isWeekend && (
+                      <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
+                        <CircleCheck 
+                          className={cn(
+                            "h-5 w-5",
+                            entryType === 'office-visit' && "text-green-500",
+                            entryType === 'sick' && "text-amber-500",
+                            entryType === 'pto' && "text-blue-500",
+                            (entryType === 'event' || entryType === 'holiday') && "text-purple-500"
+                          )} 
+                        />
                       </div>
                     )}
                   </button>
@@ -171,19 +165,19 @@ const MonthView = ({ entries, selectedDate, setSelectedDate }: MonthViewProps) =
         
         <div className="flex flex-wrap gap-2 justify-center mt-4">
           <div className="flex items-center gap-1">
-            <Check className="h-3 w-3 text-green-500" />
+            <CircleCheck className="h-4 w-4 text-green-500" />
             <span className="text-xs">Office Visit</span>
           </div>
           <div className="flex items-center gap-1">
-            <X className="h-3 w-3 text-amber-500" />
+            <CircleCheck className="h-4 w-4 text-amber-500" />
             <span className="text-xs">Sick Day</span>
           </div>
           <div className="flex items-center gap-1">
-            <Check className="h-3 w-3 text-blue-500" />
+            <CircleCheck className="h-4 w-4 text-blue-500" />
             <span className="text-xs">PTO</span>
           </div>
           <div className="flex items-center gap-1">
-            <Check className="h-3 w-3 text-purple-500" />
+            <CircleCheck className="h-4 w-4 text-purple-500" />
             <span className="text-xs">Event</span>
           </div>
         </div>
@@ -192,7 +186,6 @@ const MonthView = ({ entries, selectedDate, setSelectedDate }: MonthViewProps) =
   );
 };
 
-// Helper to format entry types for display
 const formatEntryType = (type: Entry['type']): string => {
   switch (type) {
     case 'office-visit': return 'Office';
