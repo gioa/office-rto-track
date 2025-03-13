@@ -47,34 +47,6 @@ const Stats = ({ entries, dateRange }: StatsProps) => {
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 animate-slide-up animation-delay-100">
       <Card className="glass subtle-shadow">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">Top Offices</CardTitle>
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth="2"
-            className="h-4 w-4 text-muted-foreground"
-          >
-            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-          </svg>
-        </CardHeader>
-        <CardContent>
-          <div className="text-2xl font-bold">{officeLocations[0].name}</div>
-          <p className="text-xs text-muted-foreground">
-            {officeLocations.map((office, index) => (
-              <span key={office.name}>
-                {office.name}: {office.count}{index < officeLocations.length - 1 ? ', ' : ''}
-              </span>
-            ))}
-          </p>
-        </CardContent>
-      </Card>
-      
-      <Card className="glass subtle-shadow">
-        <CardHeader className="flex flex-row items-center justify-between pb-2">
           <CardTitle className="text-sm font-medium">Weekly Average</CardTitle>
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -140,6 +112,34 @@ const Stats = ({ entries, dateRange }: StatsProps) => {
           <div className="text-2xl font-bold">{totalSickDays + totalPTO}</div>
           <p className="text-xs text-muted-foreground">
             {totalSickDays} sick, {totalPTO} PTO days
+          </p>
+        </CardContent>
+      </Card>
+      
+      <Card className="glass subtle-shadow">
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardTitle className="text-sm font-medium">Top Offices</CardTitle>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth="2"
+            className="h-4 w-4 text-muted-foreground"
+          >
+            <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+          </svg>
+        </CardHeader>
+        <CardContent>
+          <div className="text-2xl font-bold">{officeLocations[0].name}</div>
+          <p className="text-xs text-muted-foreground">
+            {officeLocations.map((office, index) => (
+              <span key={office.name}>
+                {office.name}: {office.count}{index < officeLocations.length - 1 ? ', ' : ''}
+              </span>
+            ))}
           </p>
         </CardContent>
       </Card>
