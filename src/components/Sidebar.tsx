@@ -1,23 +1,13 @@
 
 import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { Calendar, List, Plus, User } from "lucide-react";
+import { List, User } from "lucide-react";
 
 const navigationItems = [
   {
     name: "Dashboard",
     href: "/",
     icon: List,
-  },
-  {
-    name: "Calendar",
-    href: "/calendar",
-    icon: Calendar,
-  },
-  {
-    name: "Add Entry",
-    href: "/add-entry",
-    icon: Plus,
   },
 ];
 

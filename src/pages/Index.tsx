@@ -5,9 +5,13 @@ import Sidebar from "@/components/Sidebar";
 import FilterBar from "@/components/Dashboard/FilterBar";
 import Stats from "@/components/Dashboard/Stats";
 import VisitChart from "@/components/Dashboard/VisitChart";
-import { mockEntries, mockWeeklyStats, getFilteredEntries } from "@/lib/mockData";
-import { DateRange, FilterOptions } from "@/lib/types";
+import MonthView from "@/components/Calendar/MonthView";
+import EntryForm from "@/components/EntryForm/EntryForm";
+import { mockEntries, mockWeeklyStats, getFilteredEntries, getEntriesForDate } from "@/lib/mockData";
+import { DateRange, FilterOptions, Entry } from "@/lib/types";
 import { addMonths, subMonths } from "date-fns";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
   // Set up initial date range (last 3 months)
@@ -20,6 +24,10 @@ const Index = () => {
   const [includeSick, setIncludeSick] = useState(true);
   const [includePto, setIncludePto] = useState(true);
   const [includeEvents, setIncludeEvents] = useState(true);
+  
+  // Set up selected date for calendar
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const selectedEntries = getEntriesForDate(mockEntries, selectedDate);
   
   // Filtered entries based on filters
   const [filteredEntries, setFilteredEntries] = useState(mockEntries);
@@ -61,11 +69,53 @@ const Index = () => {
               setIncludeEvents={setIncludeEvents}
             />
             
-            <div className="space-y-6">
-              <Stats entries={filteredEntries} dateRange={dateRange} />
-              
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Main dashboard content - left 2/3 */}
+              <div className="lg:col-span-2 space-y-6">
+                <Stats entries={filteredEntries} dateRange={dateRange} />
                 <VisitChart data={mockWeeklyStats} />
+              </div>
+              
+              {/* Right sidebar with tabs for Calendar and Add Entry - right 1/3 */}
+              <div className="lg:col-span-1">
+                <Tabs defaultValue="calendar" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="calendar">Calendar</TabsTrigger>
+                    <TabsTrigger value="add-entry">Add Entry</TabsTrigger>
+                  </TabsList>
+                  
+                  <TabsContent value="calendar" className="mt-4">
+                    <Card className="glass subtle-shadow overflow-hidden">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-xl">Calendar View</CardTitle>
+                        <CardDescription>
+                          View your office attendance
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent className="p-0">
+                        <MonthView 
+                          entries={mockEntries} 
+                          selectedDate={selectedDate}
+                          setSelectedDate={setSelectedDate}
+                        />
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                  
+                  <TabsContent value="add-entry" className="mt-4">
+                    <Card className="glass subtle-shadow overflow-hidden">
+                      <CardHeader className="pb-2">
+                        <CardTitle className="text-xl">Add New Entry</CardTitle>
+                        <CardDescription>
+                          Record office visits, sick days or PTO
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <EntryForm compact={true} />
+                      </CardContent>
+                    </Card>
+                  </TabsContent>
+                </Tabs>
               </div>
             </div>
           </div>
