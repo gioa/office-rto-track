@@ -6,7 +6,6 @@ import {
   Calendar as CalendarIcon, 
   Filter, 
   Check, 
-  Briefcase,
   Thermometer,
   Plane,
   Flag
@@ -18,13 +17,6 @@ import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { 
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { 
   ToggleGroup, 
   ToggleGroupItem 
@@ -82,59 +74,53 @@ const FilterBar = ({
     }
     
     setDateRange({ from, to: now });
+    setIsCalendarOpen(false);
   };
   
   return (
     <div className="space-y-4 mb-6 animate-slide-up">
-      {/* Date Range Controls */}
+      {/* Combined Date Range Controls */}
       <div className="flex flex-col sm:flex-row gap-2">
-        <div className="flex-1 flex flex-col sm:flex-row gap-2">
-          <Select onValueChange={handlePresetChange}>
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Select time period" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="1m">Last Month</SelectItem>
-              <SelectItem value="3m">Last 3 Months</SelectItem>
-              <SelectItem value="6m">Last 6 Months</SelectItem>
-              <SelectItem value="1y">Last Year</SelectItem>
-            </SelectContent>
-          </Select>
-
-          <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "justify-start text-left font-normal w-full sm:flex-1",
-                  !dateRange.from && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {dateRangeText}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                initialFocus
-                mode="range"
-                defaultMonth={dateRange.from}
-                selected={{
-                  from: dateRange.from,
-                  to: dateRange.to,
-                }}
-                onSelect={(range) => {
-                  setDateRange({ from: range?.from, to: range?.to });
-                  if (range?.to) {
-                    setTimeout(() => setIsCalendarOpen(false), 300);
-                  }
-                }}
-                numberOfMonths={2}
-                className={cn("p-3 pointer-events-auto")}
-              />
-            </PopoverContent>
-          </Popover>
-        </div>
+        <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              className={cn(
+                "justify-start text-left font-normal w-full sm:flex-1",
+                !dateRange.from && "text-muted-foreground"
+              )}
+            >
+              <CalendarIcon className="mr-2 h-4 w-4" />
+              {dateRangeText}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-auto p-0" align="start">
+            <Calendar
+              initialFocus
+              mode="range"
+              defaultMonth={dateRange.from}
+              selected={{
+                from: dateRange.from,
+                to: dateRange.to,
+              }}
+              onSelect={(range) => {
+                setDateRange({ from: range?.from, to: range?.to });
+              }}
+              numberOfMonths={2}
+              className={cn("p-3 pointer-events-auto")}
+            />
+            {/* Preset date ranges at the bottom of the calendar */}
+            <div className="flex items-center justify-between p-3 border-t">
+              <span className="text-sm font-medium">Quick select:</span>
+              <div className="flex gap-2">
+                <Button variant="outline" size="sm" onClick={() => handlePresetChange("1m")}>1M</Button>
+                <Button variant="outline" size="sm" onClick={() => handlePresetChange("3m")}>3M</Button>
+                <Button variant="outline" size="sm" onClick={() => handlePresetChange("6m")}>6M</Button>
+                <Button variant="outline" size="sm" onClick={() => handlePresetChange("1y")}>1Y</Button>
+              </div>
+            </div>
+          </PopoverContent>
+        </Popover>
         
         <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
           <PopoverTrigger asChild>
@@ -156,52 +142,52 @@ const FilterBar = ({
             <div className="space-y-4">
               <h4 className="font-medium mb-2">Include in calculations:</h4>
               
-              <ToggleGroup type="multiple" className="flex flex-col gap-2">
-                <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted">
+              <div className="space-y-2">
+                <div className="flex items-center space-x-3 p-2 rounded-md hover:bg-muted">
                   <Checkbox 
                     id="include-sick" 
                     checked={includeSick} 
                     onCheckedChange={(checked) => setIncludeSick(checked === true)}
                   />
-                  <Label htmlFor="include-sick" className="flex flex-1 items-center gap-2 cursor-pointer">
-                    <Badge variant={includeSick ? "default" : "outline"} className="gap-1">
+                  <Label htmlFor="include-sick" className="flex flex-1 items-center cursor-pointer">
+                    <Badge variant={includeSick ? "default" : "outline"} className="gap-1 mr-2">
                       <Thermometer className="h-3 w-3" />
                       <span>Sick</span>
                     </Badge>
-                    <span className="text-sm text-muted-foreground ml-2">Include sick days</span>
+                    <span className="text-sm text-muted-foreground">Include sick days</span>
                   </Label>
                 </div>
                 
-                <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted">
+                <div className="flex items-center space-x-3 p-2 rounded-md hover:bg-muted">
                   <Checkbox 
                     id="include-pto" 
                     checked={includePto} 
                     onCheckedChange={(checked) => setIncludePto(checked === true)}
                   />
-                  <Label htmlFor="include-pto" className="flex flex-1 items-center gap-2 cursor-pointer">
-                    <Badge variant={includePto ? "default" : "outline"} className="gap-1">
+                  <Label htmlFor="include-pto" className="flex flex-1 items-center cursor-pointer">
+                    <Badge variant={includePto ? "default" : "outline"} className="gap-1 mr-2">
                       <Plane className="h-3 w-3" />
                       <span>PTO</span>
                     </Badge>
-                    <span className="text-sm text-muted-foreground ml-2">Include PTO</span>
+                    <span className="text-sm text-muted-foreground">Include PTO</span>
                   </Label>
                 </div>
                 
-                <div className="flex items-center space-x-2 p-2 rounded-md hover:bg-muted">
+                <div className="flex items-center space-x-3 p-2 rounded-md hover:bg-muted">
                   <Checkbox 
                     id="include-events" 
                     checked={includeEvents} 
                     onCheckedChange={(checked) => setIncludeEvents(checked === true)}
                   />
-                  <Label htmlFor="include-events" className="flex flex-1 items-center gap-2 cursor-pointer">
-                    <Badge variant={includeEvents ? "default" : "outline"} className="gap-1">
+                  <Label htmlFor="include-events" className="flex flex-1 items-center cursor-pointer">
+                    <Badge variant={includeEvents ? "default" : "outline"} className="gap-1 mr-2">
                       <Flag className="h-3 w-3" />
                       <span>Events</span>
                     </Badge>
-                    <span className="text-sm text-muted-foreground ml-2">Include company events</span>
+                    <span className="text-sm text-muted-foreground">Include company events</span>
                   </Label>
                 </div>
-              </ToggleGroup>
+              </div>
               
               <div className="flex justify-between pt-2">
                 <Button 

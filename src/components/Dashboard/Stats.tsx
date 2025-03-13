@@ -11,6 +11,13 @@ interface StatsProps {
   };
 }
 
+// Top office locations for the mock data
+const officeLocations = [
+  { name: "SF", count: 12 },
+  { name: "NYC", count: 9 },
+  { name: "MTV", count: 6 }
+];
+
 const Stats = ({ entries, dateRange }: StatsProps) => {
   // Calculate metrics
   const totalOfficeVisits = countEntriesByType(entries, 'office-visit');
@@ -40,7 +47,7 @@ const Stats = ({ entries, dateRange }: StatsProps) => {
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 animate-slide-up animation-delay-100">
       <Card className="glass subtle-shadow">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">Office Visits</CardTitle>
+          <CardTitle className="text-sm font-medium">Top Offices</CardTitle>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -55,8 +62,14 @@ const Stats = ({ entries, dateRange }: StatsProps) => {
           </svg>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{totalOfficeVisits}</div>
-          <p className="text-xs text-muted-foreground">+{Math.round(totalOfficeVisits * 0.1)} from last period</p>
+          <div className="text-2xl font-bold">{officeLocations[0].name}</div>
+          <p className="text-xs text-muted-foreground">
+            {officeLocations.map((office, index) => (
+              <span key={office.name}>
+                {office.name}: {office.count}{index < officeLocations.length - 1 ? ', ' : ''}
+              </span>
+            ))}
+          </p>
         </CardContent>
       </Card>
       
@@ -109,7 +122,7 @@ const Stats = ({ entries, dateRange }: StatsProps) => {
       
       <Card className="glass subtle-shadow">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">Time Off</CardTitle>
+          <CardTitle className="text-sm font-medium">Office Visits</CardTitle>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -124,7 +137,7 @@ const Stats = ({ entries, dateRange }: StatsProps) => {
           </svg>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{totalSickDays + totalPTO}</div>
+          <div className="text-2xl font-bold">{totalOfficeVisits}</div>
           <p className="text-xs text-muted-foreground">
             {totalSickDays} sick, {totalPTO} PTO days
           </p>
