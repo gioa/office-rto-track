@@ -14,9 +14,10 @@ interface PlannedDaysManagerProps {
 }
 
 const PlannedDaysManager = ({ onDaysChange }: PlannedDaysManagerProps) => {
-  const [selectedDays, setSelectedDays] = useState<number[]>([1, 3, 5]); // Default to Mon, Wed, Fri
+  const [selectedDays, setSelectedDays] = useState<number[]>([]); // Start with no days selected
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [otherPlannedDays, setOtherPlannedDays] = useState<PlannedDay[]>([]);
+  const [isDirty, setIsDirty] = useState(false);
   
   // Initialize planned days on component mount
   useEffect(() => {
@@ -43,11 +44,17 @@ const PlannedDaysManager = ({ onDaysChange }: PlannedDaysManagerProps) => {
     setTimeout(() => {
       onDaysChange(plannedDays);
       setIsSubmitting(false);
+      setIsDirty(false);
       toast({
         title: "Planned days updated",
         description: "Your planned office days have been saved.",
       });
     }, 600);
+  };
+  
+  const handleDaysChange = (days: number[]) => {
+    setSelectedDays(days);
+    setIsDirty(true);
   };
   
   const handleShowOtherPersonDays = (plannedDays: PlannedDay[]) => {
@@ -69,7 +76,7 @@ const PlannedDaysManager = ({ onDaysChange }: PlannedDaysManagerProps) => {
   };
 
   return (
-    <Card className="bg-card shadow-sm overflow-hidden">
+    <Card className="bg-card shadow-sm overflow-hidden border-0">
       <CardContent className="p-0">
         <Tabs defaultValue="my-days">
           <TabsList className="w-full grid grid-cols-2">
@@ -86,7 +93,7 @@ const PlannedDaysManager = ({ onDaysChange }: PlannedDaysManagerProps) => {
           <TabsContent value="my-days" className="p-4">
             <WeekdaySelector 
               selectedDays={selectedDays} 
-              onChange={setSelectedDays}
+              onChange={handleDaysChange}
               disabled={isSubmitting}
             />
             
@@ -94,6 +101,7 @@ const PlannedDaysManager = ({ onDaysChange }: PlannedDaysManagerProps) => {
               onClick={handleSavePlannedDays} 
               className="w-full mt-4"
               disabled={isSubmitting}
+              variant={isDirty ? "default" : "secondary"}
             >
               {isSubmitting ? (
                 "Saving..."
