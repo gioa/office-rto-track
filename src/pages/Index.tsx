@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import FilterBar from "@/components/Dashboard/FilterBar";
@@ -48,33 +47,15 @@ const Index = () => {
       <Header />
       <main className="flex-1">
         <div className="container py-6">
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold tracking-tight animate-slide-down">Dashboard</h2>
-            <p className="text-muted-foreground animate-slide-down animation-delay-100">
-              Track and manage your Return-to-Office attendance
-            </p>
-          </div>
-          
-          <FilterBar 
-            dateRange={dateRange}
-            setDateRange={setDateRange}
-            includeSick={includeSick}
-            setIncludeSick={setIncludeSick}
-            includePto={includePto}
-            setIncludePto={setIncludePto}
-            includeEvents={includeEvents}
-            setIncludeEvents={setIncludeEvents}
-          />
-          
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Main dashboard content - left 2/3 */}
-            <div className="lg:col-span-2 space-y-6">
-              <Stats entries={filteredEntries} dateRange={dateRange} />
-              <VisitChart data={mockWeeklyStats} />
+          <div className="flex justify-between items-start mb-8">
+            <div>
+              <h2 className="text-3xl font-bold tracking-tight animate-slide-down">Dashboard</h2>
+              <p className="text-muted-foreground animate-slide-down animation-delay-100">
+                Track and manage your Return-to-Office attendance
+              </p>
             </div>
             
-            {/* Right sidebar with tabs for Calendar and Add Entry - right 1/3 */}
-            <div className="lg:col-span-1">
+            <div className="w-full max-w-md">
               <Tabs defaultValue="calendar" className="w-full">
                 <TabsList className="grid w-full grid-cols-2">
                   <TabsTrigger value="calendar">Calendar</TabsTrigger>
@@ -113,6 +94,24 @@ const Index = () => {
                   </Card>
                 </TabsContent>
               </Tabs>
+            </div>
+          </div>
+          
+          <FilterBar 
+            dateRange={dateRange}
+            setDateRange={setDateRange}
+            includeSick={includeSick}
+            setIncludeSick={setIncludeSick}
+            includePto={includePto}
+            setIncludePto={setIncludePto}
+            includeEvents={includeEvents}
+            setIncludeEvents={setIncludeEvents}
+          />
+          
+          <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
+            <div className="space-y-6">
+              <Stats entries={filteredEntries} dateRange={dateRange} />
+              <VisitChart data={mockWeeklyStats} />
             </div>
           </div>
         </div>
