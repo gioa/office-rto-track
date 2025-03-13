@@ -1,7 +1,6 @@
 
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 interface WeekdaySelectorProps {
   selectedDays: number[];
@@ -27,27 +26,28 @@ const WeekdaySelector = ({ selectedDays, onChange, disabled = false }: WeekdaySe
   };
 
   return (
-    <div className="space-y-2">
-      <p className="text-sm font-medium mb-2">Select your planned office days:</p>
-      <div className="flex gap-2 justify-between">
+    <div className="space-y-4">
+      <p className="text-sm font-medium mb-1">Repeat on</p>
+      <div className="flex gap-3 justify-between">
         {weekdays.map((day) => (
-          <div 
-            key={day.id} 
+          <button
+            key={day.id}
+            type="button"
+            onClick={() => handleDayToggle(day.id)}
+            disabled={disabled}
             className={cn(
-              "flex flex-col items-center justify-center rounded-md border p-2 w-12 h-12 transition-colors",
-              selectedDays.includes(day.id) ? "border-primary/50 bg-primary/5" : "border-input",
-              disabled && "opacity-50"
+              "flex items-center justify-center rounded-full w-12 h-12 text-base font-medium transition-colors",
+              selectedDays.includes(day.id) 
+                ? "bg-primary text-primary-foreground" 
+                : "bg-secondary/80 text-foreground hover:bg-secondary",
+              disabled && "opacity-50 cursor-not-allowed"
             )}
             title={day.fullName}
+            aria-label={`Select ${day.fullName}`}
+            aria-pressed={selectedDays.includes(day.id)}
           >
-            <span className="text-sm font-medium mb-1">{day.name}</span>
-            <Checkbox
-              id={`day-${day.id}`}
-              checked={selectedDays.includes(day.id)}
-              onCheckedChange={() => handleDayToggle(day.id)}
-              disabled={disabled}
-            />
-          </div>
+            {day.name}
+          </button>
         ))}
       </div>
     </div>
