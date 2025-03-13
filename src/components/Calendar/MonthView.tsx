@@ -6,6 +6,7 @@ import { Entry, PlannedDay } from "@/lib/types";
 import CalendarHeader from "./CalendarHeader";
 import CalendarDay from "./CalendarDay";
 import CalendarLegend from "./CalendarLegend";
+import EntryFormDialog from "@/components/EntryForm/EntryFormDialog";
 
 interface MonthViewProps {
   entries: Entry[];
@@ -82,6 +83,11 @@ const MonthView = ({
         </div>
         
         <CalendarLegend />
+        
+        {/* Add Entry button below the legends */}
+        <div className="mt-4 flex justify-center">
+          <EntryFormDialog buttonVariant="outline" buttonSize="sm" />
+        </div>
       </CardContent>
     </Card>
   );

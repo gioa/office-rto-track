@@ -84,9 +84,8 @@ const Index = () => {
             <div className="lg:col-span-1 space-y-6">
               {/* Calendar Card */}
               <Card className="glass subtle-shadow overflow-hidden">
-                <CardHeader className="p-4 pb-0 flex flex-row items-center justify-between">
+                <CardHeader className="p-4 pb-0">
                   <CardTitle className="text-lg">Calendar</CardTitle>
-                  <EntryFormDialog buttonVariant="outline" buttonSize="sm" />
                 </CardHeader>
                 <CardContent className="p-0">
                   <MonthView 
