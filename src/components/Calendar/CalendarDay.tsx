@@ -1,10 +1,12 @@
 
 import { isSameDay, isSameMonth, format, isAfter, isToday } from "date-fns";
-import { CircleCheck } from "lucide-react";
+import { CircleCheck, Plus } from "lucide-react";
 import { Entry, PlannedDay } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import EntryFormDialog from "@/components/EntryForm/EntryFormDialog";
 import { getEntriesForDay, getFirstEntryType, formatEntryType } from "./utils";
 
 interface CalendarDayProps {
@@ -107,6 +109,14 @@ const CalendarDay = ({
                 </div>
               ))}
             </div>
+            <div className="mt-2 pt-2 border-t border-border">
+              <EntryFormDialog date={day} buttonVariant="outline" buttonSize="sm" fullWidth>
+                <Button variant="outline" size="sm" className="w-full text-xs">
+                  <Plus className="h-3 w-3 mr-1" />
+                  Add Entry
+                </Button>
+              </EntryFormDialog>
+            </div>
           </div>
         ) : isPlannedDay ? (
           <div className="p-2">
@@ -117,11 +127,27 @@ const CalendarDay = ({
                 {pd.userName && pd.userName !== "You" && `Also: ${pd.userName}`}
               </div>
             ))}
+            <div className="mt-2 pt-2 border-t border-border">
+              <EntryFormDialog date={day} buttonVariant="outline" buttonSize="sm" fullWidth>
+                <Button variant="outline" size="sm" className="w-full text-xs">
+                  <Plus className="h-3 w-3 mr-1" />
+                  Add Entry
+                </Button>
+              </EntryFormDialog>
+            </div>
           </div>
         ) : (
           <div className="p-2">
             <p className="text-sm font-medium">{format(day, 'EEEE, MMMM d, yyyy')}</p>
             <p className="text-xs text-muted-foreground">No entries for this day</p>
+            <div className="mt-2 pt-2 border-t border-border">
+              <EntryFormDialog date={day} buttonVariant="outline" buttonSize="sm" fullWidth>
+                <Button variant="outline" size="sm" className="w-full text-xs">
+                  <Plus className="h-3 w-3 mr-1" />
+                  Add Entry
+                </Button>
+              </EntryFormDialog>
+            </div>
           </div>
         )}
       </TooltipContent>

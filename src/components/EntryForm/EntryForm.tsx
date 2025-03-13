@@ -13,9 +13,10 @@ import FullEntryForm from "./FullEntryForm";
 
 interface EntryFormProps {
   compact?: boolean;
+  initialDate?: Date;
 }
 
-const EntryForm = ({ compact = false }: EntryFormProps) => {
+const EntryForm = ({ compact = false, initialDate }: EntryFormProps) => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedType, setSelectedType] = useState<string>("office-visit");
@@ -23,7 +24,7 @@ const EntryForm = ({ compact = false }: EntryFormProps) => {
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      date: new Date(),
+      date: initialDate || new Date(),
       type: "office-visit",
       note: "",
     },
