@@ -53,16 +53,30 @@ const EntryDateSelector = ({ control, selectedType }: EntryDateSelectorProps) =>
               </FormControl>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode={isPtoOrEvent ? "range" : "single"}
-                selected={field.value}
-                onSelect={field.onChange}
-                initialFocus
-                className={cn("p-3 pointer-events-auto")}
-                // For office visits and sick days, we only allow weekdays
-                disabled={selectedType === "office-visit" || selectedType === "sick" ? 
-                  (date) => date.getDay() === 0 || date.getDay() === 6 : undefined}
-              />
+              {isPtoOrEvent ? (
+                // Range selector for PTO and events
+                <Calendar
+                  mode="range"
+                  selected={field.value as DateRange}
+                  onSelect={field.onChange}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                />
+              ) : (
+                // Single date selector for other entry types
+                <Calendar
+                  mode="single"
+                  selected={field.value as Date}
+                  onSelect={field.onChange}
+                  initialFocus
+                  className={cn("p-3 pointer-events-auto")}
+                  // For office visits and sick days, we only allow weekdays
+                  disabled={(date) => 
+                    (selectedType === "office-visit" || selectedType === "sick") ? 
+                      date.getDay() === 0 || date.getDay() === 6 : false
+                  }
+                />
+              )}
             </PopoverContent>
           </Popover>
           <FormMessage />
