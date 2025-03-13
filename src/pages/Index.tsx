@@ -9,7 +9,7 @@ import EntryForm from "@/components/EntryForm/EntryForm";
 import { mockEntries, mockWeeklyStats, getFilteredEntries, getEntriesForDate } from "@/lib/mockData";
 import { DateRange, FilterOptions, Entry } from "@/lib/types";
 import { addMonths, subMonths } from "date-fns";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const Index = () => {
@@ -48,27 +48,27 @@ const Index = () => {
       <Header />
       <main className="flex-1">
         <div className="container py-6">
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold tracking-tight animate-slide-down">Dashboard</h2>
-            <p className="text-muted-foreground animate-slide-down animation-delay-100">
-              Track and manage your Return-to-Office attendance
-            </p>
-          </div>
-          
-          <FilterBar 
-            dateRange={dateRange}
-            setDateRange={setDateRange}
-            includeSick={includeSick}
-            setIncludeSick={setIncludeSick}
-            includePto={includePto}
-            setIncludePto={setIncludePto}
-            includeEvents={includeEvents}
-            setIncludeEvents={setIncludeEvents}
-          />
-          
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Main dashboard content - left 2/3 */}
             <div className="lg:col-span-2 space-y-6">
+              <div className="mb-4">
+                <h2 className="text-3xl font-bold tracking-tight animate-slide-down">Dashboard</h2>
+                <p className="text-muted-foreground animate-slide-down animation-delay-100">
+                  Track and manage your Return-to-Office attendance
+                </p>
+              </div>
+              
+              <FilterBar 
+                dateRange={dateRange}
+                setDateRange={setDateRange}
+                includeSick={includeSick}
+                setIncludeSick={setIncludeSick}
+                includePto={includePto}
+                setIncludePto={setIncludePto}
+                includeEvents={includeEvents}
+                setIncludeEvents={setIncludeEvents}
+              />
+              
               <Stats entries={filteredEntries} dateRange={dateRange} />
               <VisitChart data={mockWeeklyStats} />
             </div>
@@ -83,12 +83,6 @@ const Index = () => {
                 
                 <TabsContent value="calendar" className="mt-4">
                   <Card className="glass subtle-shadow overflow-hidden">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-xl">Calendar View</CardTitle>
-                      <CardDescription>
-                        View your office attendance
-                      </CardDescription>
-                    </CardHeader>
                     <CardContent className="p-0">
                       <MonthView 
                         entries={mockEntries} 
@@ -101,13 +95,7 @@ const Index = () => {
                 
                 <TabsContent value="add-entry" className="mt-4">
                   <Card className="glass subtle-shadow overflow-hidden">
-                    <CardHeader className="pb-2">
-                      <CardTitle className="text-xl">Add New Entry</CardTitle>
-                      <CardDescription>
-                        Record office visits, sick days or PTO
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
+                    <CardContent className="p-4">
                       <EntryForm compact={true} />
                     </CardContent>
                   </Card>
