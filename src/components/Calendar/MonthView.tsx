@@ -79,7 +79,7 @@ const MonthView = ({ entries, selectedDate, setSelectedDate }: MonthViewProps) =
     <Card className="glass subtle-shadow animate-slide-up animation-delay-100">
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
-          <CardTitle>Calendar View</CardTitle>
+          <CardTitle>Calendar</CardTitle>
           <div className="flex gap-1">
             <Button variant="outline" size="icon" onClick={previousMonth} className="h-8 w-8">
               <ChevronLeft className="h-4 w-4" />
@@ -171,19 +171,19 @@ const MonthView = ({ entries, selectedDate, setSelectedDate }: MonthViewProps) =
         
         <div className="flex flex-wrap gap-2 justify-center mt-4">
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-full bg-green-500"></div>
+            <Check className="h-3 w-3 text-green-500" />
             <span className="text-xs">Office Visit</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-full bg-amber-500"></div>
+            <X className="h-3 w-3 text-amber-500" />
             <span className="text-xs">Sick Day</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-full bg-blue-500"></div>
+            <Check className="h-3 w-3 text-blue-500" />
             <span className="text-xs">PTO</span>
           </div>
           <div className="flex items-center gap-1">
-            <div className="w-3 h-3 rounded-full bg-purple-500"></div>
+            <Check className="h-3 w-3 text-purple-500" />
             <span className="text-xs">Event</span>
           </div>
         </div>
