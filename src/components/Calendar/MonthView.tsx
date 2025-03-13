@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
-import { Entry } from "@/lib/types";
+import { Entry, PlannedDay } from "@/lib/types";
 import CalendarHeader from "./CalendarHeader";
 import CalendarDay from "./CalendarDay";
 import CalendarLegend from "./CalendarLegend";
@@ -11,9 +11,15 @@ interface MonthViewProps {
   entries: Entry[];
   selectedDate: Date;
   setSelectedDate: (date: Date) => void;
+  plannedDays?: PlannedDay[];
 }
 
-const MonthView = ({ entries, selectedDate, setSelectedDate }: MonthViewProps) => {
+const MonthView = ({ 
+  entries, 
+  selectedDate, 
+  setSelectedDate,
+  plannedDays = []
+}: MonthViewProps) => {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   
   const firstDayOfMonth = startOfMonth(currentMonth);
@@ -49,6 +55,7 @@ const MonthView = ({ entries, selectedDate, setSelectedDate }: MonthViewProps) =
               currentMonth={currentMonth}
               selectedDate={selectedDate}
               entries={entries}
+              plannedDays={plannedDays}
               setSelectedDate={setSelectedDate}
             />
           ))}

@@ -7,11 +7,13 @@ import VisitChart from "@/components/Dashboard/VisitChart";
 import MonthView from "@/components/Calendar/MonthView";
 import EntryForm from "@/components/EntryForm/EntryForm";
 import LogTable from "@/components/Dashboard/LogTable";
+import PlannedDaysManager from "@/components/PlannedDays/PlannedDaysManager";
 import { mockEntries, mockWeeklyStats, getFilteredEntries, getEntriesForDate } from "@/lib/mockData";
-import { DateRange, FilterOptions, Entry } from "@/lib/types";
+import { DateRange, FilterOptions, Entry, PlannedDay } from "@/lib/types";
 import { subMonths } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Calendar, Plus, Calendar as CalendarIcon } from "lucide-react";
 
 const Index = () => {
   // Set up initial date range (last 3 months)
@@ -28,6 +30,9 @@ const Index = () => {
   // Set up selected date for calendar
   const [selectedDate, setSelectedDate] = useState(new Date());
   const selectedEntries = getEntriesForDate(mockEntries, selectedDate);
+  
+  // Set up planned days
+  const [plannedDays, setPlannedDays] = useState<PlannedDay[]>([]);
   
   // Filtered entries based on filters
   const [filteredEntries, setFilteredEntries] = useState(mockEntries);
@@ -77,12 +82,22 @@ const Index = () => {
               <LogTable entries={filteredEntries} />
             </div>
             
-            {/* Right sidebar with tabs for Calendar and Add Entry - right 1/3 */}
+            {/* Right sidebar with tabs for Calendar, Add Entry, and Planned Days - right 1/3 */}
             <div className="lg:col-span-1">
               <Tabs defaultValue="calendar" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="calendar">Calendar</TabsTrigger>
-                  <TabsTrigger value="add-entry">Add Entry</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="calendar" className="flex items-center">
+                    <CalendarIcon className="h-4 w-4 mr-1" />
+                    <span className="hidden sm:inline">Calendar</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="add-entry" className="flex items-center">
+                    <Plus className="h-4 w-4 mr-1" />
+                    <span className="hidden sm:inline">Add Entry</span>
+                  </TabsTrigger>
+                  <TabsTrigger value="planned" className="flex items-center">
+                    <Calendar className="h-4 w-4 mr-1" />
+                    <span className="hidden sm:inline">Plan</span>
+                  </TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="calendar" className="mt-4">
@@ -92,6 +107,7 @@ const Index = () => {
                         entries={mockEntries} 
                         selectedDate={selectedDate}
                         setSelectedDate={setSelectedDate}
+                        plannedDays={plannedDays}
                       />
                     </CardContent>
                   </Card>
@@ -103,6 +119,10 @@ const Index = () => {
                       <EntryForm compact={true} />
                     </CardContent>
                   </Card>
+                </TabsContent>
+                
+                <TabsContent value="planned" className="mt-4">
+                  <PlannedDaysManager onDaysChange={setPlannedDays} />
                 </TabsContent>
               </Tabs>
             </div>

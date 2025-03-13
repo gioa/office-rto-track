@@ -35,3 +35,10 @@ export interface WeeklyStats {
   totalWorkDays: number;
   percentage: number;
 }
+
+export interface PlannedDay {
+  userId: string;
+  userName: string;
+  weekday: number; // 0 for Sunday, 1 for Monday, etc.
+  department?: string;
+}

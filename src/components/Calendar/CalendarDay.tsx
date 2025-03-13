@@ -1,7 +1,7 @@
 
-import { isSameDay, isSameMonth, format } from "date-fns";
+import { isSameDay, isSameMonth, format, isAfter, isToday } from "date-fns";
 import { CircleCheck } from "lucide-react";
-import { Entry } from "@/lib/types";
+import { Entry, PlannedDay } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { Badge } from "@/components/ui/badge";
@@ -12,6 +12,7 @@ interface CalendarDayProps {
   currentMonth: Date;
   selectedDate: Date;
   entries: Entry[];
+  plannedDays?: PlannedDay[];
   setSelectedDate: (date: Date) => void;
 }
 
@@ -20,6 +21,7 @@ const CalendarDay = ({
   currentMonth, 
   selectedDate, 
   entries, 
+  plannedDays = [],
   setSelectedDate 
 }: CalendarDayProps) => {
   const dayEntries = getEntriesForDay(entries, day);
@@ -29,18 +31,23 @@ const CalendarDay = ({
   
   const entryType = getFirstEntryType(entries, day);
   
+  // Check if this day is a planned office day
+  const isPlannedDay = !isWeekend && isAfter(day, new Date()) && 
+    plannedDays.some(pd => pd.weekday === day.getDay());
+  
   const getDateClasses = (day: Date) => {
-    const isToday = isSameDay(day, new Date());
+    const isCurrentToday = isToday(day);
     const isSelected = isSameDay(day, selectedDate);
     const isCurrentMonth = isSameMonth(day, currentMonth);
-    const isWeekend = day.getDay() === 0 || day.getDay() === 6;
+    const isWeekendDay = day.getDay() === 0 || day.getDay() === 6;
     
     return cn(
       "calendar-day w-full h-12 sm:h-16 p-1 relative",
-      isToday && "calendar-day-today",
+      isCurrentToday && "calendar-day-today",
       isSelected && "calendar-day-active",
       !isCurrentMonth && "calendar-day-disabled",
-      isWeekend && "text-muted-foreground"
+      isWeekendDay && "text-muted-foreground",
+      isPlannedDay && "day-planned"
     );
   };
   
@@ -66,6 +73,12 @@ const CalendarDay = ({
                   (entryType === 'event' || entryType === 'holiday') && "text-purple-500"
                 )} 
               />
+            </div>
+          )}
+          
+          {isPlannedDay && !hasEntry && (
+            <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
+              <CircleCheck className="h-5 w-5 text-blue-300/50 opacity-70" />
             </div>
           )}
         </button>
@@ -94,6 +107,16 @@ const CalendarDay = ({
                 </div>
               ))}
             </div>
+          </div>
+        ) : isPlannedDay ? (
+          <div className="p-2">
+            <p className="text-sm font-medium">{format(day, 'EEEE, MMMM d, yyyy')}</p>
+            <p className="text-xs text-blue-600">Planned office day</p>
+            {plannedDays.filter(pd => pd.weekday === day.getDay()).map((pd, idx) => (
+              <div key={idx} className="text-xs text-muted-foreground mt-1">
+                {pd.userName && pd.userName !== "You" && `Also: ${pd.userName}`}
+              </div>
+            ))}
           </div>
         ) : (
           <div className="p-2">
