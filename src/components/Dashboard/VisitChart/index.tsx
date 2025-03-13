@@ -22,12 +22,12 @@ const VisitChart = ({ data }: VisitChartProps) => {
           Your RTO compliance (target: 3 days per week)
         </CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="h-[300px] w-full">
+      <CardContent className="pb-2">
+        <div className="h-[350px] w-full">
           <ChartContainer config={chartConfig}>
             <BarChart 
               data={chartData} 
-              margin={{ top: 10, right: 30, left: -10, bottom: 30 }}
+              margin={{ top: 10, right: 20, left: -10, bottom: 10 }}
               stackOffset="sign"
             >
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted)/0.3)" />
@@ -49,7 +49,7 @@ const VisitChart = ({ data }: VisitChartProps) => {
                 layout="horizontal"
                 verticalAlign="bottom"
                 align="center"
-                wrapperStyle={{ paddingTop: 10, paddingBottom: 10 }}
+                wrapperStyle={{ paddingTop: 10, paddingBottom: 5 }}
               />
               <ReferenceLine 
                 y={3} 
