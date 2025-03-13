@@ -45,7 +45,12 @@ const VisitChart = ({ data }: VisitChartProps) => {
                 allowDecimals={false}
               />
               <Tooltip content={<ChartTooltip />} />
-              <Legend />
+              <Legend 
+                layout="horizontal"
+                verticalAlign="bottom"
+                align="center"
+                wrapperStyle={{ paddingTop: 10 }}
+              />
               <ReferenceLine 
                 y={3} 
                 stroke="hsl(var(--primary)/0.5)" 
@@ -58,12 +63,12 @@ const VisitChart = ({ data }: VisitChartProps) => {
                 }} 
               />
               
-              {/* Office visits - always the base of the stack with bottom radius */}
+              {/* Office visits - always the base of the stack with no radius */}
               <Bar 
                 dataKey="daysInOffice" 
                 stackId="a"
                 fill="var(--color-office)" 
-                radius={[4, 4, 0, 0]} 
+                radius={0} 
                 maxBarSize={50} 
                 name="Office Days"
               />
