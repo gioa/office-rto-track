@@ -1,9 +1,11 @@
+
 import { WeeklyStats } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine, TooltipProps, Legend } from "recharts";
 import { mockEntries } from "@/lib/mockData";
 import { startOfWeek, endOfWeek } from "date-fns";
+import { ChartContainer, ChartConfig } from "@/components/ui/chart";
 
 interface VisitChartProps {
   data: WeeklyStats[];
@@ -19,6 +21,7 @@ interface EnhancedWeeklyStats extends WeeklyStats {
   displayPtoDays: number;
   displayEventDays: number;
   displayHolidayDays: number;
+  compliancePercentage: number;
 }
 
 const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>) => {
@@ -77,7 +80,7 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
           
           <div className="flex flex-col col-span-2">
             <span className="text-xs font-medium">Compliance</span>
-            <span className="text-xs">{Math.min(100, Math.round((data.daysInOffice / 3) * 100))}%</span>
+            <span className="text-xs">{data.compliancePercentage}%</span>
           </div>
         </div>
       </div>
@@ -85,6 +88,25 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
   }
 
   return null;
+};
+
+// Chart configuration with colors matching the calendar
+const chartConfig: ChartConfig = {
+  "office": {
+    color: "#10b981" // green-500
+  },
+  "sick": {
+    color: "#f97316" // orange-500 
+  },
+  "pto": {
+    color: "#3b82f6" // blue-500
+  },
+  "event": {
+    color: "#8b5cf6" // purple-500
+  },
+  "holiday": {
+    color: "#ec4899" // pink-500
+  }
 };
 
 const VisitChart = ({ data }: VisitChartProps) => {
@@ -120,6 +142,7 @@ const VisitChart = ({ data }: VisitChartProps) => {
       }
     });
     
+    // Calculate how many days we still need to reach the 3-day target
     const remainingNeeded = Math.max(0, 3 - week.daysInOffice);
     
     let displaySickDays = 0;
@@ -129,8 +152,11 @@ const VisitChart = ({ data }: VisitChartProps) => {
     
     let remaining = remainingNeeded;
     
-    displaySickDays = Math.min(remaining, sickDays);
-    remaining -= displaySickDays;
+    // Only include sick/pto/event/holiday days if we haven't reached 3 days yet
+    if (remaining > 0) {
+      displaySickDays = Math.min(remaining, sickDays);
+      remaining -= displaySickDays;
+    }
     
     if (remaining > 0) {
       displayPtoDays = Math.min(remaining, ptoDays);
@@ -146,6 +172,10 @@ const VisitChart = ({ data }: VisitChartProps) => {
       displayHolidayDays = Math.min(remaining, holidayDays);
     }
     
+    // Calculate compliance percentage - now counting all types toward the target
+    const totalCountedDays = Math.min(3, week.daysInOffice + displaySickDays + displayPtoDays + displayEventDays + displayHolidayDays);
+    const compliancePercentage = Math.min(100, Math.round((totalCountedDays / 3) * 100));
+    
     return {
       ...week,
       weekLabel: format(new Date(week.weekOf), 'MMM d'),
@@ -157,7 +187,7 @@ const VisitChart = ({ data }: VisitChartProps) => {
       displayPtoDays,
       displayEventDays,
       displayHolidayDays,
-      percentage: Math.min(100, (week.daysInOffice / 3) * 100)
+      compliancePercentage
     };
   });
   
@@ -171,7 +201,7 @@ const VisitChart = ({ data }: VisitChartProps) => {
       </CardHeader>
       <CardContent>
         <div className="h-[300px] w-full">
-          <ResponsiveContainer width="100%" height="100%">
+          <ChartContainer config={chartConfig}>
             <BarChart 
               data={chartData} 
               margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
@@ -204,48 +234,62 @@ const VisitChart = ({ data }: VisitChartProps) => {
                   fill: "hsl(var(--primary))" 
                 }} 
               />
+              
+              {/* Office visits - always the base of the stack with bottom radius */}
               <Bar 
                 dataKey="daysInOffice" 
                 stackId="a"
-                fill="hsl(var(--primary))" 
+                fill="var(--color-office)" 
                 radius={[4, 4, 0, 0]} 
                 maxBarSize={50} 
                 name="Office Days"
               />
+              
+              {/* Sick days with no radius (middle layers) */}
               <Bar 
                 dataKey="displaySickDays" 
                 stackId="a"
-                fill="hsl(var(--destructive)/0.7)" 
+                fill="var(--color-sick)" 
                 radius={[0, 0, 0, 0]} 
                 maxBarSize={50} 
                 name="Sick Days"
               />
+              
+              {/* PTO days with no radius (middle layers) */}
               <Bar 
                 dataKey="displayPtoDays" 
                 stackId="a"
-                fill="hsl(var(--secondary)/0.7)" 
+                fill="var(--color-pto)" 
                 radius={[0, 0, 0, 0]} 
                 maxBarSize={50} 
                 name="PTO Days"
               />
+              
+              {/* Events with no radius (middle layers) */}
               <Bar 
                 dataKey="displayEventDays" 
                 stackId="a"
-                fill="hsl(var(--accent)/0.7)" 
+                fill="var(--color-event)" 
                 radius={[0, 0, 0, 0]} 
                 maxBarSize={50} 
                 name="Events"
               />
+              
+              {/* Holidays - potential top layer with top radius */}
               <Bar 
                 dataKey="displayHolidayDays" 
                 stackId="a"
-                fill="hsl(217, 91%, 60%)" 
-                radius={[0, 0, 0, 0]} 
+                fill="var(--color-holiday)" 
+                radius={(datum) => {
+                  // Apply top radius only if this is the top of the stack
+                  const isTopOfStack = datum.displayHolidayDays > 0;
+                  return isTopOfStack ? [4, 4, 0, 0] : [0, 0, 0, 0];
+                }}
                 maxBarSize={50} 
                 name="Holidays"
               />
             </BarChart>
-          </ResponsiveContainer>
+          </ChartContainer>
         </div>
       </CardContent>
     </Card>
