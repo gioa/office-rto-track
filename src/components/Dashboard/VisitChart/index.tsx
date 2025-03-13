@@ -1,4 +1,3 @@
-
 import { WeeklyStats } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceLine, Legend } from "recharts";
@@ -6,13 +5,54 @@ import { ChartContainer } from "@/components/ui/chart";
 import { transformWeeklyStats } from "./utils";
 import ChartTooltip from "./ChartTooltip";
 import { chartConfig } from "./config";
+import { useWeeklyStats } from "@/hooks/useWeeklyStats";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface VisitChartProps {
-  data: WeeklyStats[];
+  data?: WeeklyStats[];
 }
 
 const VisitChart = ({ data }: VisitChartProps) => {
-  const chartData = transformWeeklyStats(data);
+  const { data: apiData, isLoading, error } = useWeeklyStats(10);
+  
+  const chartData = transformWeeklyStats(data || apiData || []);
+  
+  if (isLoading && !data) {
+    return (
+      <Card className="col-span-4 glass subtle-shadow animate-slide-up animation-delay-200">
+        <CardHeader>
+          <CardTitle>Weekly Office Visits</CardTitle>
+          <CardDescription>
+            Your RTO compliance (target: 3 days per week)
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pb-2">
+          <div className="h-[350px] w-full flex items-center justify-center">
+            <Skeleton className="h-[300px] w-full" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+  
+  if (error && !data) {
+    return (
+      <Card className="col-span-4 glass subtle-shadow animate-slide-up animation-delay-200">
+        <CardHeader>
+          <CardTitle>Weekly Office Visits</CardTitle>
+          <CardDescription>
+            Your RTO compliance (target: 3 days per week)
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="pb-2">
+          <div className="h-[350px] w-full flex items-center justify-center flex-col">
+            <p className="text-destructive">Failed to load chart data</p>
+            <p className="text-sm text-muted-foreground">Please try again later</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
   
   return (
     <Card className="col-span-4 glass subtle-shadow animate-slide-up animation-delay-200">
@@ -63,7 +103,6 @@ const VisitChart = ({ data }: VisitChartProps) => {
                 }} 
               />
               
-              {/* Office visits - always the base of the stack with no radius */}
               <Bar 
                 dataKey="daysInOffice" 
                 stackId="a"
@@ -73,7 +112,6 @@ const VisitChart = ({ data }: VisitChartProps) => {
                 name="Office Days"
               />
               
-              {/* Sick days with no radius (middle layers) */}
               <Bar 
                 dataKey="displaySickDays" 
                 stackId="a"
@@ -83,7 +121,6 @@ const VisitChart = ({ data }: VisitChartProps) => {
                 name="Sick Days"
               />
               
-              {/* PTO days with no radius (middle layers) */}
               <Bar 
                 dataKey="displayPtoDays" 
                 stackId="a"
@@ -93,7 +130,6 @@ const VisitChart = ({ data }: VisitChartProps) => {
                 name="PTO Days"
               />
               
-              {/* Events with no radius (middle layers) */}
               <Bar 
                 dataKey="displayEventDays" 
                 stackId="a"
@@ -103,7 +139,6 @@ const VisitChart = ({ data }: VisitChartProps) => {
                 name="Events"
               />
               
-              {/* Holidays - potential top layer with top radius */}
               <Bar 
                 dataKey="displayHolidayDays" 
                 stackId="a"

@@ -7,7 +7,7 @@ import MonthView from "@/components/Calendar/MonthView";
 import EntryFormDialog from "@/components/EntryForm/EntryFormDialog";
 import LogTable from "@/components/Dashboard/LogTable";
 import PlannedDaysManager from "@/components/PlannedDays/PlannedDaysManager";
-import { mockEntries, mockWeeklyStats, getFilteredEntries, getEntriesForDate } from "@/lib/mockData";
+import { mockEntries, getFilteredEntries, getEntriesForDate } from "@/lib/mockData";
 import { DateRange, FilterOptions, Entry, PlannedDay } from "@/lib/types";
 import { subMonths } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -73,7 +73,9 @@ const Index = () => {
               />
               
               <Stats entries={filteredEntries} dateRange={dateRange} />
-              <VisitChart data={mockWeeklyStats} />
+              
+              {/* Notice we're no longer passing the mockWeeklyStats - let the component fetch from API */}
+              <VisitChart />
               
               {/* Add Log Table below the chart */}
               <LogTable entries={filteredEntries} />
