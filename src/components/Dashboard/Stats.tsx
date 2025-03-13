@@ -122,7 +122,7 @@ const Stats = ({ entries, dateRange }: StatsProps) => {
       
       <Card className="glass subtle-shadow">
         <CardHeader className="flex flex-row items-center justify-between pb-2">
-          <CardTitle className="text-sm font-medium">Office Visits</CardTitle>
+          <CardTitle className="text-sm font-medium">Time Off</CardTitle>
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 24 24"
@@ -137,7 +137,7 @@ const Stats = ({ entries, dateRange }: StatsProps) => {
           </svg>
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{totalOfficeVisits}</div>
+          <div className="text-2xl font-bold">{totalSickDays + totalPTO}</div>
           <p className="text-xs text-muted-foreground">
             {totalSickDays} sick, {totalPTO} PTO days
           </p>

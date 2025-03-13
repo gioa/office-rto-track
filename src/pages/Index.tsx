@@ -6,6 +6,7 @@ import Stats from "@/components/Dashboard/Stats";
 import VisitChart from "@/components/Dashboard/VisitChart";
 import MonthView from "@/components/Calendar/MonthView";
 import EntryForm from "@/components/EntryForm/EntryForm";
+import LogTable from "@/components/Dashboard/LogTable";
 import { mockEntries, mockWeeklyStats, getFilteredEntries, getEntriesForDate } from "@/lib/mockData";
 import { DateRange, FilterOptions, Entry } from "@/lib/types";
 import { subMonths } from "date-fns";
@@ -71,6 +72,9 @@ const Index = () => {
               
               <Stats entries={filteredEntries} dateRange={dateRange} />
               <VisitChart data={mockWeeklyStats} />
+              
+              {/* Add Log Table below the chart */}
+              <LogTable entries={filteredEntries} />
             </div>
             
             {/* Right sidebar with tabs for Calendar and Add Entry - right 1/3 */}
