@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import FilterBar from "@/components/Dashboard/FilterBar";
@@ -84,9 +83,6 @@ const Index = () => {
             <div className="lg:col-span-1 space-y-6">
               {/* Calendar Card */}
               <Card className="glass subtle-shadow overflow-hidden">
-                <CardHeader className="p-4 pb-0">
-                  <CardTitle className="text-lg">Calendar</CardTitle>
-                </CardHeader>
                 <CardContent className="p-0">
                   <MonthView 
                     entries={mockEntries} 
