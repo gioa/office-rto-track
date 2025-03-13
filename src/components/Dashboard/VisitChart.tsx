@@ -1,23 +1,20 @@
-
 import { WeeklyStats } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine, TooltipProps, Legend } from "recharts";
 import { mockEntries } from "@/lib/mockData";
-import { startOfWeek, endOfWeek, isSameDay } from "date-fns";
+import { startOfWeek, endOfWeek } from "date-fns";
 
 interface VisitChartProps {
   data: WeeklyStats[];
 }
 
-// Extend the chart data with counts for each type
 interface EnhancedWeeklyStats extends WeeklyStats {
   weekLabel: string;
   sickDays: number;
   ptoDays: number;
   eventDays: number;
   holidayDays: number;
-  // The actual days to display for non-office types (only shown when needed)
   displaySickDays: number;
   displayPtoDays: number;
   displayEventDays: number;
@@ -91,22 +88,18 @@ const CustomTooltip = ({ active, payload, label }: TooltipProps<number, string>)
 };
 
 const VisitChart = ({ data }: VisitChartProps) => {
-  // Process the data to include counts for different entry types
   const chartData: EnhancedWeeklyStats[] = data.map(week => {
     const weekStart = startOfWeek(new Date(week.weekOf), { weekStartsOn: 0 });
     const weekEnd = endOfWeek(new Date(week.weekOf), { weekStartsOn: 0 });
     
-    // Count days by type for this week
     let sickDays = 0;
     let ptoDays = 0;
     let eventDays = 0;
     let holidayDays = 0;
     
-    // Count entries by type
     mockEntries.forEach(entry => {
       const entryDate = new Date(entry.date);
       if (entryDate >= weekStart && entryDate <= weekEnd) {
-        // Don't count weekends
         const day = entryDate.getDay();
         if (day === 0 || day === 6) return;
         
@@ -127,10 +120,8 @@ const VisitChart = ({ data }: VisitChartProps) => {
       }
     });
     
-    // Only display these days when office visits are under 3
     const remainingNeeded = Math.max(0, 3 - week.daysInOffice);
     
-    // Calculate how many of each type to display (prioritize in order)
     let displaySickDays = 0;
     let displayPtoDays = 0;
     let displayEventDays = 0;
@@ -138,23 +129,19 @@ const VisitChart = ({ data }: VisitChartProps) => {
     
     let remaining = remainingNeeded;
     
-    // Prioritize sick days first
     displaySickDays = Math.min(remaining, sickDays);
     remaining -= displaySickDays;
     
-    // Then PTO days
     if (remaining > 0) {
       displayPtoDays = Math.min(remaining, ptoDays);
       remaining -= displayPtoDays;
     }
     
-    // Then event days
     if (remaining > 0) {
       displayEventDays = Math.min(remaining, eventDays);
       remaining -= displayEventDays;
     }
     
-    // Finally holidays
     if (remaining > 0) {
       displayHolidayDays = Math.min(remaining, holidayDays);
     }
@@ -170,7 +157,6 @@ const VisitChart = ({ data }: VisitChartProps) => {
       displayPtoDays,
       displayEventDays,
       displayHolidayDays,
-      // Update percentage to be based on 3 days instead of total work days
       percentage: Math.min(100, (week.daysInOffice / 3) * 100)
     };
   });
