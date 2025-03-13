@@ -8,7 +8,7 @@ import MonthView from "@/components/Calendar/MonthView";
 import EntryForm from "@/components/EntryForm/EntryForm";
 import { mockEntries, mockWeeklyStats, getFilteredEntries, getEntriesForDate } from "@/lib/mockData";
 import { DateRange, FilterOptions, Entry } from "@/lib/types";
-import { addMonths, subMonths } from "date-fns";
+import { subMonths } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
