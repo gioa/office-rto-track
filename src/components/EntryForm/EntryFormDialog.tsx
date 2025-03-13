@@ -42,11 +42,12 @@ const EntryFormDialog = ({
               "shadow-md hover:shadow-lg transition-all duration-300 bg-primary hover:bg-primary/90 font-medium", 
               "hover:translate-y-[-2px]",
               "mt-6",
+              "text-white", // Add explicit text-white class
               className, 
               fullWidth ? "w-full" : ""
             )}
           >
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="h-4 w-4 mr-2 text-white" /> {/* Add text-white to the icon */}
             Add Entry
           </Button>
         )}
