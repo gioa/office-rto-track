@@ -103,11 +103,11 @@ const VisitChart = ({ data }: VisitChartProps) => {
                 dataKey="displayHolidayDays" 
                 stackId="a"
                 fill="var(--color-holiday)" 
-                radius={datum => {
+                radius={(datum) => {
                   // Apply top radius only if this is the top of the stack
-                  const isTopOfStack = datum.displayHolidayDays > 0;
-                  return isTopOfStack ? [4, 4, 0, 0] : 0;
-                }} 
+                  // Use explicit static array instead of conditional return
+                  return datum.displayHolidayDays > 0 ? [4, 4, 0, 0] : 0;
+                }}
                 maxBarSize={50} 
                 name="Holidays"
               />
