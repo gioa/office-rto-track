@@ -27,7 +27,7 @@ const VisitChart = ({ data }: VisitChartProps) => {
           <ChartContainer config={chartConfig}>
             <BarChart 
               data={chartData} 
-              margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+              margin={{ top: 10, right: 30, left: -10, bottom: 30 }}
               stackOffset="sign"
             >
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted)/0.3)" />
@@ -49,7 +49,7 @@ const VisitChart = ({ data }: VisitChartProps) => {
                 layout="horizontal"
                 verticalAlign="bottom"
                 align="center"
-                wrapperStyle={{ paddingTop: 10 }}
+                wrapperStyle={{ paddingTop: 10, paddingBottom: 10 }}
               />
               <ReferenceLine 
                 y={3} 
