@@ -87,13 +87,17 @@ export const generateMockEntries = (): Entry[] => {
 
   holidays.forEach((holiday, index) => {
     if (holiday.date >= threeMonthsAgo && holiday.date <= today) {
-      entries.push({
-        id: `holiday-${index}`,
-        date: holiday.date,
-        type: 'holiday',
-        note: holiday.name,
-        userId: 'company',
-      });
+      // Skip adding holidays on weekends
+      const day = holiday.date.getDay();
+      if (day !== 0 && day !== 6) {
+        entries.push({
+          id: `holiday-${index}`,
+          date: holiday.date,
+          type: 'holiday',
+          note: holiday.name,
+          userId: 'company',
+        });
+      }
     }
   });
 
