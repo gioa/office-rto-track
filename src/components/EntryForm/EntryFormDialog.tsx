@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
 import EntryForm from "./EntryForm";
+import { cn } from "@/lib/utils";
 
 interface EntryFormDialogProps {
   date?: Date;
@@ -26,7 +27,7 @@ const EntryFormDialog = ({
   buttonSize = "default",
   className,
   children,
-  fullWidth = false,
+  fullWidth = true,
 }: EntryFormDialogProps) => {
   return (
     <Dialog>
@@ -37,8 +38,7 @@ const EntryFormDialog = ({
           <Button 
             variant={buttonVariant} 
             size={buttonSize}
-            className={className}
-            {...(fullWidth && { className: "w-full" })}
+            className={cn(className, fullWidth ? "w-full" : "")}
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Entry
