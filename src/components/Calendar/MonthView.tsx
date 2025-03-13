@@ -32,6 +32,26 @@ const MonthView = ({
   
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   
+  // Get the planned weekdays as an array to use for styling
+  const getPlannedDaysModifier = () => {
+    const today = new Date();
+    const futureDates: Record<string, Date> = {};
+    
+    // Create a map of planned days in the future
+    // For each day in the current month, check if it's a planned office day
+    daysInMonth.forEach(day => {
+      if (
+        day.getTime() > today.getTime() && // Only future dates
+        day.getDay() !== 0 && day.getDay() !== 6 && // Not weekend
+        plannedDays.some(pd => pd.weekday === day.getDay()) // Is a planned day
+      ) {
+        futureDates[format(day, 'yyyy-MM-dd')] = day;
+      }
+    });
+    
+    return futureDates;
+  };
+  
   return (
     <Card className="glass subtle-shadow animate-slide-up animation-delay-100">
       <CalendarHeader 

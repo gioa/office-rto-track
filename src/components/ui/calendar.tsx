@@ -50,12 +50,15 @@ function Calendar({
         day_range_middle:
           "aria-selected:bg-accent aria-selected:text-accent-foreground",
         day_hidden: "invisible",
-        day_planned: "border-2 border-dashed border-blue-300/50", // Add a new class for planned days
         ...classNames,
       }}
       components={{
         IconLeft: ({ ..._props }) => <ChevronLeft className="h-4 w-4" />,
         IconRight: ({ ..._props }) => <ChevronRight className="h-4 w-4" />,
+      }}
+      modifiersClassNames={{
+        // This is how we need to define custom modifiers
+        planned: "border-2 border-dashed border-blue-300/50"
       }}
       {...props}
     />

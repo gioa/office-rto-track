@@ -47,7 +47,7 @@ const CalendarDay = ({
       isSelected && "calendar-day-active",
       !isCurrentMonth && "calendar-day-disabled",
       isWeekendDay && "text-muted-foreground",
-      isPlannedDay && "day-planned"
+      isPlannedDay && "planned" // Changed from day-planned to planned
     );
   };
   
