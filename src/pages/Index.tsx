@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import FilterBar from "@/components/Dashboard/FilterBar";
@@ -108,8 +109,8 @@ const Index = () => {
             setIncludeEvents={setIncludeEvents}
           />
           
-          <div className="grid grid-cols-1 lg:grid-cols-1 gap-6">
-            <div className="space-y-6">
+          <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <div className="lg:col-span-3 space-y-6">
               <Stats entries={filteredEntries} dateRange={dateRange} />
               <VisitChart data={mockWeeklyStats} />
             </div>
