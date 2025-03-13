@@ -69,7 +69,7 @@ const PlannedDaysManager = ({ onDaysChange }: PlannedDaysManagerProps) => {
   };
 
   return (
-    <Card className="glass subtle-shadow overflow-hidden">
+    <Card className="bg-card shadow-sm overflow-hidden">
       <CardContent className="p-0">
         <Tabs defaultValue="my-days">
           <TabsList className="w-full grid grid-cols-2">
