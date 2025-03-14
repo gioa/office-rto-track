@@ -10,6 +10,7 @@ import EntryFormDialog from "@/components/EntryForm/EntryFormDialog";
 import { getEntriesForDay, getFirstEntryType, formatEntryType, isWeekend } from "./utils";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { useEntries } from "@/hooks/entries";
+import { useEffect, useState } from "react";
 
 interface CalendarDayProps {
   day: Date;
@@ -31,6 +32,7 @@ const CalendarDay = ({
   // Use the consistent isWeekend helper
   const dayIsWeekend = isWeekend(day);
   const { addEntry } = useEntries();
+  const [tooltipOpen, setTooltipOpen] = useState(false);
   
   // Force empty entries array for weekend days
   const filteredEntries = dayIsWeekend ? [] : getEntriesForDay(entries, day);
@@ -53,6 +55,13 @@ const CalendarDay = ({
   // Check if we have a user entry (sick, pto, event, holiday) that can be deleted
   const isDeletableEntry = hasEntry && !isOfficeVisit;
   
+  // Close tooltip when a dialog is opened
+  const handleDialogOpenChange = (open: boolean) => {
+    if (open) {
+      setTooltipOpen(false);
+    }
+  };
+  
   const getDateClasses = (day: Date) => {
     const isCurrentToday = isToday(day);
     const isSelected = isSameDay(day, selectedDate);
@@ -74,11 +83,18 @@ const CalendarDay = ({
   };
 
   return (
-    <Tooltip delayDuration={300}>
+    <Tooltip 
+      delayDuration={300} 
+      open={tooltipOpen}
+      onOpenChange={setTooltipOpen}
+    >
       <TooltipTrigger asChild>
         <button
           type="button"
-          onClick={() => setSelectedDate(day)}
+          onClick={() => {
+            setSelectedDate(day);
+            setTooltipOpen(true);
+          }}
           className={getDateClasses(day)}
           disabled={!isSameMonth(day, currentMonth)}
         >
@@ -108,7 +124,7 @@ const CalendarDay = ({
         </button>
       </TooltipTrigger>
       
-      <TooltipContent align="center" className="p-0 w-64" side="top" onClick={handleTooltipContentClick}>
+      <TooltipContent align="center" className="p-0 w-64 tooltip-content" side="top" onClick={handleTooltipContentClick}>
         {filteredEntries.length > 0 && !dayIsWeekend ? (
           <div className="p-2">
             <p className="text-sm font-medium mb-1">{format(day, 'EEEE, MMMM d, yyyy')}</p>
@@ -136,9 +152,18 @@ const CalendarDay = ({
               {isOfficeVisit ? (
                 <p className="text-xs text-muted-foreground text-center">Office visit entries cannot be modified</p>
               ) : isDeletableEntry && filteredEntries[0] ? (
-                <DeleteEntryButton entry={filteredEntries[0]} />
+                <DeleteEntryButton 
+                  entry={filteredEntries[0]} 
+                  onOpenChange={handleDialogOpenChange} 
+                />
               ) : (
-                <EntryFormDialog date={day} buttonVariant="outline" buttonSize="sm" fullWidth>
+                <EntryFormDialog 
+                  date={day} 
+                  buttonVariant="outline" 
+                  buttonSize="sm" 
+                  fullWidth
+                  onOpenChange={handleDialogOpenChange}
+                >
                   <Button variant="outline" size="sm" className="w-full text-xs">
                     <Plus className="h-3 w-3 mr-1" />
                     Add Entry
@@ -157,7 +182,13 @@ const CalendarDay = ({
               </div>
             ))}
             <div className="mt-2 pt-2 border-t border-border">
-              <EntryFormDialog date={day} buttonVariant="outline" buttonSize="sm" fullWidth>
+              <EntryFormDialog 
+                date={day} 
+                buttonVariant="outline" 
+                buttonSize="sm" 
+                fullWidth
+                onOpenChange={handleDialogOpenChange}
+              >
                 <Button variant="outline" size="sm" className="w-full text-xs">
                   <Plus className="h-3 w-3 mr-1" />
                   Add Entry
@@ -173,7 +204,13 @@ const CalendarDay = ({
             </p>
             {!dayIsWeekend && (
               <div className="mt-2 pt-2 border-t border-border">
-                <EntryFormDialog date={day} buttonVariant="outline" buttonSize="sm" fullWidth>
+                <EntryFormDialog 
+                  date={day} 
+                  buttonVariant="outline" 
+                  buttonSize="sm" 
+                  fullWidth
+                  onOpenChange={handleDialogOpenChange}
+                >
                   <Button variant="outline" size="sm" className="w-full text-xs">
                     <Plus className="h-3 w-3 mr-1" />
                     Add Entry
@@ -189,7 +226,7 @@ const CalendarDay = ({
 };
 
 // Delete Entry Button Component
-const DeleteEntryButton = ({ entry }: { entry: Entry }) => {
+const DeleteEntryButton = ({ entry, onOpenChange }: { entry: Entry, onOpenChange?: (open: boolean) => void }) => {
   const { deleteEntry } = useEntries();
   
   const handleDelete = async () => {
@@ -197,14 +234,17 @@ const DeleteEntryButton = ({ entry }: { entry: Entry }) => {
   };
   
   return (
-    <AlertDialog>
+    <AlertDialog onOpenChange={onOpenChange}>
       <AlertDialogTrigger asChild>
         <Button variant="outline" size="sm" className="w-full text-xs text-destructive hover:text-destructive">
           <Trash2 className="h-3 w-3 mr-1" />
           Delete Entry
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+      <AlertDialogContent 
+        onClick={(e) => e.stopPropagation()}
+        className="alert-dialog-content"
+      >
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Entry</AlertDialogTitle>
           <AlertDialogDescription>

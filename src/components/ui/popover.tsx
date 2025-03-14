@@ -32,7 +32,12 @@ const PopoverContent = React.forwardRef<
           target.closest('.rdp') ||
           target.closest('.rdp-day') ||
           target.closest('.popover-content') ||
-          target.closest('.calendar')
+          target.closest('.calendar') ||
+          // Additional selectors for common modal-related elements
+          target.closest('.dialog-content') ||
+          target.closest('.dialog-overlay') ||
+          target.closest('.alert-dialog-overlay') ||
+          target.closest('.alert-dialog-content')
         ) {
           e.preventDefault();
         }

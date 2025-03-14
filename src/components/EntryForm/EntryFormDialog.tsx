@@ -21,6 +21,7 @@ interface EntryFormDialogProps {
   className?: string;
   children?: React.ReactNode;
   fullWidth?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 const EntryFormDialog = ({
@@ -30,13 +31,22 @@ const EntryFormDialog = ({
   className,
   children,
   fullWidth = true,
+  onOpenChange,
 }: EntryFormDialogProps) => {
   const [open, setOpen] = useState(false);
   const { addEntry } = useEntries();
 
+  const handleOpenChange = (openState: boolean) => {
+    setOpen(openState);
+    // Call the parent's onOpenChange handler if provided
+    if (onOpenChange) {
+      onOpenChange(openState);
+    }
+  };
+
   const handleSubmitComplete = (keepOpen: boolean) => {
     if (!keepOpen) {
-      setOpen(false);
+      handleOpenChange(false);
     }
   };
 
@@ -44,11 +54,11 @@ const EntryFormDialog = ({
     // Stop propagation to prevent parent elements from capturing the click
     e.stopPropagation();
     // Set the dialog to open
-    setOpen(true);
+    handleOpenChange(true);
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild onClick={handleTriggerClick}>
         {children ? (
           children
@@ -68,7 +78,7 @@ const EntryFormDialog = ({
         )}
       </DialogTrigger>
       <DialogContent 
-        className="sm:max-w-[425px]" 
+        className="sm:max-w-[425px] dialog-content" 
         onClick={(e) => e.stopPropagation()}
         onPointerDownOutside={(e) => {
           // Prevent closing when clicking inside calendar elements
