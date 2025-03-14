@@ -1,5 +1,4 @@
-
-import { WeeklyStats } from "@/lib/types";
+import { Entry, WeeklyStats } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceLine, Legend, ResponsiveContainer } from "recharts";
 import { transformWeeklyStats } from "./utils";
@@ -7,18 +6,32 @@ import ChartTooltip from "./ChartTooltip";
 import { chartConfig } from "./config";
 import { useWeeklyStats } from "@/hooks/useWeeklyStats";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useMemo } from "react";
+import { generateWeeklyStats } from "@/lib/data/statsGenerator";
 
 interface VisitChartProps {
-  data?: WeeklyStats[];
+  entries?: Entry[];
+  dateRange?: {
+    from: Date | undefined;
+    to: Date | undefined;
+  };
 }
 
-const VisitChart = ({ data }: VisitChartProps) => {
+const VisitChart = ({ entries, dateRange }: VisitChartProps) => {
   const { data: apiData, isLoading, error } = useWeeklyStats(10);
   
-  // Ensure we have data to display
-  const chartData = transformWeeklyStats(data || apiData || []);
+  // Generate weekly stats from filtered entries if provided
+  const filteredStats = useMemo(() => {
+    if (entries) {
+      return generateWeeklyStats(entries);
+    }
+    return null;
+  }, [entries]);
   
-  if (isLoading && !data) {
+  // Ensure we have data to display - prioritize filtered data if available
+  const chartData = transformWeeklyStats(filteredStats || apiData || []);
+  
+  if (isLoading && !entries && !filteredStats) {
     return (
       <Card className="col-span-4 glass subtle-shadow animate-slide-up animation-delay-200">
         <CardHeader>
@@ -36,7 +49,7 @@ const VisitChart = ({ data }: VisitChartProps) => {
     );
   }
   
-  if (error && !data && (!chartData || chartData.length === 0)) {
+  if (error && !entries && !filteredStats && (!chartData || chartData.length === 0)) {
     return (
       <Card className="col-span-4 glass subtle-shadow animate-slide-up animation-delay-200">
         <CardHeader>

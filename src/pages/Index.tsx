@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import FilterBar from "@/components/Dashboard/FilterBar";
@@ -7,10 +8,11 @@ import MonthView from "@/components/Calendar/MonthView";
 import EntryFormDialog from "@/components/EntryForm/EntryFormDialog";
 import LogTable from "@/components/Dashboard/LogTable";
 import PlannedDaysManager from "@/components/PlannedDays/PlannedDaysManager";
-import { mockEntries, getFilteredEntries, getEntriesForDate } from "@/lib/mockData";
+import { mockEntries, getEntriesForDate } from "@/lib/mockData";
 import { DateRange, FilterOptions, Entry, PlannedDay } from "@/lib/types";
 import { subMonths } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getFilteredEntries } from "@/lib/utils/entryFilters";
 
 const Index = () => {
   // Set up initial date range (last 3 months)
@@ -32,7 +34,7 @@ const Index = () => {
   const [plannedDays, setPlannedDays] = useState<PlannedDay[]>([]);
   
   // Filtered entries based on filters
-  const [filteredEntries, setFilteredEntries] = useState(mockEntries);
+  const [filteredEntries, setFilteredEntries] = useState<Entry[]>(mockEntries);
   
   // Update filtered entries when filters change
   useEffect(() => {
@@ -74,8 +76,8 @@ const Index = () => {
               
               <Stats entries={filteredEntries} dateRange={dateRange} />
               
-              {/* Notice we're no longer passing the mockWeeklyStats - let the component fetch from API */}
-              <VisitChart />
+              {/* Pass the filtered entries to the chart */}
+              <VisitChart entries={filteredEntries} dateRange={dateRange} />
               
               {/* Add Log Table below the chart */}
               <LogTable entries={filteredEntries} />
@@ -87,7 +89,7 @@ const Index = () => {
               <Card className="glass subtle-shadow overflow-hidden">
                 <CardContent className="p-0">
                   <MonthView 
-                    entries={mockEntries} 
+                    entries={filteredEntries} 
                     selectedDate={selectedDate}
                     setSelectedDate={setSelectedDate}
                     plannedDays={plannedDays}

@@ -1,5 +1,5 @@
 
-import { Entry } from '../types';
+import { Entry, FilterOptions } from '../types';
 
 // Count entries by type
 export const countEntriesByType = (entries: Entry[], type: Entry['type']): number => {

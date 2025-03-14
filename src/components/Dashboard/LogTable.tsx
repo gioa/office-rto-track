@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { format } from "date-fns";
 import { Entry } from "@/lib/types";
@@ -20,6 +19,11 @@ interface LogTableProps {
 const LogTable = ({ entries }: LogTableProps) => {
   const [page, setPage] = useState(0);
   const itemsPerPage = 5;
+  
+  // Reset pagination when entries change
+  useState(() => {
+    setPage(0);
+  }, [entries]);
   
   // Sort entries by date (newest first)
   const sortedEntries = [...entries].sort((a, b) => 
@@ -95,7 +99,7 @@ const LogTable = ({ entries }: LogTableProps) => {
         {sortedEntries.length > itemsPerPage && (
           <div className="flex justify-between items-center mt-4">
             <div className="text-sm text-muted-foreground">
-              Showing {page * itemsPerPage + 1} to {Math.min((page + 1) * itemsPerPage, sortedEntries.length)} of {sortedEntries.length} entries
+              Showing {sortedEntries.length > 0 ? page * itemsPerPage + 1 : 0} to {Math.min((page + 1) * itemsPerPage, sortedEntries.length)} of {sortedEntries.length} entries
             </div>
             <div className="flex gap-2">
               <button 

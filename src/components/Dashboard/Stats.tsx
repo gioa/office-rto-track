@@ -1,15 +1,13 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Entry } from "@/lib/types";
-import { countEntriesByType, countEntriesInDateRange } from "@/lib/mockData";
+import { Entry, DateRange } from "@/lib/types";
+import { countEntriesByType, countEntriesInDateRange } from "@/lib/utils/entryFilters";
 import { Activity, ShieldCheck, Calendar, Building } from "lucide-react";
+import { useEffect, useState } from "react";
 
 interface StatsProps {
   entries: Entry[];
-  dateRange: {
-    from: Date | undefined;
-    to: Date | undefined;
-  };
+  dateRange: DateRange;
 }
 
 // Top office locations for the mock data
@@ -20,29 +18,48 @@ const officeLocations = [
 ];
 
 const Stats = ({ entries, dateRange }: StatsProps) => {
-  // Calculate metrics
-  const totalOfficeVisits = countEntriesByType(entries, 'office-visit');
-  const totalSickDays = countEntriesByType(entries, 'sick');
-  const totalPTO = countEntriesByType(entries, 'pto');
-  
-  // Calculate weekly average (if date range is set)
-  let weeklyAverage = 0;
-  if (dateRange.from && dateRange.to) {
-    const daysDiff = Math.round((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24));
-    const weeks = Math.max(1, Math.round(daysDiff / 7));
-    const officeVisitsInRange = countEntriesInDateRange(entries, dateRange.from, dateRange.to, 'office-visit');
-    weeklyAverage = Math.round((officeVisitsInRange / weeks) * 10) / 10;
-  }
-  
-  // Calculate compliance
-  let complianceRate = 0;
-  if (dateRange.from && dateRange.to) {
-    const officeVisitsInRange = countEntriesInDateRange(entries, dateRange.from, dateRange.to, 'office-visit');
-    const workdays = countWorkdays(dateRange.from, dateRange.to);
-    const weeks = Math.max(1, Math.round(workdays / 5));
-    const requiredDays = weeks * 3; // 3 days per week policy
-    complianceRate = Math.min(100, Math.round((officeVisitsInRange / requiredDays) * 100));
-  }
+  const [stats, setStats] = useState({
+    totalOfficeVisits: 0,
+    totalSickDays: 0,
+    totalPTO: 0,
+    weeklyAverage: 0,
+    complianceRate: 0
+  });
+
+  // Recalculate stats when entries or dateRange changes
+  useEffect(() => {
+    // Calculate metrics
+    const totalOfficeVisits = countEntriesByType(entries, 'office-visit');
+    const totalSickDays = countEntriesByType(entries, 'sick');
+    const totalPTO = countEntriesByType(entries, 'pto');
+    
+    // Calculate weekly average (if date range is set)
+    let weeklyAverage = 0;
+    if (dateRange.from && dateRange.to) {
+      const daysDiff = Math.round((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24));
+      const weeks = Math.max(1, Math.round(daysDiff / 7));
+      const officeVisitsInRange = countEntriesInDateRange(entries, dateRange.from, dateRange.to, 'office-visit');
+      weeklyAverage = Math.round((officeVisitsInRange / weeks) * 10) / 10;
+    }
+    
+    // Calculate compliance
+    let complianceRate = 0;
+    if (dateRange.from && dateRange.to) {
+      const officeVisitsInRange = countEntriesInDateRange(entries, dateRange.from, dateRange.to, 'office-visit');
+      const workdays = countWorkdays(dateRange.from, dateRange.to);
+      const weeks = Math.max(1, Math.round(workdays / 5));
+      const requiredDays = weeks * 3; // 3 days per week policy
+      complianceRate = Math.min(100, Math.round((officeVisitsInRange / requiredDays) * 100));
+    }
+
+    setStats({
+      totalOfficeVisits,
+      totalSickDays,
+      totalPTO,
+      weeklyAverage,
+      complianceRate
+    });
+  }, [entries, dateRange]);
   
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 animate-slide-up animation-delay-100">
@@ -52,7 +69,7 @@ const Stats = ({ entries, dateRange }: StatsProps) => {
           <Activity className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{weeklyAverage}</div>
+          <div className="text-2xl font-bold">{stats.weeklyAverage}</div>
           <p className="text-xs text-muted-foreground">days in office per week</p>
         </CardContent>
       </Card>
@@ -63,7 +80,7 @@ const Stats = ({ entries, dateRange }: StatsProps) => {
           <ShieldCheck className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{complianceRate}%</div>
+          <div className="text-2xl font-bold">{stats.complianceRate}%</div>
           <p className="text-xs text-muted-foreground">of required office days</p>
         </CardContent>
       </Card>
@@ -74,9 +91,9 @@ const Stats = ({ entries, dateRange }: StatsProps) => {
           <Calendar className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{totalSickDays + totalPTO}</div>
+          <div className="text-2xl font-bold">{stats.totalSickDays + stats.totalPTO}</div>
           <p className="text-xs text-muted-foreground">
-            {totalSickDays} sick, {totalPTO} PTO days
+            {stats.totalSickDays} sick, {stats.totalPTO} PTO days
           </p>
         </CardContent>
       </Card>
