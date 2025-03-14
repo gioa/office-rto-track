@@ -1,4 +1,3 @@
-
 export type EntryType = 'office-visit' | 'sick' | 'pto' | 'event' | 'holiday';
 
 export interface Entry {
@@ -7,6 +6,7 @@ export interface Entry {
   type: EntryType;
   note?: string;
   userId: string; // For actual user identification in a real app
+  officeLocation?: string; // Added office location property
 }
 
 export interface User {

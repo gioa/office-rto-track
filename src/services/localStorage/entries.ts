@@ -19,6 +19,7 @@ export const getAllEntries = async (): Promise<Entry[]> => {
     date: new Date(badge.date),
     type: 'office-visit',
     userId: badge.email === currentUser.email ? currentUser.id : badge.email,
+    officeLocation: badge.officeLocation || 'Unknown', // Include the office location
   }));
   
   // Convert user entries to Entry format
