@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { Entry } from "@/lib/types";
@@ -70,13 +71,13 @@ const LogTable = ({ entries }: LogTableProps) => {
 
   const handleNextPage = () => {
     if (page < totalPages - 1) {
-      setPage(p => p + 1);
+      setPage(page + 1);
     }
   };
 
   const handlePrevPage = () => {
     if (page > 0) {
-      setPage(p => p - 1);
+      setPage(page - 1);
     }
   };
 
@@ -149,7 +150,7 @@ const LogTable = ({ entries }: LogTableProps) => {
               <PaginationContent>
                 <PaginationItem>
                   <PaginationPrevious 
-                    onClick={handlePrevPage} 
+                    onClick={() => handlePrevPage()} 
                     className={page === 0 ? 'pointer-events-none opacity-50' : ''}
                   />
                 </PaginationItem>
@@ -167,7 +168,7 @@ const LogTable = ({ entries }: LogTableProps) => {
                 
                 <PaginationItem>
                   <PaginationNext 
-                    onClick={handleNextPage}
+                    onClick={() => handleNextPage()}
                     className={page >= totalPages - 1 ? 'pointer-events-none opacity-50' : ''}
                   />
                 </PaginationItem>

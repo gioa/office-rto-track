@@ -37,6 +37,7 @@ PaginationItem.displayName = "PaginationItem"
 
 type PaginationLinkProps = {
   isActive?: boolean
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void
 } & Pick<ButtonProps, "size"> &
   React.ComponentProps<"button">
 
@@ -57,10 +58,7 @@ const PaginationLink = ({
       }),
       className
     )}
-    onClick={(e) => {
-      e.preventDefault();
-      if (onClick) onClick(e);
-    }}
+    onClick={onClick}
     {...props}
   />
 )
