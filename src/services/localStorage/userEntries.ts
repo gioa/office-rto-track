@@ -2,7 +2,7 @@
 /**
  * Supabase operations for user entries
  */
-import { UserEntry } from "@/lib/types";
+import { UserEntry, EntryType } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 import { initializeStorage } from "./initialize";
 
@@ -24,7 +24,7 @@ export const getUserEntries = async (): Promise<UserEntry[]> => {
     email: entry.email,
     date: new Date(entry.date),
     dayOfWeek: entry.day_of_week,
-    type: entry.type,
+    type: entry.type as EntryType, // Cast to EntryType
     note: entry.note
   }));
 };
@@ -45,7 +45,7 @@ export const getUserEntriesByEmail = async (email: string): Promise<UserEntry[]>
     email: entry.email,
     date: new Date(entry.date),
     dayOfWeek: entry.day_of_week,
-    type: entry.type,
+    type: entry.type as EntryType, // Cast to EntryType
     note: entry.note
   }));
 };
@@ -57,7 +57,7 @@ export const addUserEntry = async (entry: Omit<UserEntry, 'id'>): Promise<UserEn
       email: entry.email,
       date: entry.date.toISOString(),
       day_of_week: entry.dayOfWeek,
-      type: entry.type,
+      type: entry.type, // This is already EntryType from the parameter
       note: entry.note
     })
     .select()
@@ -73,7 +73,7 @@ export const addUserEntry = async (entry: Omit<UserEntry, 'id'>): Promise<UserEn
     email: data.email,
     date: new Date(data.date),
     dayOfWeek: data.day_of_week,
-    type: data.type,
+    type: data.type as EntryType, // Cast to EntryType
     note: data.note
   };
 };
