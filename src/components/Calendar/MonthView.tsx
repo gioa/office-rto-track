@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, startOfWeek } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Entry, PlannedDay } from "@/lib/types";
 import CalendarHeader from "./CalendarHeader";
@@ -25,10 +25,14 @@ const MonthView = ({
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const firstDayOfMonth = startOfMonth(currentMonth);
   const lastDayOfMonth = endOfMonth(currentMonth);
+  
+  // Generate days for the calendar view, ensuring we start from the first day of the week
+  // containing the first of the month, ensuring correct alignment
   const daysInMonth = eachDayOfInterval({
-    start: firstDayOfMonth,
+    start: startOfWeek(firstDayOfMonth, { weekStartsOn: 0 }), // Explicitly use Sunday (0) as start
     end: lastDayOfMonth
   });
+  
   const previousMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
   const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
   const goToday = () => setCurrentMonth(new Date());

@@ -52,7 +52,7 @@ const EntryDateSelector = ({ control, selectedType }: EntryDateSelectorProps) =>
                 </Button>
               </FormControl>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
+            <PopoverContent className="w-auto p-0 z-50" align="start">
               {isPtoOrEvent ? (
                 // Range selector for PTO and events
                 <Calendar
@@ -61,6 +61,7 @@ const EntryDateSelector = ({ control, selectedType }: EntryDateSelectorProps) =>
                   onSelect={field.onChange}
                   initialFocus
                   className={cn("p-3 pointer-events-auto")}
+                  weekStartsOn={0} // Explicitly set to Sunday
                 />
               ) : (
                 // Single date selector for other entry types
@@ -70,6 +71,7 @@ const EntryDateSelector = ({ control, selectedType }: EntryDateSelectorProps) =>
                   onSelect={field.onChange}
                   initialFocus
                   className={cn("p-3 pointer-events-auto")}
+                  weekStartsOn={0} // Explicitly set to Sunday
                   // For office visits and sick days, we only allow weekdays
                   disabled={(date) => 
                     (selectedType === "office-visit" || selectedType === "sick") ? 
