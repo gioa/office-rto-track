@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
@@ -6,12 +7,14 @@ import CalendarHeader from "./CalendarHeader";
 import CalendarDay from "./CalendarDay";
 import CalendarLegend from "./CalendarLegend";
 import EntryFormDialog from "@/components/EntryForm/EntryFormDialog";
+
 interface MonthViewProps {
   entries: Entry[];
   selectedDate: Date;
   setSelectedDate: (date: Date) => void;
   plannedDays?: PlannedDay[];
 }
+
 const MonthView = ({
   entries,
   selectedDate,
@@ -49,9 +52,11 @@ const MonthView = ({
     });
     return futureDates;
   };
-  return <Card className="glass subtle-shadow animate-slide-up animation-delay-100">
+  
+  return (
+    <Card className="glass subtle-shadow animate-slide-up animation-delay-100">
       <CalendarHeader currentMonth={currentMonth} previousMonth={previousMonth} nextMonth={nextMonth} goToday={goToday} />
-      <CardContent className="Fix the data in the calendar view, don't show checkmark for Sat and Sun.">
+      <CardContent>
         <div className="grid grid-cols-7 gap-1">
           {dayNames.map(day => <div key={day} className="text-center text-xs font-medium py-1">
               {day}
@@ -67,6 +72,8 @@ const MonthView = ({
           <EntryFormDialog buttonVariant="outline" buttonSize="sm" />
         </div>
       </CardContent>
-    </Card>;
+    </Card>
+  );
 };
+
 export default MonthView;

@@ -85,7 +85,8 @@ const CalendarDay = ({
             </div>
           )}
           
-          {isPlannedDay && !hasEntry && (
+          {/* Never show planned checkmarks on weekends */}
+          {isPlannedDay && !hasEntry && !isWeekend && (
             <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
               <CircleCheck className="h-5 w-5 text-blue-300/50 opacity-70" />
             </div>
