@@ -22,6 +22,38 @@ export const generateWeeklyStats = (entries: Entry[]): WeeklyStats[] => {
              entryDate <= weekEnd;
     }).length;
     
+    // Count sick days for this week
+    const sickDays = entries.filter(entry => {
+      const entryDate = new Date(entry.date);
+      return entry.type === 'sick' && 
+             entryDate >= weekStart && 
+             entryDate <= weekEnd;
+    }).length;
+    
+    // Count PTO days for this week
+    const ptoDays = entries.filter(entry => {
+      const entryDate = new Date(entry.date);
+      return entry.type === 'pto' && 
+             entryDate >= weekStart && 
+             entryDate <= weekEnd;
+    }).length;
+    
+    // Count event days for this week
+    const eventDays = entries.filter(entry => {
+      const entryDate = new Date(entry.date);
+      return entry.type === 'event' && 
+             entryDate >= weekStart && 
+             entryDate <= weekEnd;
+    }).length;
+    
+    // Count holiday days for this week
+    const holidayDays = entries.filter(entry => {
+      const entryDate = new Date(entry.date);
+      return entry.type === 'holiday' && 
+             entryDate >= weekStart && 
+             entryDate <= weekEnd;
+    }).length;
+    
     // Calculate working days (excluding weekends)
     let totalWorkDays = 0;
     for (let d = new Date(weekStart); d <= weekEnd; d.setDate(d.getDate() + 1)) {
@@ -33,7 +65,11 @@ export const generateWeeklyStats = (entries: Entry[]): WeeklyStats[] => {
       weekOf: weekStart,
       daysInOffice,
       totalWorkDays,
-      percentage: totalWorkDays > 0 ? (daysInOffice / totalWorkDays) * 100 : 0
+      percentage: totalWorkDays > 0 ? (daysInOffice / totalWorkDays) * 100 : 0,
+      sickDays,
+      ptoDays,
+      eventDays,
+      holidayDays
     });
   }
   

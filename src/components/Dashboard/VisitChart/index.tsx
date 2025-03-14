@@ -24,7 +24,7 @@ const VisitChart = ({ entries, dateRange }: VisitChartProps) => {
   
   // Regenerate chart data whenever entries or dateRange changes
   useEffect(() => {
-    if (entries) {
+    if (entries && entries.length > 0) {
       const filteredStats = generateWeeklyStats(entries);
       setChartData(transformWeeklyStats(filteredStats));
     } else if (apiData) {

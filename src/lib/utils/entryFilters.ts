@@ -44,11 +44,11 @@ export const getFilteredEntries = (
     includeEvents?: boolean
   }
 ): Entry[] => {
-  return entries.filter(entry => {
+  // Create a defensive copy of entries to avoid mutation
+  return [...entries].filter(entry => {
     // Date range filter
     if (filters.dateRange?.from && filters.dateRange?.to) {
       const entryDate = new Date(entry.date);
-      entryDate.setHours(0, 0, 0, 0);
       const fromDate = new Date(filters.dateRange.from);
       fromDate.setHours(0, 0, 0, 0);
       const toDate = new Date(filters.dateRange.to);

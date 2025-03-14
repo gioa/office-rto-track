@@ -8,11 +8,11 @@ import MonthView from "@/components/Calendar/MonthView";
 import EntryFormDialog from "@/components/EntryForm/EntryFormDialog";
 import LogTable from "@/components/Dashboard/LogTable";
 import PlannedDaysManager from "@/components/PlannedDays/PlannedDaysManager";
-import { mockEntries, getEntriesForDate } from "@/lib/mockData";
+import { mockEntries } from "@/lib/mockData";
 import { DateRange, FilterOptions, Entry, PlannedDay } from "@/lib/types";
 import { subMonths } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getFilteredEntries } from "@/lib/utils/entryFilters";
+import { getFilteredEntries, getEntriesForDate } from "@/lib/utils/entryFilters";
 
 const Index = () => {
   // Set up initial date range (last 3 months)
@@ -28,13 +28,15 @@ const Index = () => {
   
   // Set up selected date for calendar
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const selectedEntries = getEntriesForDate(mockEntries, selectedDate);
   
   // Set up planned days
   const [plannedDays, setPlannedDays] = useState<PlannedDay[]>([]);
   
   // Filtered entries based on filters
   const [filteredEntries, setFilteredEntries] = useState<Entry[]>(mockEntries);
+  
+  // Selected entries for the calendar view
+  const [selectedEntries, setSelectedEntries] = useState<Entry[]>([]);
   
   // Update filtered entries when filters change
   useEffect(() => {
@@ -47,6 +49,11 @@ const Index = () => {
     
     setFilteredEntries(newFilteredEntries);
   }, [dateRange, includeSick, includePto, includeEvents]);
+  
+  // Update selected entries when selected date or filtered entries change
+  useEffect(() => {
+    setSelectedEntries(getEntriesForDate(filteredEntries, selectedDate));
+  }, [selectedDate, filteredEntries]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30">

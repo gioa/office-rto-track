@@ -34,6 +34,10 @@ export interface WeeklyStats {
   daysInOffice: number;
   totalWorkDays: number;
   percentage: number;
+  sickDays?: number;
+  ptoDays?: number;
+  eventDays?: number;
+  holidayDays?: number;
 }
 
 export interface PlannedDay {

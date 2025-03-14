@@ -1,7 +1,6 @@
 
 import { WeeklyStats } from "@/lib/types";
 import { format, startOfWeek, endOfWeek } from "date-fns";
-import { mockEntries } from "@/lib/mockData";
 
 export interface EnhancedWeeklyStats extends WeeklyStats {
   weekLabel: string;
@@ -18,39 +17,20 @@ export interface EnhancedWeeklyStats extends WeeklyStats {
 
 export const transformWeeklyStats = (data: WeeklyStats[]): EnhancedWeeklyStats[] => {
   return data.map(week => {
+    // Use the provided data directly without refiltering from mockEntries
+    // This ensures filtered data is correctly represented
+    
     const weekStart = startOfWeek(new Date(week.weekOf), { weekStartsOn: 0 });
-    const weekEnd = endOfWeek(new Date(week.weekOf), { weekStartsOn: 0 });
-    
-    let sickDays = 0;
-    let ptoDays = 0;
-    let eventDays = 0;
-    let holidayDays = 0;
-    
-    mockEntries.forEach(entry => {
-      const entryDate = new Date(entry.date);
-      if (entryDate >= weekStart && entryDate <= weekEnd) {
-        const day = entryDate.getDay();
-        if (day === 0 || day === 6) return;
-        
-        switch (entry.type) {
-          case 'sick':
-            sickDays++;
-            break;
-          case 'pto':
-            ptoDays++;
-            break;
-          case 'event':
-            eventDays++;
-            break;
-          case 'holiday':
-            holidayDays++;
-            break;
-        }
-      }
-    });
     
     // Calculate how many days we still need to reach the 3-day target
     const remainingNeeded = Math.max(0, 3 - week.daysInOffice);
+    
+    // Use the sickDays, ptoDays, etc. that are already in the weekly stats
+    // These values are now generated correctly based on filtered entries
+    const sickDays = week.sickDays || 0;
+    const ptoDays = week.ptoDays || 0;
+    const eventDays = week.eventDays || 0;
+    const holidayDays = week.holidayDays || 0;
     
     let displaySickDays = 0;
     let displayPtoDays = 0;
@@ -79,7 +59,7 @@ export const transformWeeklyStats = (data: WeeklyStats[]): EnhancedWeeklyStats[]
       displayHolidayDays = Math.min(remaining, holidayDays);
     }
     
-    // Calculate compliance percentage - now counting all types toward the target
+    // Calculate compliance percentage - counting all types toward the target
     const totalCountedDays = Math.min(3, week.daysInOffice + displaySickDays + displayPtoDays + displayEventDays + displayHolidayDays);
     const compliancePercentage = Math.min(100, Math.round((totalCountedDays / 3) * 100));
     
