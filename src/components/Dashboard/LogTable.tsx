@@ -26,31 +26,31 @@ interface LogTableProps {
 }
 
 const LogTable = ({ entries }: LogTableProps) => {
-  const [page, setPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
   const [paginatedEntries, setPaginatedEntries] = useState<Entry[]>([]);
   const itemsPerPage = 5;
-  const totalPages = Math.ceil(entries.length / itemsPerPage);
   
-  // Reset pagination when entries change
+  // Sort and filter entries
+  const processedEntries = entries
+    .filter(entry => {
+      const dayOfWeek = new Date(entry.date).getDay();
+      return dayOfWeek !== 0 && dayOfWeek !== 6; // Filter out weekends
+    })
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  
+  const totalPages = Math.ceil(processedEntries.length / itemsPerPage);
+  
+  // Reset to page 1 when entries change
   useEffect(() => {
-    setPage(0);
+    setCurrentPage(1);
   }, [entries]);
   
   // Update paginated entries when page or entries change
   useEffect(() => {
-    // Sort entries by date (newest first)
-    const sortedEntries = [...entries].sort((a, b) => 
-      new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
-    
-    // Get entries for current page
-    const newPaginatedEntries = sortedEntries.slice(
-      page * itemsPerPage,
-      (page + 1) * itemsPerPage
-    );
-    
-    setPaginatedEntries(newPaginatedEntries);
-  }, [entries, page]);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    setPaginatedEntries(processedEntries.slice(startIndex, endIndex));
+  }, [processedEntries, currentPage]);
   
   // Get day of week
   const getDayOfWeek = (date: Date): string => {
@@ -84,33 +84,62 @@ const LogTable = ({ entries }: LogTableProps) => {
     return id.substring(0, 2).toUpperCase();
   };
 
-  const handleNextPage = () => {
-    if (page < totalPages - 1) {
-      setPage(page + 1);
+  // Page navigation handlers
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
     }
   };
 
-  const handlePrevPage = () => {
-    if (page > 0) {
-      setPage(page - 1);
+  const goToPreviousPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage(currentPage - 1);
+    }
+  };
+
+  const goToNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage(currentPage + 1);
     }
   };
 
   // Generate array of page numbers to display
   const getPageNumbers = () => {
-    if (totalPages <= 3) {
-      // If 3 or fewer pages, show all
-      return Array.from({ length: totalPages }, (_, i) => i);
-    } else if (page < 1) {
-      // If on first page, show first 3
-      return [0, 1, 2];
-    } else if (page >= totalPages - 2) {
-      // If on last 2 pages, show last 3
-      return [totalPages - 3, totalPages - 2, totalPages - 1];
+    const range = [];
+    const maxPagesToShow = 3;
+    
+    if (totalPages <= maxPagesToShow) {
+      // If there are only a few pages, show all of them
+      for (let i = 1; i <= totalPages; i++) {
+        range.push(i);
+      }
     } else {
-      // Otherwise show current page and neighbors
-      return [page - 1, page, page + 1];
+      // Always show current page
+      range.push(currentPage);
+      
+      // Add page before current if possible
+      if (currentPage > 1) {
+        range.unshift(currentPage - 1);
+      }
+      
+      // Add page after current if possible
+      if (currentPage < totalPages) {
+        range.push(currentPage + 1);
+      }
+      
+      // Fill in any remaining slots
+      while (range.length < maxPagesToShow && range.length < totalPages) {
+        if (range[0] > 1) {
+          range.unshift(range[0] - 1);
+        } else if (range[range.length - 1] < totalPages) {
+          range.push(range[range.length - 1] + 1);
+        } else {
+          break;
+        }
+      }
     }
+    
+    return range;
   };
 
   return (
@@ -153,35 +182,37 @@ const LogTable = ({ entries }: LogTableProps) => {
         </div>
         
         {/* Pagination controls */}
-        {entries.length > itemsPerPage && (
+        {processedEntries.length > 0 && (
           <div className="flex justify-between items-center mt-4">
             <div className="text-sm text-muted-foreground">
-              Showing {entries.length > 0 ? page * itemsPerPage + 1 : 0} to {Math.min((page + 1) * itemsPerPage, entries.length)} of {entries.length} entries
+              Showing {processedEntries.length > 0 ? 
+                `${(currentPage - 1) * itemsPerPage + 1} to ${Math.min(currentPage * itemsPerPage, processedEntries.length)}` : 0} of {processedEntries.length} entries
             </div>
+            
             <Pagination>
               <PaginationContent>
                 <PaginationItem>
                   <PaginationPrevious 
-                    onClick={() => handlePrevPage()} 
-                    className={page === 0 ? 'pointer-events-none opacity-50' : ''}
+                    onClick={goToPreviousPage}
+                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
                   />
                 </PaginationItem>
                 
                 {getPageNumbers().map((pageNum) => (
                   <PaginationItem key={pageNum}>
                     <PaginationLink 
-                      onClick={() => setPage(pageNum)}
-                      isActive={pageNum === page}
+                      onClick={() => goToPage(pageNum)}
+                      isActive={pageNum === currentPage}
                     >
-                      {pageNum + 1}
+                      {pageNum}
                     </PaginationLink>
                   </PaginationItem>
                 ))}
                 
                 <PaginationItem>
                   <PaginationNext 
-                    onClick={() => handleNextPage()}
-                    className={page >= totalPages - 1 ? 'pointer-events-none opacity-50' : ''}
+                    onClick={goToNextPage}
+                    className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}
                   />
                 </PaginationItem>
               </PaginationContent>
