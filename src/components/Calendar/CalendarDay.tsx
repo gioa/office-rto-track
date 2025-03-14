@@ -28,6 +28,7 @@ const CalendarDay = ({
   // Use the consistent isWeekend helper
   const dayIsWeekend = isWeekend(day);
   const [tooltipOpen, setTooltipOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
   
   // Force empty entries array for weekend days
   const filteredEntries = dayIsWeekend ? [] : getEntriesForDay(entries, day);
@@ -44,11 +45,22 @@ const CalendarDay = ({
   const isPlannedDay = !dayIsWeekend && isAfter(day, new Date()) && 
     plannedDays.some(pd => pd.weekday === day.getDay());
   
-  // Close tooltip when a dialog is opened
+  // Handle modal state changes
   const handleDialogOpenChange = (open: boolean) => {
+    setModalOpen(open);
+    // Only close the tooltip when the modal is opened
     if (open) {
       setTooltipOpen(false);
     }
+  };
+  
+  // Handle tooltip state, considering modal state
+  const handleTooltipOpenChange = (open: boolean) => {
+    // If a modal is open, don't allow the tooltip to be opened
+    if (modalOpen && open) {
+      return;
+    }
+    setTooltipOpen(open);
   };
   
   const getDateClasses = (day: Date) => {
@@ -75,7 +87,7 @@ const CalendarDay = ({
     <Tooltip 
       delayDuration={300} 
       open={tooltipOpen}
-      onOpenChange={setTooltipOpen}
+      onOpenChange={handleTooltipOpenChange}
     >
       <TooltipTrigger asChild>
         <button

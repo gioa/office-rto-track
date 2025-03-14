@@ -41,7 +41,7 @@ const DialogContent = React.forwardRef<
         className
       )}
       onPointerDownOutside={(e) => {
-        // Prevent closing when clicking inside calendar or tooltip elements
+        // Prevent closing when clicking on other dialog-related elements
         const target = e.target as HTMLElement;
         if (
           target.closest('.calendar') ||
@@ -50,7 +50,9 @@ const DialogContent = React.forwardRef<
           target.closest('.rdp') ||
           target.closest('.rdp-day') ||
           target.closest('[role="dialog"]') ||
-          target.closest('.popover-content')
+          target.closest('.popover-content') ||
+          target.closest('.alert-dialog-content') ||
+          target.closest('.alert-dialog-overlay')
         ) {
           e.preventDefault();
         }

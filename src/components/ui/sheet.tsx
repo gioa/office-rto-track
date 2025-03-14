@@ -1,3 +1,4 @@
+
 import * as SheetPrimitive from "@radix-ui/react-dialog"
 import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
@@ -61,12 +62,15 @@ const SheetContent = React.forwardRef<
       ref={ref}
       className={cn(sheetVariants({ side }), className)}
       onPointerDownOutside={(e) => {
-        // Prevent closing when clicking on calendar-related elements
+        // Prevent closing when clicking on dialog-related elements
         const target = e.target as HTMLElement;
         if (
           target.closest('.calendar') ||
           target.closest('.tooltip-content') ||
-          target.closest('[role="dialog"]')
+          target.closest('[role="dialog"]') ||
+          target.closest('.alert-dialog-content') ||
+          target.closest('.dialog-content') ||
+          target.closest('.popover-content')
         ) {
           e.preventDefault();
         }

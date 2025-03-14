@@ -5,6 +5,7 @@ import { Trash2 } from "lucide-react";
 import { Entry } from "@/lib/types";
 import { formatEntryType } from "./utils";
 import { useEntries } from "@/hooks/entries";
+import { useState } from "react";
 
 interface DeleteEntryButtonProps {
   entry: Entry;
@@ -13,15 +14,34 @@ interface DeleteEntryButtonProps {
 
 const DeleteEntryButton = ({ entry, onOpenChange }: DeleteEntryButtonProps) => {
   const { deleteEntry } = useEntries();
+  const [isOpen, setIsOpen] = useState(false);
   
   const handleDelete = async () => {
     await deleteEntry.mutateAsync(entry.id);
   };
+
+  const handleOpenChange = (open: boolean) => {
+    setIsOpen(open);
+    if (onOpenChange) {
+      onOpenChange(open);
+    }
+  };
   
   return (
-    <AlertDialog onOpenChange={onOpenChange}>
+    <AlertDialog 
+      open={isOpen} 
+      onOpenChange={handleOpenChange}
+    >
       <AlertDialogTrigger asChild>
-        <Button variant="outline" size="sm" className="w-full text-xs text-destructive hover:text-destructive">
+        <Button 
+          variant="outline" 
+          size="sm" 
+          className="w-full text-xs text-destructive hover:text-destructive"
+          onClick={(e) => {
+            e.stopPropagation();
+            setIsOpen(true);
+          }}
+        >
           <Trash2 className="h-3 w-3 mr-1" />
           Delete Entry
         </Button>

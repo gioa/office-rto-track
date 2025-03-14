@@ -22,10 +22,14 @@ const PopoverContent = React.forwardRef<
         className
       )}
       onPointerDownOutside={(e) => {
-        // Prevent closing when clicking inside dialog or dialog-related elements
+        // Don't close the popover if we're clicking on a dialog or related elements
         const target = e.target as HTMLElement;
+        
+        // If we're interacting with a dialog or modal, don't close the popover
         if (
           target.closest('[role="dialog"]') ||
+          target.closest('.dialog-content') ||
+          target.closest('.alert-dialog-content') ||
           target.closest('[data-state="open"]') ||
           target.closest('.calendar-day') ||
           target.closest('.tooltip-content') ||
@@ -34,10 +38,8 @@ const PopoverContent = React.forwardRef<
           target.closest('.popover-content') ||
           target.closest('.calendar') ||
           // Additional selectors for common modal-related elements
-          target.closest('.dialog-content') ||
           target.closest('.dialog-overlay') ||
-          target.closest('.alert-dialog-overlay') ||
-          target.closest('.alert-dialog-content')
+          target.closest('.alert-dialog-overlay')
         ) {
           e.preventDefault();
         }
