@@ -37,19 +37,12 @@ const DeleteEntryButton = ({ entry, onOpenChange }: DeleteEntryButtonProps) => {
           variant="outline" 
           size="sm" 
           className="w-full text-xs text-destructive hover:text-destructive"
-          onClick={(e) => {
-            e.stopPropagation();
-            setIsOpen(true);
-          }}
         >
           <Trash2 className="h-3 w-3 mr-1" />
           Delete Entry
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent 
-        onClick={(e) => e.stopPropagation()}
-        className="alert-dialog-content"
-      >
+      <AlertDialogContent className="alert-dialog-content">
         <AlertDialogHeader>
           <AlertDialogTitle>Delete Entry</AlertDialogTitle>
           <AlertDialogDescription>
@@ -58,12 +51,9 @@ const DeleteEntryButton = ({ entry, onOpenChange }: DeleteEntryButtonProps) => {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={(e) => e.stopPropagation()}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction 
-            onClick={(e) => {
-              e.stopPropagation();
-              handleDelete();
-            }}
+            onClick={handleDelete}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
             Delete

@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -50,16 +50,9 @@ const EntryFormDialog = ({
     }
   };
 
-  const handleTriggerClick = (e: React.MouseEvent) => {
-    // Stop propagation to prevent parent elements from capturing the click
-    e.stopPropagation();
-    // Set the dialog to open
-    handleOpenChange(true);
-  };
-
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild onClick={handleTriggerClick}>
+      <DialogTrigger asChild>
         {children ? (
           children
         ) : (
@@ -77,24 +70,7 @@ const EntryFormDialog = ({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent 
-        className="sm:max-w-[425px] dialog-content" 
-        onClick={(e) => e.stopPropagation()}
-        onPointerDownOutside={(e) => {
-          // Prevent closing when clicking inside calendar elements
-          const target = e.target as HTMLElement;
-          if (
-            target.closest('.calendar') ||
-            target.closest('.rdp') ||
-            target.closest('.rdp-day') ||
-            target.closest('[role="dialog"]') ||
-            target.closest('.popover-content') ||
-            target.closest('.tooltip-content')
-          ) {
-            e.preventDefault();
-          }
-        }}
-      >
+      <DialogContent className="sm:max-w-[425px] dialog-content">
         <DialogHeader>
           <DialogTitle>Add New Entry</DialogTitle>
           <DialogDescription>

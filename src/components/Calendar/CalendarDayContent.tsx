@@ -39,7 +39,7 @@ const CalendarDayContent = ({
   
   if (hasEntries) {
     return (
-      <div className="p-2" onClick={handleTooltipContentClick}>
+      <div className="p-2">
         <p className="text-sm font-medium mb-1">{format(day, 'EEEE, MMMM d, yyyy')}</p>
         <div className="space-y-1">
           {entries.map((entry, idx) => (
@@ -88,7 +88,7 @@ const CalendarDayContent = ({
     );
   } else if (isPlannedDay && !dayIsWeekend) {
     return (
-      <div className="p-2" onClick={handleTooltipContentClick}>
+      <div className="p-2">
         <p className="text-sm font-medium">{format(day, 'EEEE, MMMM d, yyyy')}</p>
         <p className="text-xs text-blue-600">Planned office day</p>
         {plannedDays.filter(pd => pd.weekday === day.getDay()).map((pd, idx) => (
@@ -114,7 +114,7 @@ const CalendarDayContent = ({
     );
   } else {
     return (
-      <div className="p-2" onClick={handleTooltipContentClick}>
+      <div className="p-2">
         <p className="text-sm font-medium">{format(day, 'EEEE, MMMM d, yyyy')}</p>
         <p className="text-xs text-muted-foreground">
           {dayIsWeekend ? "Weekend day" : "No entries for this day"}
