@@ -9,7 +9,99 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      badge_entries: {
+        Row: {
+          checkin_time: string | null
+          checkout_time: string | null
+          created_at: string
+          date: string
+          day_of_week: number
+          email: string
+          id: string
+          office_location: string | null
+        }
+        Insert: {
+          checkin_time?: string | null
+          checkout_time?: string | null
+          created_at?: string
+          date: string
+          day_of_week: number
+          email: string
+          id?: string
+          office_location?: string | null
+        }
+        Update: {
+          checkin_time?: string | null
+          checkout_time?: string | null
+          created_at?: string
+          date?: string
+          day_of_week?: number
+          email?: string
+          id?: string
+          office_location?: string | null
+        }
+        Relationships: []
+      }
+      user_entries: {
+        Row: {
+          created_at: string
+          date: string
+          day_of_week: number
+          email: string
+          id: string
+          note: string | null
+          type: string
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          day_of_week: number
+          email: string
+          id?: string
+          note?: string | null
+          type: string
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          day_of_week?: number
+          email?: string
+          id?: string
+          note?: string | null
+          type?: string
+        }
+        Relationships: []
+      }
+      user_planned_days: {
+        Row: {
+          created_at: string
+          effective_from: string | null
+          effective_to: string | null
+          email: string
+          id: string
+          planned_days: number[]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          effective_from?: string | null
+          effective_to?: string | null
+          email: string
+          id?: string
+          planned_days: number[]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          effective_from?: string | null
+          effective_to?: string | null
+          email?: string
+          id?: string
+          planned_days?: number[]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

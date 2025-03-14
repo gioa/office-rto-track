@@ -10,7 +10,7 @@ import { getWeeklyStats } from '@/services/localStorage/entries';
 const STATS_QUERY_KEY = 'weekly-stats';
 
 export const useStats = () => {
-  // Query for getting weekly stats
+  // Query for getting weekly stats - now async
   const { data: weeklyStats = [], isLoading, error } = useQuery({
     queryKey: [STATS_QUERY_KEY],
     queryFn: getWeeklyStats,

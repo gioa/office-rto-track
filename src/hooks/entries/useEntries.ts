@@ -6,7 +6,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from '@/components/ui/use-toast';
 import { Entry, FilterOptions } from '@/lib/types';
 import { getFilteredEntries } from '@/lib/utils/entryFilters';
-import * as localStorageService from '@/services/localStorageService';
+import * as dataService from '@/services/dataService';
 import { currentUser } from '@/lib/data/currentUser';
 
 // Query key for entries
@@ -16,10 +16,10 @@ export const ENTRIES_QUERY_KEY = 'entries';
 export const useEntries = (filterOptions?: FilterOptions) => {
   const queryClient = useQueryClient();
   
-  // Query for getting entries
+  // Query for getting entries - now async
   const { data: entries = [], isLoading, error } = useQuery({
     queryKey: [ENTRIES_QUERY_KEY],
-    queryFn: localStorageService.getAllEntries,
+    queryFn: dataService.getAllEntries,
   });
   
   // Filter entries if filter options are provided
@@ -39,23 +39,23 @@ export const useEntries = (filterOptions?: FilterOptions) => {
       
       if (type === 'office-visit') {
         // For office visits, create a badge entry
-        return Promise.resolve(localStorageService.addBadgeEntry({
+        return dataService.addBadgeEntry({
           email: userEmail,
           date,
           dayOfWeek: date.getDay(),
           officeLocation: officeLocation || 'Default Office',
           checkinTime: new Date(new Date(date).setHours(9, 0, 0, 0)),
           checkoutTime: new Date(new Date(date).setHours(17, 0, 0, 0))
-        }));
+        });
       } else {
         // For other types, create a user entry
-        return Promise.resolve(localStorageService.addUserEntry({
+        return dataService.addUserEntry({
           email: userEmail,
           date,
           dayOfWeek: date.getDay(),
           type,
           note,
-        }));
+        });
       }
     },
     onSuccess: () => {

@@ -10,6 +10,7 @@ import PeoplePlanner from "./PeoplePlanner";
 import { UserCheck, Users, Save } from "lucide-react";
 import { saveUserPlannedDays, getUserPlannedDaysByUserId, convertToPlannedDays } from "@/services/dataService";
 import { currentUser } from "@/lib/data/currentUser";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 interface PlannedDaysManagerProps {
   onDaysChange: (plannedDays: PlannedDay[]) => void;
@@ -17,14 +18,42 @@ interface PlannedDaysManagerProps {
 
 const PlannedDaysManager = ({ onDaysChange }: PlannedDaysManagerProps) => {
   const [selectedDays, setSelectedDays] = useState<number[]>([]); // Start with no days selected
-  const [isSubmitting, setIsSubmitting] = useState(false);
   const [otherPlannedDays, setOtherPlannedDays] = useState<PlannedDay[]>([]);
   const [isDirty, setIsDirty] = useState(false);
+  const queryClient = useQueryClient();
   
-  // Initialize planned days on component mount
+  // Get user's planned days
+  const { data: userPlan, isLoading } = useQuery({
+    queryKey: ['plannedDays', currentUser.id],
+    queryFn: () => getUserPlannedDaysByUserId(currentUser.id),
+  });
+  
+  // Mutation for saving planned days
+  const savePlannedDaysMutation = useMutation({
+    mutationFn: (days: number[]) => saveUserPlannedDays(
+      currentUser.id,
+      currentUser.email,
+      days
+    ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['plannedDays'] });
+      setIsDirty(false);
+      toast({
+        title: "Planned days updated",
+        description: "Your planned office days have been saved.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Error saving planned days",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        variant: "destructive",
+      });
+    }
+  });
+  
+  // Initialize planned days on component mount or when userPlan changes
   useEffect(() => {
-    // Get existing planned days for current user
-    const userPlan = getUserPlannedDaysByUserId(currentUser.id);
     if (userPlan) {
       setSelectedDays(userPlan.plannedDays);
       
@@ -37,17 +66,11 @@ const PlannedDaysManager = ({ onDaysChange }: PlannedDaysManagerProps) => {
       
       onDaysChange(plannedDays);
     }
-  }, []);
+  }, [userPlan, onDaysChange]);
   
   const handleSavePlannedDays = () => {
-    setIsSubmitting(true);
-    
     // Save planned days to our data model
-    saveUserPlannedDays(
-      currentUser.id,
-      currentUser.email,
-      selectedDays
-    );
+    savePlannedDaysMutation.mutate(selectedDays);
     
     // Convert selected days to PlannedDay objects for the current user
     const plannedDays = selectedDays.map(day => ({
@@ -57,15 +80,7 @@ const PlannedDaysManager = ({ onDaysChange }: PlannedDaysManagerProps) => {
     }));
     
     // Update the calendar with the new planned days
-    setTimeout(() => {
-      onDaysChange([...plannedDays, ...otherPlannedDays]);
-      setIsSubmitting(false);
-      setIsDirty(false);
-      toast({
-        title: "Planned days updated",
-        description: "Your planned office days have been saved.",
-      });
-    }, 600);
+    onDaysChange([...plannedDays, ...otherPlannedDays]);
   };
   
   const handleDaysChange = (days: number[]) => {
@@ -110,16 +125,16 @@ const PlannedDaysManager = ({ onDaysChange }: PlannedDaysManagerProps) => {
             <WeekdaySelector 
               selectedDays={selectedDays} 
               onChange={handleDaysChange}
-              disabled={isSubmitting}
+              disabled={savePlannedDaysMutation.isPending || isLoading}
             />
             
             <Button 
               onClick={handleSavePlannedDays} 
               className="w-full mt-4"
-              disabled={isSubmitting}
+              disabled={savePlannedDaysMutation.isPending || isLoading}
               variant={isDirty ? "default" : "secondary"}
             >
-              {isSubmitting ? (
+              {savePlannedDaysMutation.isPending ? (
                 "Saving..."
               ) : (
                 <>

@@ -1,61 +1,144 @@
 
 /**
- * LocalStorage operations for planned days
+ * Supabase operations for planned days
  */
 import { UserPlannedDays } from "@/lib/types";
-import { STORAGE_KEYS, getStorageItem, setStorageItem } from "./config";
+import { supabase } from "@/integrations/supabase/client";
 import { initializeStorage } from "./initialize";
 
 // User planned days methods
-export const getUserPlannedDays = (): UserPlannedDays[] => {
+export const getUserPlannedDays = async (): Promise<UserPlannedDays[]> => {
   initializeStorage();
-  return getStorageItem<UserPlannedDays[]>(STORAGE_KEYS.USER_PLANNED_DAYS, []);
+  
+  const { data, error } = await supabase
+    .from('user_planned_days')
+    .select('*');
+    
+  if (error) {
+    console.error('Error fetching user planned days:', error);
+    return [];
+  }
+  
+  return (data || []).map(plan => ({
+    id: plan.id,
+    userId: plan.user_id,
+    email: plan.email,
+    plannedDays: plan.planned_days,
+    effectiveFrom: plan.effective_from ? new Date(plan.effective_from) : undefined,
+    effectiveTo: plan.effective_to ? new Date(plan.effective_to) : undefined
+  }));
 };
 
-export const getUserPlannedDaysByUserId = (userId: string): UserPlannedDays | undefined => {
-  const plans = getUserPlannedDays();
-  return plans.find(plan => plan.userId === userId);
+export const getUserPlannedDaysByUserId = async (userId: string): Promise<UserPlannedDays | undefined> => {
+  const { data, error } = await supabase
+    .from('user_planned_days')
+    .select('*')
+    .eq('user_id', userId)
+    .maybeSingle();
+    
+  if (error) {
+    console.error('Error fetching user planned days by user ID:', error);
+    return undefined;
+  }
+  
+  if (!data) return undefined;
+  
+  return {
+    id: data.id,
+    userId: data.user_id,
+    email: data.email,
+    plannedDays: data.planned_days,
+    effectiveFrom: data.effective_from ? new Date(data.effective_from) : undefined,
+    effectiveTo: data.effective_to ? new Date(data.effective_to) : undefined
+  };
 };
 
-export const getUserPlannedDaysByEmail = (email: string): UserPlannedDays | undefined => {
-  const plans = getUserPlannedDays();
-  return plans.find(plan => plan.email === email);
+export const getUserPlannedDaysByEmail = async (email: string): Promise<UserPlannedDays | undefined> => {
+  const { data, error } = await supabase
+    .from('user_planned_days')
+    .select('*')
+    .eq('email', email)
+    .maybeSingle();
+    
+  if (error) {
+    console.error('Error fetching user planned days by email:', error);
+    return undefined;
+  }
+  
+  if (!data) return undefined;
+  
+  return {
+    id: data.id,
+    userId: data.user_id,
+    email: data.email,
+    plannedDays: data.planned_days,
+    effectiveFrom: data.effective_from ? new Date(data.effective_from) : undefined,
+    effectiveTo: data.effective_to ? new Date(data.effective_to) : undefined
+  };
 };
 
-export const saveUserPlannedDays = (
+export const saveUserPlannedDays = async (
   userId: string, 
   email: string, 
   plannedDays: number[],
   effectiveFrom?: Date,
   effectiveTo?: Date
-): UserPlannedDays => {
-  const plans = getUserPlannedDays();
+): Promise<UserPlannedDays> => {
+  // Check if there's an existing plan for this user
+  const existingPlan = await getUserPlannedDaysByUserId(userId);
   
-  // Look for existing plan to update
-  const existingPlanIndex = plans.findIndex(plan => plan.userId === userId);
-  
-  if (existingPlanIndex >= 0) {
+  if (existingPlan) {
     // Update existing plan
-    plans[existingPlanIndex] = {
-      ...plans[existingPlanIndex],
-      plannedDays,
-      effectiveFrom,
-      effectiveTo
+    const { data, error } = await supabase
+      .from('user_planned_days')
+      .update({
+        planned_days: plannedDays,
+        effective_from: effectiveFrom?.toISOString(),
+        effective_to: effectiveTo?.toISOString()
+      })
+      .eq('id', existingPlan.id)
+      .select()
+      .single();
+      
+    if (error) {
+      console.error('Error updating user planned days:', error);
+      throw new Error(`Failed to update planned days: ${error.message}`);
+    }
+    
+    return {
+      id: data.id,
+      userId: data.user_id,
+      email: data.email,
+      plannedDays: data.planned_days,
+      effectiveFrom: data.effective_from ? new Date(data.effective_from) : undefined,
+      effectiveTo: data.effective_to ? new Date(data.effective_to) : undefined
     };
-    setStorageItem(STORAGE_KEYS.USER_PLANNED_DAYS, plans);
-    return plans[existingPlanIndex];
   } else {
     // Create new plan
-    const newPlan: UserPlannedDays = {
-      id: `plan-${Date.now()}`,
-      userId,
-      email,
-      plannedDays,
-      effectiveFrom,
-      effectiveTo
+    const { data, error } = await supabase
+      .from('user_planned_days')
+      .insert({
+        user_id: userId,
+        email,
+        planned_days: plannedDays,
+        effective_from: effectiveFrom?.toISOString(),
+        effective_to: effectiveTo?.toISOString()
+      })
+      .select()
+      .single();
+      
+    if (error) {
+      console.error('Error creating user planned days:', error);
+      throw new Error(`Failed to create planned days: ${error.message}`);
+    }
+    
+    return {
+      id: data.id,
+      userId: data.user_id,
+      email: data.email,
+      plannedDays: data.planned_days,
+      effectiveFrom: data.effective_from ? new Date(data.effective_from) : undefined,
+      effectiveTo: data.effective_to ? new Date(data.effective_to) : undefined
     };
-    plans.push(newPlan);
-    setStorageItem(STORAGE_KEYS.USER_PLANNED_DAYS, plans);
-    return newPlan;
   }
 };

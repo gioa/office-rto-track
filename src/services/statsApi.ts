@@ -1,4 +1,3 @@
-
 /**
  * API service for fetching weekly statistics data
  */
@@ -10,27 +9,21 @@ import { getWeeklyStats } from "./localStorage/entries";
  */
 export const fetchWeeklyStats = async (weeks: number = 10): Promise<WeeklyStats[]> => {
   try {
-    // In a real application, we would fetch from an API
-    // const response = await fetch('https://your-real-api-endpoint.com/stats');
-    // if (!response.ok) throw new Error(`API request failed: ${response.status}`);
-    // const data = await response.json();
-    // return formatApiResponse(data);
-    
-    // For now, get data from local storage
-    return getWeeklyStats();
-    
+    // Now using Supabase via our data layer
+    return await getWeeklyStats();
   } catch (error) {
     console.error("Error fetching stats data:", error);
-    // Fall back to local data
-    return getWeeklyStats();
+    // Fall back to empty array in case of error
+    return [];
   }
 };
 
 /**
- * Transforms API response to match the WeeklyStats interface
+ * Transforms API response to match the WeeklyStats interface - no longer needed
+ * as we're working directly with our data model now
  */
 const formatApiResponse = (data: any): WeeklyStats[] => {
-  // Handle API response format when you have a real API
+  // Keep for backward compatibility
   if (Array.isArray(data) && data.length > 0 && 'weekOf' in data[0]) {
     return data;
   }
@@ -45,5 +38,5 @@ const formatApiResponse = (data: any): WeeklyStats[] => {
   }
   
   console.error("Unable to process API response format", data);
-  return getWeeklyStats(); // Fallback to local data
+  return []; // Return empty array instead of falling back
 };

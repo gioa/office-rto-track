@@ -16,7 +16,17 @@ import { getFilteredEntries, getEntriesForDate } from "@/lib/utils/entryFilters"
 import { useEntries } from "@/hooks/entries";
 import { FadeIn, ScaleIn } from "@/utils/animations";
 
-const Index = () => {
+// Create a query client instance
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 1000 * 60 * 5, // 5 minutes
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+const IndexContent = () => {
   // Set up initial date range (last 3 months)
   const [dateRange, setDateRange] = useState<DateRange>({
     from: subMonths(new Date(), 3),
@@ -128,6 +138,15 @@ const Index = () => {
         </div>
       </main>
     </div>
+  );
+};
+
+// Wrap the app with QueryClientProvider
+const Index = () => {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <IndexContent />
+    </QueryClientProvider>
   );
 };
 

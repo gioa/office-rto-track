@@ -1,29 +1,83 @@
 
 /**
- * LocalStorage operations for badge entries
+ * Supabase operations for badge entries
  */
 import { BadgeEntry } from "@/lib/types";
-import { STORAGE_KEYS, getStorageItem, setStorageItem } from "./config";
+import { supabase } from "@/integrations/supabase/client";
 import { initializeStorage } from "./initialize";
 
 // Badge entries methods
-export const getBadgeEntries = (): BadgeEntry[] => {
+export const getBadgeEntries = async (): Promise<BadgeEntry[]> => {
   initializeStorage();
-  return getStorageItem<BadgeEntry[]>(STORAGE_KEYS.BADGE_ENTRIES, []);
+  
+  const { data, error } = await supabase
+    .from('badge_entries')
+    .select('*');
+    
+  if (error) {
+    console.error('Error fetching badge entries:', error);
+    return [];
+  }
+  
+  return (data || []).map(entry => ({
+    id: entry.id,
+    email: entry.email,
+    date: new Date(entry.date),
+    dayOfWeek: entry.day_of_week,
+    officeLocation: entry.office_location,
+    checkinTime: entry.checkin_time ? new Date(entry.checkin_time) : undefined,
+    checkoutTime: entry.checkout_time ? new Date(entry.checkout_time) : undefined
+  }));
 };
 
-export const getBadgeEntriesByEmail = (email: string): BadgeEntry[] => {
-  const entries = getBadgeEntries();
-  return entries.filter(entry => entry.email === email);
+export const getBadgeEntriesByEmail = async (email: string): Promise<BadgeEntry[]> => {
+  const { data, error } = await supabase
+    .from('badge_entries')
+    .select('*')
+    .eq('email', email);
+    
+  if (error) {
+    console.error('Error fetching badge entries by email:', error);
+    return [];
+  }
+  
+  return (data || []).map(entry => ({
+    id: entry.id,
+    email: entry.email,
+    date: new Date(entry.date),
+    dayOfWeek: entry.day_of_week,
+    officeLocation: entry.office_location,
+    checkinTime: entry.checkin_time ? new Date(entry.checkin_time) : undefined,
+    checkoutTime: entry.checkout_time ? new Date(entry.checkout_time) : undefined
+  }));
 };
 
-export const addBadgeEntry = (entry: Omit<BadgeEntry, 'id'>): BadgeEntry => {
-  const entries = getBadgeEntries();
-  const newEntry = {
-    ...entry,
-    id: `badge-${Date.now()}`
+export const addBadgeEntry = async (entry: Omit<BadgeEntry, 'id'>): Promise<BadgeEntry> => {
+  const { data, error } = await supabase
+    .from('badge_entries')
+    .insert({
+      email: entry.email,
+      date: entry.date.toISOString(),
+      day_of_week: entry.dayOfWeek,
+      office_location: entry.officeLocation,
+      checkin_time: entry.checkinTime?.toISOString(),
+      checkout_time: entry.checkoutTime?.toISOString()
+    })
+    .select()
+    .single();
+    
+  if (error) {
+    console.error('Error adding badge entry:', error);
+    throw new Error(`Failed to add badge entry: ${error.message}`);
+  }
+  
+  return {
+    id: data.id,
+    email: data.email,
+    date: new Date(data.date),
+    dayOfWeek: data.day_of_week,
+    officeLocation: data.office_location,
+    checkinTime: data.checkin_time ? new Date(data.checkin_time) : undefined,
+    checkoutTime: data.checkout_time ? new Date(data.checkout_time) : undefined
   };
-  entries.push(newEntry);
-  setStorageItem(STORAGE_KEYS.BADGE_ENTRIES, entries);
-  return newEntry;
 };

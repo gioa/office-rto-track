@@ -1,29 +1,79 @@
 
 /**
- * LocalStorage operations for user entries
+ * Supabase operations for user entries
  */
 import { UserEntry } from "@/lib/types";
-import { STORAGE_KEYS, getStorageItem, setStorageItem } from "./config";
+import { supabase } from "@/integrations/supabase/client";
 import { initializeStorage } from "./initialize";
 
 // User entries methods
-export const getUserEntries = (): UserEntry[] => {
+export const getUserEntries = async (): Promise<UserEntry[]> => {
   initializeStorage();
-  return getStorageItem<UserEntry[]>(STORAGE_KEYS.USER_ENTRIES, []);
+  
+  const { data, error } = await supabase
+    .from('user_entries')
+    .select('*');
+    
+  if (error) {
+    console.error('Error fetching user entries:', error);
+    return [];
+  }
+  
+  return (data || []).map(entry => ({
+    id: entry.id,
+    email: entry.email,
+    date: new Date(entry.date),
+    dayOfWeek: entry.day_of_week,
+    type: entry.type,
+    note: entry.note
+  }));
 };
 
-export const getUserEntriesByEmail = (email: string): UserEntry[] => {
-  const entries = getUserEntries();
-  return entries.filter(entry => entry.email === email);
+export const getUserEntriesByEmail = async (email: string): Promise<UserEntry[]> => {
+  const { data, error } = await supabase
+    .from('user_entries')
+    .select('*')
+    .eq('email', email);
+    
+  if (error) {
+    console.error('Error fetching user entries by email:', error);
+    return [];
+  }
+  
+  return (data || []).map(entry => ({
+    id: entry.id,
+    email: entry.email,
+    date: new Date(entry.date),
+    dayOfWeek: entry.day_of_week,
+    type: entry.type,
+    note: entry.note
+  }));
 };
 
-export const addUserEntry = (entry: Omit<UserEntry, 'id'>): UserEntry => {
-  const entries = getUserEntries();
-  const newEntry = {
-    ...entry,
-    id: `user-entry-${Date.now()}`
+export const addUserEntry = async (entry: Omit<UserEntry, 'id'>): Promise<UserEntry> => {
+  const { data, error } = await supabase
+    .from('user_entries')
+    .insert({
+      email: entry.email,
+      date: entry.date.toISOString(),
+      day_of_week: entry.dayOfWeek,
+      type: entry.type,
+      note: entry.note
+    })
+    .select()
+    .single();
+    
+  if (error) {
+    console.error('Error adding user entry:', error);
+    throw new Error(`Failed to add user entry: ${error.message}`);
+  }
+  
+  return {
+    id: data.id,
+    email: data.email,
+    date: new Date(data.date),
+    dayOfWeek: data.day_of_week,
+    type: data.type,
+    note: data.note
   };
-  entries.push(newEntry);
-  setStorageItem(STORAGE_KEYS.USER_ENTRIES, entries);
-  return newEntry;
 };

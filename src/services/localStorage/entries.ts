@@ -9,9 +9,9 @@ import { generateWeeklyStats } from "@/lib/data/statsGenerator";
 import { currentUser } from "@/lib/data/currentUser";
 
 // Get all entries in Entry format (for compatibility with current components)
-export const getAllEntries = (): Entry[] => {
-  const badgeEntries = getBadgeEntries();
-  const userEntries = getUserEntries();
+export const getAllEntries = async (): Promise<Entry[]> => {
+  const badgeEntries = await getBadgeEntries();
+  const userEntries = await getUserEntries();
   
   // Convert badge entries to Entry format
   const officeVisits: Entry[] = badgeEntries.map(badge => ({
@@ -39,8 +39,8 @@ export const getAllEntries = (): Entry[] => {
   return allEntries;
 };
 
-// Generate weekly stats from localStorage data
-export const getWeeklyStats = (): ReturnType<typeof generateWeeklyStats> => {
-  const entries = getAllEntries();
+// Generate weekly stats from Supabase data
+export const getWeeklyStats = async (): Promise<ReturnType<typeof generateWeeklyStats>> => {
+  const entries = await getAllEntries();
   return generateWeeklyStats(entries);
 };
