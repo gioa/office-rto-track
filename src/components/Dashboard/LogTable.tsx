@@ -1,4 +1,5 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { Entry } from "@/lib/types";
 import { 
@@ -21,7 +22,7 @@ const LogTable = ({ entries }: LogTableProps) => {
   const itemsPerPage = 5;
   
   // Reset pagination when entries change
-  useState(() => {
+  useEffect(() => {
     setPage(0);
   }, [entries]);
   
