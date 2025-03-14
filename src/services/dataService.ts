@@ -22,6 +22,9 @@ export const getUserEntries = localStorageService.getUserEntries;
 export const getUserEntriesByEmail = localStorageService.getUserEntriesByEmail;
 export const addUserEntry = localStorageService.addUserEntry;
 
+// Entry deletion API
+export const deleteEntry = localStorageService.deleteEntry;
+
 // User planned days API
 export const getUserPlannedDays = localStorageService.getUserPlannedDays;
 export const getUserPlannedDaysByUserId = localStorageService.getUserPlannedDaysByUserId;

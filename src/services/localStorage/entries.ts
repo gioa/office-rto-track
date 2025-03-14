@@ -1,4 +1,3 @@
-
 /**
  * Combined entries operations (badges + user entries)
  */
@@ -7,6 +6,7 @@ import { getBadgeEntries } from "./badgeEntries";
 import { getUserEntries } from "./userEntries";
 import { generateWeeklyStats } from "@/lib/data/statsGenerator";
 import { currentUser } from "@/lib/data/currentUser";
+import { deleteUserEntry } from "./userEntries";
 
 // Get all entries in Entry format (for compatibility with current components)
 export const getAllEntries = async (): Promise<Entry[]> => {
@@ -44,4 +44,19 @@ export const getAllEntries = async (): Promise<Entry[]> => {
 export const getWeeklyStats = async (): Promise<ReturnType<typeof generateWeeklyStats>> => {
   const entries = await getAllEntries();
   return generateWeeklyStats(entries);
+};
+
+// Delete an entry based on its ID
+// This function determines if it's a user entry and deletes it if possible
+export const deleteEntry = async (entryId: string): Promise<void> => {
+  // Currently, we only support deleting user entries (PTO, sick days, etc.)
+  // Office visit entries (badge entries) cannot be deleted
+  try {
+    // We're assuming the ID format allows us to determine it's a user entry
+    // In a real system, we would use more sophisticated ID detection or separate endpoints
+    await deleteUserEntry(entryId);
+    return Promise.resolve();
+  } catch (error) {
+    return Promise.reject(error);
+  }
 };
