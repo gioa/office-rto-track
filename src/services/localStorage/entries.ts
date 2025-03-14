@@ -30,8 +30,11 @@ export const getAllEntries = (): Entry[] => {
     userId: entry.email === currentUser.email ? currentUser.id : entry.email,
   }));
   
-  // Combine all entries, but filter out weekend entries for consistency with the charts
-  const allEntries = [...officeVisits, ...otherEntries];
+  // Combine all entries, but filter out weekend entries for consistency
+  const allEntries = [...officeVisits, ...otherEntries].filter(entry => {
+    const dayOfWeek = entry.date.getDay();
+    return dayOfWeek !== 0 && dayOfWeek !== 6; // Remove weekend entries (0=Sunday, 6=Saturday)
+  });
   
   return allEntries;
 };

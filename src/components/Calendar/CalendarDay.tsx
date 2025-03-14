@@ -26,14 +26,15 @@ const CalendarDay = ({
   plannedDays = [],
   setSelectedDate 
 }: CalendarDayProps) => {
-  const dayEntries = getEntriesForDay(entries, day);
-  const dayNumber = format(day, 'd');
+  // Filter out weekend entries completely
   const isWeekend = day.getDay() === 0 || day.getDay() === 6;
-  const hasEntry = dayEntries.length > 0;
+  const filteredEntries = isWeekend ? [] : getEntriesForDay(entries, day);
+  const hasEntry = filteredEntries.length > 0;
+  const dayNumber = format(day, 'd');
   
-  const entryType = getFirstEntryType(entries, day);
+  const entryType = isWeekend ? null : getFirstEntryType(entries, day);
   
-  // Check if this day is a planned office day - but never on weekends
+  // Check if this day is a planned office day - never on weekends
   const isPlannedDay = !isWeekend && isAfter(day, new Date()) && 
     plannedDays.some(pd => pd.weekday === day.getDay());
   
@@ -69,7 +70,7 @@ const CalendarDay = ({
         >
           <span className="absolute top-1 right-2 text-xs">{dayNumber}</span>
           
-          {/* Only show checkmarks for weekdays, even if there are entries */}
+          {/* Only show checkmarks for weekdays with entries */}
           {hasEntry && !isWeekend && (
             <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
               <CircleCheck 
@@ -93,11 +94,11 @@ const CalendarDay = ({
       </TooltipTrigger>
       
       <TooltipContent align="center" className="p-0 w-64" onClick={handleTooltipContentClick}>
-        {dayEntries.length > 0 ? (
+        {filteredEntries.length > 0 ? (
           <div className="p-2">
             <p className="text-sm font-medium mb-1">{format(day, 'EEEE, MMMM d, yyyy')}</p>
             <div className="space-y-1">
-              {dayEntries.map((entry, idx) => (
+              {filteredEntries.map((entry, idx) => (
                 <div key={idx} className="flex items-center text-xs">
                   <Badge 
                     variant="outline" 

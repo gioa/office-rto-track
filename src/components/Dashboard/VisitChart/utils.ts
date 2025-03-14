@@ -22,16 +22,17 @@ export const transformWeeklyStats = (data: WeeklyStats[]): EnhancedWeeklyStats[]
     
     const weekStart = startOfWeek(new Date(week.weekOf), { weekStartsOn: 0 });
     
-    // Calculate how many days we still need to reach the 3-day target
-    // Note: daysInOffice already includes event days from statsGenerator
-    const remainingNeeded = Math.max(0, 3 - week.daysInOffice);
-    
-    // Use the sickDays, ptoDays, etc. that are already in the weekly stats
+    // Make sure we use the count directly from the stats
+    // Note: daysInOffice already correctly includes event days
     const sickDays = week.sickDays || 0;
     const ptoDays = week.ptoDays || 0;
     const eventDays = week.eventDays || 0;
     const holidayDays = week.holidayDays || 0;
     
+    // Calculate how many days we still need to reach the 3-day target
+    const remainingNeeded = Math.max(0, 3 - week.daysInOffice);
+    
+    // For display, we'll count sick, PTO, and holiday towards the remaining target days
     let displaySickDays = 0;
     let displayPtoDays = 0;
     let displayEventDays = 0;
@@ -40,7 +41,6 @@ export const transformWeeklyStats = (data: WeeklyStats[]): EnhancedWeeklyStats[]
     let remaining = remainingNeeded;
     
     // Since events are already counted in daysInOffice, we don't need to count them again
-    // But we still want to track sick/pto/holiday days
     if (remaining > 0) {
       displaySickDays = Math.min(remaining, sickDays);
       remaining -= displaySickDays;
