@@ -53,8 +53,6 @@ const EntryFormDialog = ({
             variant={buttonVariant} 
             size={buttonSize}
             className={cn(
-              "shadow-md transition-all duration-300 font-medium", 
-              "hover:shadow-lg hover:translate-y-[-2px] hover:bg-primary/90",
               "mt-6",
               className, 
               fullWidth ? "w-full" : ""
