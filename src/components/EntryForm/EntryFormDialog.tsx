@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,7 +10,7 @@ import {
 import { Plus } from "lucide-react";
 import EntryForm from "./EntryForm";
 import { cn } from "@/lib/utils";
-import { useEntries } from "@/hooks/useEntries";
+import { useEntries } from "@/hooks/entries";
 
 interface EntryFormDialogProps {
   date?: Date;

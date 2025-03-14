@@ -42,23 +42,18 @@ const EntryForm = ({
     setIsSubmitting(true);
     
     try {
-      // Handle the different date formats (single date or date range)
       const date = typeof values.date === 'object' && 'from' in values.date 
         ? values.date.from 
         : values.date as Date;
       
-      // If it's a date range and we have the addEntry mutation
       if (typeof values.date === 'object' && 'from' in values.date && values.date.to && addEntry) {
-        // Create an entry for each day in the range
         const startDate = new Date(values.date.from);
         const endDate = new Date(values.date.to);
         
         for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-          // Skip weekends
           const dayOfWeek = d.getDay();
           if (dayOfWeek === 0 || dayOfWeek === 6) continue;
           
-          // Use the addEntry mutation from useEntries hook
           await addEntry.mutateAsync({ 
             type: values.type, 
             date: new Date(d), 
@@ -66,7 +61,6 @@ const EntryForm = ({
           });
         }
       } else if (addEntry) {
-        // Single day entry using the addEntry mutation
         await addEntry.mutateAsync({ 
           type: values.type, 
           date, 
@@ -74,7 +68,6 @@ const EntryForm = ({
         });
       }
       
-      // Show success message
       toast({
         title: "Entry added successfully",
         description: (
@@ -99,22 +92,18 @@ const EntryForm = ({
     } finally {
       setIsSubmitting(false);
       
-      // Keep modal open if adding another entry, otherwise close it
       if (onSubmitComplete) {
         onSubmitComplete(addAnother);
       }
       
-      // Reset form if we're adding another entry or if we're in standalone mode
       if (addAnother || !compact) {
         form.reset({
           date: initialDate || new Date(),
-          type: values.type, // Maintain the same type for convenience
+          type: values.type,
           note: "",
         });
       }
       
-      // In compact mode (sidebar), don't navigate away if not adding another
-      // Only navigate away if we're in the full form mode and not adding another
       if (!compact && !addAnother) {
         navigate("/");
       }
@@ -125,7 +114,6 @@ const EntryForm = ({
     form.setValue("type", value as any);
     setSelectedType(value);
     
-    // Reset the date field when switching between single and range modes
     if (value === "pto" || value === "event") {
       form.setValue("date", { from: new Date(), to: undefined });
     } else {
@@ -133,7 +121,6 @@ const EntryForm = ({
     }
   };
 
-  // If compact, render a simplified form directly
   if (compact) {
     return (
       <CompactEntryForm
@@ -148,7 +135,6 @@ const EntryForm = ({
     );
   }
 
-  // Full form with card wrapper for the standalone page
   return (
     <Card className="glass subtle-shadow max-w-xl w-full mx-auto mt-8 animate-scale-in">
       <CardHeader>

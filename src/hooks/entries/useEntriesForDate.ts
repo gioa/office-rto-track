@@ -1,0 +1,33 @@
+
+/**
+ * Hook for working with entries for a specific date
+ */
+import { useState, useEffect } from 'react';
+import { Entry } from '@/lib/types';
+import { useEntries } from './useEntries';
+
+export const useEntriesForDate = (date: Date) => {
+  const { entries, isLoading, error } = useEntries();
+  const [entriesForDate, setEntriesForDate] = useState<Entry[]>([]);
+  
+  useEffect(() => {
+    if (!isLoading && entries.length > 0) {
+      // Filter entries for the selected date
+      const filtered = entries.filter(entry => {
+        const entryDate = new Date(entry.date);
+        return (
+          entryDate.getDate() === date.getDate() &&
+          entryDate.getMonth() === date.getMonth() &&
+          entryDate.getFullYear() === date.getFullYear()
+        );
+      });
+      setEntriesForDate(filtered);
+    }
+  }, [entries, date, isLoading]);
+  
+  return {
+    entriesForDate,
+    isLoading,
+    error,
+  };
+};

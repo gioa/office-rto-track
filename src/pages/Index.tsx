@@ -13,7 +13,7 @@ import { DateRange, FilterOptions, Entry, PlannedDay } from "@/lib/types";
 import { subMonths } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getFilteredEntries, getEntriesForDate } from "@/lib/utils/entryFilters";
-import { useEntries } from "@/hooks/useEntries";
+import { useEntries } from "@/hooks/entries";
 import { FadeIn, ScaleIn } from "@/utils/animations";
 
 const Index = () => {
