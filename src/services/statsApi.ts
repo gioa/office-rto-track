@@ -1,34 +1,27 @@
 
 /**
- * API service for fetching weekly statistics data from external data sources
- * (Snowflake, Databricks, etc.)
+ * API service for fetching weekly statistics data
  */
-
 import { WeeklyStats } from "@/lib/types";
-
-// Simple configuration object - update these with your actual values
-const API_CONFIG = {
-  baseUrl: "https://your-api-gateway.example.com",
-  endpoint: "/weekly-stats",
-  apiKey: "your-api-key-here", // Replace with your actual API key
-};
+import { mockWeeklyStats } from "@/lib/mockData";
 
 /**
- * Fetches weekly stats from the external data source (Snowflake/Databricks)
- * @param weeks Number of weeks of data to fetch
- * @returns Promise with the weekly stats data
+ * Fetches weekly stats data with fallback to mock data
  */
 export const fetchWeeklyStats = async (weeks: number = 10): Promise<WeeklyStats[]> => {
   try {
-    // Build request URL and headers
-    const url = `${API_CONFIG.baseUrl}${API_CONFIG.endpoint}?weeks=${weeks}`;
-    const headers: HeadersInit = {
-      "Content-Type": "application/json",
-      "x-api-key": API_CONFIG.apiKey,
-    };
+    // In a real application, we would fetch from an API
+    // For now, we'll simulate an API call but use mock data
     
-    // Make the API request
-    const response = await fetch(url, { method: "GET", headers });
+    // For demo purposes, we'll just use our mock data directly
+    // No real API call is made to avoid CORS and network issues
+    
+    // Uncomment this code when you have a real API endpoint
+    /*
+    const response = await fetch('https://your-real-api-endpoint.com/stats', {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' }
+    });
     
     if (!response.ok) {
       throw new Error(`API request failed: ${response.status}`);
@@ -36,12 +29,17 @@ export const fetchWeeklyStats = async (weeks: number = 10): Promise<WeeklyStats[
     
     const data = await response.json();
     return formatApiResponse(data);
+    */
+    
+    // Simulate API latency
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Return mock data
+    return mockWeeklyStats;
     
   } catch (error) {
     console.error("Error fetching data:", error);
-    
-    // Fallback to mock data during development
-    const { mockWeeklyStats } = await import("@/lib/mockData");
+    // Always fall back to mock data
     return mockWeeklyStats;
   }
 };
@@ -50,12 +48,11 @@ export const fetchWeeklyStats = async (weeks: number = 10): Promise<WeeklyStats[
  * Transforms API response to match the WeeklyStats interface
  */
 const formatApiResponse = (data: any): WeeklyStats[] => {
-  // If data is already in the correct format
+  // Handle API response format when you have a real API
   if (Array.isArray(data) && data.length > 0 && 'weekOf' in data[0]) {
     return data;
   }
   
-  // Handle Snowflake/Databricks response format
   if (data.results && Array.isArray(data.results)) {
     return data.results.map((item: any) => ({
       weekOf: new Date(item.week_start_date || item.weekOf),
@@ -66,5 +63,5 @@ const formatApiResponse = (data: any): WeeklyStats[] => {
   }
   
   console.error("Unable to process API response format", data);
-  return [];
+  return mockWeeklyStats; // Fallback to mock data
 };
