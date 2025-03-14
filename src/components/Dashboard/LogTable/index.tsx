@@ -5,14 +5,23 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import TableHeader from "./TableHeader";
 import TableContent from "./TableContent";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface LogTableProps {
   entries: Entry[];
 }
 
 const LogTable = ({ entries }: LogTableProps) => {
+  const [localEntries, setLocalEntries] = useState<Entry[]>(entries);
+  
+  // Update local entries whenever props change
+  useEffect(() => {
+    setLocalEntries(entries);
+  }, [entries]);
+  
   // Sort and filter entries to exclude weekends
-  const processedEntries = entries
+  const processedEntries = localEntries
     .filter(entry => {
       const dayOfWeek = new Date(entry.date).getDay();
       return dayOfWeek !== 0 && dayOfWeek !== 6; // Filter out weekends

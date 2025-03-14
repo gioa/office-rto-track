@@ -1,4 +1,3 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Entry, DateRange } from "@/lib/types";
 import { countEntriesByType, countEntriesInDateRange } from "@/lib/utils/entryFilters";
@@ -70,6 +69,27 @@ const Stats = ({ entries, dateRange }: StatsProps) => {
     };
     
     fetchTopOffices();
+    
+    // Set up subscription for real-time updates
+    const channel = supabase
+      .channel('stats-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'badge_entries'
+        },
+        () => {
+          // Refetch top offices when badge entries change
+          fetchTopOffices();
+        }
+      )
+      .subscribe();
+    
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
   
   // Recalculate stats when entries or dateRange changes
