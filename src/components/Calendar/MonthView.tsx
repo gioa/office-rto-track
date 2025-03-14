@@ -7,6 +7,7 @@ import CalendarHeader from "./CalendarHeader";
 import CalendarDay from "./CalendarDay";
 import CalendarLegend from "./CalendarLegend";
 import EntryFormDialog from "@/components/EntryForm/EntryFormDialog";
+import { isWeekend } from "./utils";
 
 interface MonthViewProps {
   entries: Entry[];
@@ -43,7 +44,7 @@ const MonthView = ({
     daysInMonth.forEach(day => {
       if (day.getTime() > today.getTime() &&
       // Only future dates
-      day.getDay() !== 0 && day.getDay() !== 6 &&
+      !isWeekend(day) &&
       // Not weekend
       plannedDays.some(pd => pd.weekday === day.getDay()) // Is a planned day
       ) {

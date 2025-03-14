@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { Entry } from '@/lib/types';
 import { useEntries } from './useEntries';
+import { isWeekend } from '@/components/Calendar/utils';
 
 export const useEntriesForDate = (date: Date) => {
   const { entries, isLoading, error } = useEntries();
@@ -12,6 +13,12 @@ export const useEntriesForDate = (date: Date) => {
   
   useEffect(() => {
     if (!isLoading && entries.length > 0) {
+      // Skip completely if date is a weekend
+      if (isWeekend(date)) {
+        setEntriesForDate([]);
+        return;
+      }
+      
       // Filter entries for the selected date
       const filtered = entries.filter(entry => {
         const entryDate = new Date(entry.date);

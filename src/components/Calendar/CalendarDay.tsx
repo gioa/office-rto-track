@@ -1,4 +1,3 @@
-
 import { isSameDay, isSameMonth, format, isAfter, isToday } from "date-fns";
 import { CircleCheck, Plus } from "lucide-react";
 import { Entry, PlannedDay } from "@/lib/types";
@@ -7,7 +6,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import EntryFormDialog from "@/components/EntryForm/EntryFormDialog";
-import { getEntriesForDay, getFirstEntryType, formatEntryType } from "./utils";
+import { getEntriesForDay, getFirstEntryType, formatEntryType, isWeekend } from "./utils";
 
 interface CalendarDayProps {
   day: Date;
@@ -26,31 +25,30 @@ const CalendarDay = ({
   plannedDays = [],
   setSelectedDate 
 }: CalendarDayProps) => {
-  // Filter out weekend entries completely
-  const isWeekend = day.getDay() === 0 || day.getDay() === 6;
-  const filteredEntries = isWeekend ? [] : getEntriesForDay(entries, day);
+  // Use the consistent isWeekend helper
+  const dayIsWeekend = isWeekend(day);
+  const filteredEntries = dayIsWeekend ? [] : getEntriesForDay(entries, day);
   const hasEntry = filteredEntries.length > 0;
   const dayNumber = format(day, 'd');
   
-  const entryType = isWeekend ? null : getFirstEntryType(entries, day);
+  const entryType = dayIsWeekend ? null : getFirstEntryType(entries, day);
   
   // Check if this day is a planned office day - never on weekends
-  const isPlannedDay = !isWeekend && isAfter(day, new Date()) && 
+  const isPlannedDay = !dayIsWeekend && isAfter(day, new Date()) && 
     plannedDays.some(pd => pd.weekday === day.getDay());
   
   const getDateClasses = (day: Date) => {
     const isCurrentToday = isToday(day);
     const isSelected = isSameDay(day, selectedDate);
     const isCurrentMonth = isSameMonth(day, currentMonth);
-    const isWeekendDay = day.getDay() === 0 || day.getDay() === 6;
     
     return cn(
       "calendar-day w-full h-12 sm:h-16 p-1 relative",
       isCurrentToday && "calendar-day-today",
       isSelected && "calendar-day-active",
       !isCurrentMonth && "calendar-day-disabled",
-      isWeekendDay && "text-muted-foreground",
-      isPlannedDay && "planned" // Changed from day-planned to planned
+      dayIsWeekend && "text-muted-foreground",
+      isPlannedDay && "planned"
     );
   };
   
@@ -71,7 +69,7 @@ const CalendarDay = ({
           <span className="absolute top-1 right-2 text-xs">{dayNumber}</span>
           
           {/* Only show checkmarks for weekdays with entries */}
-          {hasEntry && !isWeekend && (
+          {hasEntry && !dayIsWeekend && (
             <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
               <CircleCheck 
                 className={cn(
@@ -86,7 +84,7 @@ const CalendarDay = ({
           )}
           
           {/* Never show planned checkmarks on weekends */}
-          {isPlannedDay && !hasEntry && !isWeekend && (
+          {isPlannedDay && !hasEntry && !dayIsWeekend && (
             <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
               <CircleCheck className="h-5 w-5 text-blue-300/50 opacity-70" />
             </div>

@@ -13,10 +13,15 @@ export const formatEntryType = (type: Entry['type']): string => {
   }
 };
 
+// Helper to consistently determine if a date is a weekend
+export const isWeekend = (date: Date): boolean => {
+  const day = date.getDay();
+  return day === 0 || day === 6; // 0 is Sunday, 6 is Saturday
+};
+
 export const getEntriesForDay = (entries: Entry[], day: Date) => {
   // For weekend days, always return empty array
-  const dayOfWeek = day.getDay();
-  if (dayOfWeek === 0 || dayOfWeek === 6) {
+  if (isWeekend(day)) {
     return [];
   }
   
@@ -28,8 +33,7 @@ export const getEntriesForDay = (entries: Entry[], day: Date) => {
 
 export const getFirstEntryType = (entries: Entry[], day: Date) => {
   // For weekend days, always return null
-  const dayOfWeek = day.getDay();
-  if (dayOfWeek === 0 || dayOfWeek === 6) {
+  if (isWeekend(day)) {
     return null;
   }
   
@@ -39,8 +43,7 @@ export const getFirstEntryType = (entries: Entry[], day: Date) => {
 
 export const hasEntryType = (entries: Entry[], day: Date, type: Entry['type']) => {
   // For weekend days, always return false
-  const dayOfWeek = day.getDay();
-  if (dayOfWeek === 0 || dayOfWeek === 6) {
+  if (isWeekend(day)) {
     return false;
   }
   
