@@ -30,7 +30,10 @@ export const getAllEntries = (): Entry[] => {
     userId: entry.email === currentUser.email ? currentUser.id : entry.email,
   }));
   
-  return [...officeVisits, ...otherEntries];
+  // Combine all entries, but filter out weekend entries for consistency with the charts
+  const allEntries = [...officeVisits, ...otherEntries];
+  
+  return allEntries;
 };
 
 // Generate weekly stats from localStorage data

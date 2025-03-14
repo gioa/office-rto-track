@@ -19,43 +19,54 @@ export const generateWeeklyStats = (entries: Entry[]): WeeklyStats[] => {
     weekStart.setDate(weekEnd.getDate() - 6);
     
     // Count days in office for this week (including events as office visits)
+    // But exclude weekends (Saturday and Sunday)
     const daysInOffice = entries.filter(entry => {
       const entryDate = new Date(entry.date);
+      const dayOfWeek = entryDate.getDay(); // 0 = Sunday, 6 = Saturday
       return (entry.type === 'office-visit' || entry.type === 'event') && 
              entryDate >= weekStart && 
-             entryDate <= weekEnd;
+             entryDate <= weekEnd &&
+             dayOfWeek !== 0 && dayOfWeek !== 6; // Exclude weekends
     }).length;
     
-    // Count sick days for this week
+    // Count sick days for this week (excluding weekends)
     const sickDays = entries.filter(entry => {
       const entryDate = new Date(entry.date);
+      const dayOfWeek = entryDate.getDay();
       return entry.type === 'sick' && 
              entryDate >= weekStart && 
-             entryDate <= weekEnd;
+             entryDate <= weekEnd &&
+             dayOfWeek !== 0 && dayOfWeek !== 6;
     }).length;
     
-    // Count PTO days for this week
+    // Count PTO days for this week (excluding weekends)
     const ptoDays = entries.filter(entry => {
       const entryDate = new Date(entry.date);
+      const dayOfWeek = entryDate.getDay();
       return entry.type === 'pto' && 
              entryDate >= weekStart && 
-             entryDate <= weekEnd;
+             entryDate <= weekEnd &&
+             dayOfWeek !== 0 && dayOfWeek !== 6;
     }).length;
     
-    // Count event days for this week (still track separately for stats display)
+    // Count event days for this week (still track separately for stats display) (excluding weekends)
     const eventDays = entries.filter(entry => {
       const entryDate = new Date(entry.date);
+      const dayOfWeek = entryDate.getDay();
       return entry.type === 'event' && 
              entryDate >= weekStart && 
-             entryDate <= weekEnd;
+             entryDate <= weekEnd &&
+             dayOfWeek !== 0 && dayOfWeek !== 6;
     }).length;
     
-    // Count holiday days for this week
+    // Count holiday days for this week (excluding weekends)
     const holidayDays = entries.filter(entry => {
       const entryDate = new Date(entry.date);
+      const dayOfWeek = entryDate.getDay();
       return entry.type === 'holiday' && 
              entryDate >= weekStart && 
-             entryDate <= weekEnd;
+             entryDate <= weekEnd &&
+             dayOfWeek !== 0 && dayOfWeek !== 6;
     }).length;
     
     // Calculate working days (excluding weekends)

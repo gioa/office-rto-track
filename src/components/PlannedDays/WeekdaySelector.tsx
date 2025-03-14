@@ -9,6 +9,7 @@ interface WeekdaySelectorProps {
 }
 
 const WeekdaySelector = ({ selectedDays, onChange, disabled = false }: WeekdaySelectorProps) => {
+  // Only show weekdays (Mon-Fri) - no weekends
   const weekdays = [
     { id: 1, name: "M", fullName: "Monday" },
     { id: 2, name: "T", fullName: "Tuesday" },

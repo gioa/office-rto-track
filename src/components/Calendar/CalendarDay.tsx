@@ -33,7 +33,7 @@ const CalendarDay = ({
   
   const entryType = getFirstEntryType(entries, day);
   
-  // Check if this day is a planned office day
+  // Check if this day is a planned office day - but never on weekends
   const isPlannedDay = !isWeekend && isAfter(day, new Date()) && 
     plannedDays.some(pd => pd.weekday === day.getDay());
   
@@ -69,6 +69,7 @@ const CalendarDay = ({
         >
           <span className="absolute top-1 right-2 text-xs">{dayNumber}</span>
           
+          {/* Only show checkmarks for weekdays, even if there are entries */}
           {hasEntry && !isWeekend && (
             <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
               <CircleCheck 
