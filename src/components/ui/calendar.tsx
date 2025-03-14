@@ -60,7 +60,7 @@ function Calendar({
         // This is how we need to define custom modifiers
         planned: "border-2 border-dashed border-blue-300/50"
       }}
-      // Set the correct weekStartsOn value to 0 (Sunday) to ensure proper alignment
+      // Explicitly set weekStartsOn to 0 (Sunday) to ensure proper alignment
       weekStartsOn={0}
       // Disable weekend days completely
       disabled={[

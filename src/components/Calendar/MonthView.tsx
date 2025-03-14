@@ -33,7 +33,7 @@ const MonthView = ({
   const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
   const goToday = () => setCurrentMonth(new Date());
   
-  // Ensure Sunday is first day of week
+  // Define dayNames with Sunday first to match the weekStartsOn=0 setting
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   // Filter entries to remove any on weekend days
