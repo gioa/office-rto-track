@@ -34,6 +34,12 @@ const MonthView = ({
   const goToday = () => setCurrentMonth(new Date());
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+  // Filter entries to remove any on weekend days
+  const filteredEntries = entries.filter(entry => {
+    const entryDate = new Date(entry.date);
+    return !isWeekend(entryDate);
+  });
+
   // Get the planned weekdays as an array to use for styling
   const getPlannedDaysModifier = () => {
     const today = new Date();
@@ -42,12 +48,9 @@ const MonthView = ({
     // Create a map of planned days in the future
     // For each day in the current month, check if it's a planned office day
     daysInMonth.forEach(day => {
-      if (day.getTime() > today.getTime() &&
-      // Only future dates
-      !isWeekend(day) &&
-      // Not weekend
-      plannedDays.some(pd => pd.weekday === day.getDay()) // Is a planned day
-      ) {
+      if (day.getTime() > today.getTime() && // Only future dates
+          !isWeekend(day) &&                 // Never include weekend days 
+          plannedDays.some(pd => pd.weekday === day.getDay())) { // Is a planned day
         futureDates[format(day, 'yyyy-MM-dd')] = day;
       }
     });
@@ -63,7 +66,17 @@ const MonthView = ({
               {day}
             </div>)}
           
-          {daysInMonth.map((day, i) => <CalendarDay key={i} day={day} currentMonth={currentMonth} selectedDate={selectedDate} entries={entries} plannedDays={plannedDays} setSelectedDate={setSelectedDate} />)}
+          {daysInMonth.map((day, i) => (
+            <CalendarDay 
+              key={i} 
+              day={day} 
+              currentMonth={currentMonth} 
+              selectedDate={selectedDate} 
+              entries={filteredEntries} 
+              plannedDays={plannedDays} 
+              setSelectedDate={setSelectedDate} 
+            />
+          ))}
         </div>
         
         <CalendarLegend />

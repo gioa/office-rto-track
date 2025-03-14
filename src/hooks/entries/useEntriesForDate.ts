@@ -13,7 +13,7 @@ export const useEntriesForDate = (date: Date) => {
   
   useEffect(() => {
     if (!isLoading && entries.length > 0) {
-      // Skip completely if date is a weekend
+      // Skip completely if date is a weekend - always return empty array
       if (isWeekend(date)) {
         setEntriesForDate([]);
         return;
@@ -28,7 +28,11 @@ export const useEntriesForDate = (date: Date) => {
           entryDate.getFullYear() === date.getFullYear()
         );
       });
+      
       setEntriesForDate(filtered);
+    } else {
+      // If loading or no entries, set to empty array
+      setEntriesForDate([]);
     }
   }, [entries, date, isLoading]);
   

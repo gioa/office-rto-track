@@ -19,8 +19,9 @@ export const isWeekend = (date: Date): boolean => {
   return day === 0 || day === 6; // 0 is Sunday, 6 is Saturday
 };
 
+// Ensure ALL entries for weekend days are filtered out
 export const getEntriesForDay = (entries: Entry[], day: Date) => {
-  // For weekend days, always return empty array
+  // For weekend days, always return empty array regardless of what's in entries
   if (isWeekend(day)) {
     return [];
   }
@@ -32,7 +33,7 @@ export const getEntriesForDay = (entries: Entry[], day: Date) => {
 };
 
 export const getFirstEntryType = (entries: Entry[], day: Date) => {
-  // For weekend days, always return null
+  // For weekend days, always return null regardless of entries
   if (isWeekend(day)) {
     return null;
   }

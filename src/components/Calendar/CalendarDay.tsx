@@ -1,3 +1,4 @@
+
 import { isSameDay, isSameMonth, format, isAfter, isToday } from "date-fns";
 import { CircleCheck, Plus } from "lucide-react";
 import { Entry, PlannedDay } from "@/lib/types";
@@ -27,10 +28,16 @@ const CalendarDay = ({
 }: CalendarDayProps) => {
   // Use the consistent isWeekend helper
   const dayIsWeekend = isWeekend(day);
+  
+  // Force empty entries array for weekend days
   const filteredEntries = dayIsWeekend ? [] : getEntriesForDay(entries, day);
-  const hasEntry = filteredEntries.length > 0;
+  
+  // Always have no entries for weekends
+  const hasEntry = dayIsWeekend ? false : filteredEntries.length > 0;
+  
   const dayNumber = format(day, 'd');
   
+  // Ensure no entry type is reported for weekends
   const entryType = dayIsWeekend ? null : getFirstEntryType(entries, day);
   
   // Check if this day is a planned office day - never on weekends
@@ -68,7 +75,7 @@ const CalendarDay = ({
         >
           <span className="absolute top-1 right-2 text-xs">{dayNumber}</span>
           
-          {/* Only show checkmarks for weekdays with entries */}
+          {/* Only show checkmarks for weekdays with entries - NEVER for weekends */}
           {hasEntry && !dayIsWeekend && (
             <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
               <CircleCheck 
@@ -93,7 +100,7 @@ const CalendarDay = ({
       </TooltipTrigger>
       
       <TooltipContent align="center" className="p-0 w-64" onClick={handleTooltipContentClick}>
-        {filteredEntries.length > 0 ? (
+        {filteredEntries.length > 0 && !dayIsWeekend ? (
           <div className="p-2">
             <p className="text-sm font-medium mb-1">{format(day, 'EEEE, MMMM d, yyyy')}</p>
             <div className="space-y-1">
@@ -124,7 +131,7 @@ const CalendarDay = ({
               </EntryFormDialog>
             </div>
           </div>
-        ) : isPlannedDay ? (
+        ) : isPlannedDay && !dayIsWeekend ? (
           <div className="p-2">
             <p className="text-sm font-medium">{format(day, 'EEEE, MMMM d, yyyy')}</p>
             <p className="text-xs text-blue-600">Planned office day</p>
@@ -145,15 +152,19 @@ const CalendarDay = ({
         ) : (
           <div className="p-2">
             <p className="text-sm font-medium">{format(day, 'EEEE, MMMM d, yyyy')}</p>
-            <p className="text-xs text-muted-foreground">No entries for this day</p>
-            <div className="mt-2 pt-2 border-t border-border">
-              <EntryFormDialog date={day} buttonVariant="outline" buttonSize="sm" fullWidth>
-                <Button variant="outline" size="sm" className="w-full text-xs">
-                  <Plus className="h-3 w-3 mr-1" />
-                  Add Entry
-                </Button>
-              </EntryFormDialog>
-            </div>
+            <p className="text-xs text-muted-foreground">
+              {dayIsWeekend ? "Weekend day" : "No entries for this day"}
+            </p>
+            {!dayIsWeekend && (
+              <div className="mt-2 pt-2 border-t border-border">
+                <EntryFormDialog date={day} buttonVariant="outline" buttonSize="sm" fullWidth>
+                  <Button variant="outline" size="sm" className="w-full text-xs">
+                    <Plus className="h-3 w-3 mr-1" />
+                    Add Entry
+                  </Button>
+                </EntryFormDialog>
+              </div>
+            )}
           </div>
         )}
       </TooltipContent>
