@@ -60,6 +60,10 @@ function Calendar({
         // This is how we need to define custom modifiers
         planned: "border-2 border-dashed border-blue-300/50"
       }}
+      // Disable weekend days completely
+      disabled={[
+        { dayOfWeek: [0, 6] } // 0 is Sunday, 6 is Saturday
+      ]}
       {...props}
     />
   );

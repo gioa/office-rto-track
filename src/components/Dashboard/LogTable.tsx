@@ -19,6 +19,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
+  PaginationEllipsis,
 } from "@/components/ui/pagination";
 
 interface LogTableProps {
@@ -27,10 +28,9 @@ interface LogTableProps {
 
 const LogTable = ({ entries }: LogTableProps) => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [paginatedEntries, setPaginatedEntries] = useState<Entry[]>([]);
   const itemsPerPage = 5;
   
-  // Sort and filter entries
+  // Sort and filter entries to exclude weekends
   const processedEntries = entries
     .filter(entry => {
       const dayOfWeek = new Date(entry.date).getDay();
@@ -40,22 +40,17 @@ const LogTable = ({ entries }: LogTableProps) => {
   
   const totalPages = Math.ceil(processedEntries.length / itemsPerPage);
   
+  // Get current page entries
+  const getCurrentPageEntries = () => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = Math.min(startIndex + itemsPerPage, processedEntries.length);
+    return processedEntries.slice(startIndex, endIndex);
+  };
+  
   // Reset to page 1 when entries change
   useEffect(() => {
     setCurrentPage(1);
   }, [entries]);
-  
-  // Update paginated entries when page or entries change
-  useEffect(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    setPaginatedEntries(processedEntries.slice(startIndex, endIndex));
-  }, [processedEntries, currentPage]);
-  
-  // Get day of week
-  const getDayOfWeek = (date: Date): string => {
-    return format(new Date(date), 'EEEE');
-  };
   
   // Format entry type for display
   const formatEntryType = (type: string): string => {
@@ -85,62 +80,101 @@ const LogTable = ({ entries }: LogTableProps) => {
   };
 
   // Page navigation handlers
-  const goToPage = (page: number) => {
+  const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
   };
 
-  const goToPreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage(currentPage - 1);
-    }
-  };
-
-  const goToNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage(currentPage + 1);
-    }
-  };
-
-  // Generate array of page numbers to display
-  const getPageNumbers = () => {
-    const range = [];
-    const maxPagesToShow = 3;
+  // Generate pagination items
+  const renderPaginationItems = () => {
+    const items = [];
+    const maxVisiblePages = 5;
     
-    if (totalPages <= maxPagesToShow) {
-      // If there are only a few pages, show all of them
+    // If we have a smaller number of pages, show them all
+    if (totalPages <= maxVisiblePages) {
       for (let i = 1; i <= totalPages; i++) {
-        range.push(i);
+        items.push(
+          <PaginationItem key={i}>
+            <PaginationLink 
+              onClick={() => handlePageChange(i)}
+              isActive={i === currentPage}
+            >
+              {i}
+            </PaginationLink>
+          </PaginationItem>
+        );
       }
-    } else {
-      // Always show current page
-      range.push(currentPage);
-      
-      // Add page before current if possible
-      if (currentPage > 1) {
-        range.unshift(currentPage - 1);
-      }
-      
-      // Add page after current if possible
-      if (currentPage < totalPages) {
-        range.push(currentPage + 1);
-      }
-      
-      // Fill in any remaining slots
-      while (range.length < maxPagesToShow && range.length < totalPages) {
-        if (range[0] > 1) {
-          range.unshift(range[0] - 1);
-        } else if (range[range.length - 1] < totalPages) {
-          range.push(range[range.length - 1] + 1);
-        } else {
-          break;
-        }
+      return items;
+    }
+    
+    // Add first page
+    items.push(
+      <PaginationItem key={1}>
+        <PaginationLink 
+          onClick={() => handlePageChange(1)}
+          isActive={1 === currentPage}
+        >
+          1
+        </PaginationLink>
+      </PaginationItem>
+    );
+    
+    // Add ellipsis if current page is far from the first page
+    if (currentPage > 3) {
+      items.push(
+        <PaginationItem key="ellipsis-start">
+          <PaginationEllipsis />
+        </PaginationItem>
+      );
+    }
+    
+    // Add pages around current page
+    const startPage = Math.max(2, currentPage - 1);
+    const endPage = Math.min(totalPages - 1, currentPage + 1);
+    
+    for (let i = startPage; i <= endPage; i++) {
+      if (i > 1 && i < totalPages) {
+        items.push(
+          <PaginationItem key={i}>
+            <PaginationLink 
+              onClick={() => handlePageChange(i)}
+              isActive={i === currentPage}
+            >
+              {i}
+            </PaginationLink>
+          </PaginationItem>
+        );
       }
     }
     
-    return range;
+    // Add ellipsis if current page is far from the last page
+    if (currentPage < totalPages - 2) {
+      items.push(
+        <PaginationItem key="ellipsis-end">
+          <PaginationEllipsis />
+        </PaginationItem>
+      );
+    }
+    
+    // Add last page
+    if (totalPages > 1) {
+      items.push(
+        <PaginationItem key={totalPages}>
+          <PaginationLink 
+            onClick={() => handlePageChange(totalPages)}
+            isActive={totalPages === currentPage}
+          >
+            {totalPages}
+          </PaginationLink>
+        </PaginationItem>
+      );
+    }
+    
+    return items;
   };
+
+  const currentEntries = getCurrentPageEntries();
 
   return (
     <Card className="glass subtle-shadow animate-slide-up animation-delay-300">
@@ -161,11 +195,11 @@ const LogTable = ({ entries }: LogTableProps) => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {paginatedEntries.length > 0 ? (
-                paginatedEntries.map((entry) => (
+              {currentEntries.length > 0 ? (
+                currentEntries.map((entry) => (
                   <TableRow key={entry.id}>
                     <TableCell>{format(new Date(entry.date), 'MMM d, yyyy')}</TableCell>
-                    <TableCell>{getDayOfWeek(entry.date)}</TableCell>
+                    <TableCell>{format(new Date(entry.date), 'EEEE')}</TableCell>
                     <TableCell>{entry.userId === currentUser.id ? currentUser.email : entry.userId}</TableCell>
                     <TableCell>{getOfficeLocation(entry)}</TableCell>
                     <TableCell>{formatEntryType(entry.type)}</TableCell>
@@ -181,11 +215,11 @@ const LogTable = ({ entries }: LogTableProps) => {
           </Table>
         </div>
         
-        {/* Pagination controls */}
+        {/* Improved pagination controls */}
         {processedEntries.length > 0 && (
           <div className="flex justify-between items-center mt-4">
             <div className="text-sm text-muted-foreground">
-              Showing {processedEntries.length > 0 ? 
+              Showing {currentEntries.length > 0 ? 
                 `${(currentPage - 1) * itemsPerPage + 1} to ${Math.min(currentPage * itemsPerPage, processedEntries.length)}` : 0} of {processedEntries.length} entries
             </div>
             
@@ -193,26 +227,19 @@ const LogTable = ({ entries }: LogTableProps) => {
               <PaginationContent>
                 <PaginationItem>
                   <PaginationPrevious 
-                    onClick={goToPreviousPage}
-                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
+                    onClick={() => handlePageChange(currentPage - 1)}
+                    className={currentPage === 1 ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    aria-disabled={currentPage === 1}
                   />
                 </PaginationItem>
                 
-                {getPageNumbers().map((pageNum) => (
-                  <PaginationItem key={pageNum}>
-                    <PaginationLink 
-                      onClick={() => goToPage(pageNum)}
-                      isActive={pageNum === currentPage}
-                    >
-                      {pageNum}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
+                {renderPaginationItems()}
                 
                 <PaginationItem>
                   <PaginationNext 
-                    onClick={goToNextPage}
-                    className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : ''}
+                    onClick={() => handlePageChange(currentPage + 1)}
+                    className={currentPage >= totalPages ? 'pointer-events-none opacity-50' : 'cursor-pointer'}
+                    aria-disabled={currentPage >= totalPages}
                   />
                 </PaginationItem>
               </PaginationContent>

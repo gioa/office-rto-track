@@ -4,18 +4,17 @@ import { Entry, DateRange } from "@/lib/types";
 import { countEntriesByType, countEntriesInDateRange } from "@/lib/utils/entryFilters";
 import { Activity, ShieldCheck, Calendar, Building } from "lucide-react";
 import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface StatsProps {
   entries: Entry[];
   dateRange: DateRange;
 }
 
-// Top office locations for the mock data
-const officeLocations = [
-  { name: "SF", count: 12 },
-  { name: "NYC", count: 9 },
-  { name: "MTV", count: 6 }
-];
+interface OfficeLocation {
+  name: string;
+  count: number;
+}
 
 const Stats = ({ entries, dateRange }: StatsProps) => {
   const [stats, setStats] = useState({
@@ -25,7 +24,54 @@ const Stats = ({ entries, dateRange }: StatsProps) => {
     weeklyAverage: 0,
     complianceRate: 0
   });
-
+  
+  const [topOffices, setTopOffices] = useState<OfficeLocation[]>([]);
+  
+  // Calculate top office locations from badge entries
+  useEffect(() => {
+    const fetchTopOffices = async () => {
+      try {
+        // Get all badge entries from Supabase
+        const { data, error } = await supabase
+          .from('badge_entries')
+          .select('office_location, count')
+          .not('office_location', 'is', null)
+          .filter('day_of_week', 'neq', 0)  // Exclude Sunday
+          .filter('day_of_week', 'neq', 6);  // Exclude Saturday
+        
+        if (error) throw error;
+        
+        // Create a map to count occurrences of each office
+        const officeMap = new Map<string, number>();
+        
+        // For database query results that don't have aggregation
+        if (data && Array.isArray(data)) {
+          data.forEach(entry => {
+            if (entry.office_location) {
+              const location = entry.office_location;
+              officeMap.set(location, (officeMap.get(location) || 0) + 1);
+            }
+          });
+        }
+        
+        // Convert map to array and sort by count
+        const sortedOffices = Array.from(officeMap.entries())
+          .map(([name, count]) => ({ name, count }))
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 3);  // Get top 3
+        
+        setTopOffices(sortedOffices.length > 0 ? sortedOffices : [
+          { name: "No Data", count: 0 } 
+        ]);
+      } catch (error) {
+        console.error("Error fetching top offices:", error);
+        setTopOffices([{ name: "Error", count: 0 }]);
+      }
+    };
+    
+    fetchTopOffices();
+  }, []);
+  
   // Recalculate stats when entries or dateRange changes
   useEffect(() => {
     // Calculate metrics - count events as office visits for stats
@@ -122,11 +168,11 @@ const Stats = ({ entries, dateRange }: StatsProps) => {
           <Building className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
-          <div className="text-2xl font-bold">{officeLocations[0].name}</div>
+          <div className="text-2xl font-bold">{topOffices[0]?.name || "N/A"}</div>
           <p className="text-xs text-muted-foreground">
-            {officeLocations.map((office, index) => (
+            {topOffices.map((office, index) => (
               <span key={office.name}>
-                {office.name}: {office.count}{index < officeLocations.length - 1 ? ', ' : ''}
+                {office.name}: {office.count}{index < topOffices.length - 1 ? ', ' : ''}
               </span>
             ))}
           </p>
