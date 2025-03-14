@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -16,12 +15,14 @@ import { currentUser } from "@/lib/data/currentUser";
 interface EntryFormProps {
   compact?: boolean;
   initialDate?: Date;
+  onSubmitComplete?: (keepOpen: boolean) => void;
 }
 
-const EntryForm = ({ compact = false, initialDate }: EntryFormProps) => {
+const EntryForm = ({ compact = false, initialDate, onSubmitComplete }: EntryFormProps) => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedType, setSelectedType] = useState<string>("office-visit");
+  const [addAnother, setAddAnother] = useState(false);
   
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -111,10 +112,24 @@ const EntryForm = ({ compact = false, initialDate }: EntryFormProps) => {
     });
     
     setIsSubmitting(false);
-    form.reset();
     
-    // In compact mode (sidebar), don't navigate away, just reset the form
-    if (!compact) {
+    // Keep modal open if adding another entry, otherwise close it
+    if (onSubmitComplete) {
+      onSubmitComplete(addAnother);
+    }
+    
+    // Reset form if we're adding another entry or if we're in standalone mode
+    if (addAnother || !compact) {
+      form.reset({
+        date: initialDate || new Date(),
+        type: values.type, // Maintain the same type for convenience
+        note: "",
+      });
+    }
+    
+    // In compact mode (sidebar), don't navigate away if not adding another
+    // Only navigate away if we're in the full form mode and not adding another
+    if (!compact && !addAnother) {
       navigate("/");
     }
   };
@@ -140,6 +155,8 @@ const EntryForm = ({ compact = false, initialDate }: EntryFormProps) => {
         isSubmitting={isSubmitting}
         selectedType={selectedType}
         handleTypeChange={handleTypeChange}
+        addAnother={addAnother}
+        setAddAnother={setAddAnother}
       />
     );
   }
@@ -160,6 +177,8 @@ const EntryForm = ({ compact = false, initialDate }: EntryFormProps) => {
           isSubmitting={isSubmitting}
           selectedType={selectedType}
           handleTypeChange={handleTypeChange}
+          addAnother={addAnother}
+          setAddAnother={setAddAnother}
         />
       </CardContent>
     </Card>

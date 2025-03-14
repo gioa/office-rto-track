@@ -7,6 +7,8 @@ import EntryTypeSelector from "./EntryTypeSelector";
 import EntryDateSelector from "./EntryDateSelector";
 import EntryNoteField from "./EntryNoteField";
 import { useNavigate } from "react-router-dom";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
 interface FullEntryFormProps {
   form: UseFormReturn<FormValues>;
@@ -14,6 +16,8 @@ interface FullEntryFormProps {
   isSubmitting: boolean;
   selectedType: string;
   handleTypeChange: (value: string) => void;
+  addAnother: boolean;
+  setAddAnother: (value: boolean) => void;
 }
 
 const FullEntryForm = ({
@@ -22,6 +26,8 @@ const FullEntryForm = ({
   isSubmitting,
   selectedType,
   handleTypeChange,
+  addAnother,
+  setAddAnother,
 }: FullEntryFormProps) => {
   const navigate = useNavigate();
   
@@ -41,6 +47,20 @@ const FullEntryForm = ({
         <EntryNoteField 
           control={form.control} 
         />
+        
+        <div className="flex items-center space-x-2 py-2">
+          <Checkbox 
+            id="addAnother" 
+            checked={addAnother}
+            onCheckedChange={(checked) => setAddAnother(checked === true)}
+          />
+          <Label 
+            htmlFor="addAnother" 
+            className="text-sm font-medium leading-none cursor-pointer"
+          >
+            Add another entry
+          </Label>
+        </div>
         
         <div className="flex justify-end gap-2">
           <Button 

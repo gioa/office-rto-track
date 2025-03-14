@@ -1,5 +1,5 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -29,8 +29,16 @@ const EntryFormDialog = ({
   children,
   fullWidth = true,
 }: EntryFormDialogProps) => {
+  const [open, setOpen] = useState(false);
+
+  const handleSubmitComplete = (keepOpen: boolean) => {
+    if (!keepOpen) {
+      setOpen(false);
+    }
+  };
+
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         {children ? (
           children
@@ -56,7 +64,11 @@ const EntryFormDialog = ({
         <DialogHeader>
           <DialogTitle>Add New Entry</DialogTitle>
         </DialogHeader>
-        <EntryForm compact={true} initialDate={date} />
+        <EntryForm 
+          compact={true} 
+          initialDate={date} 
+          onSubmitComplete={handleSubmitComplete}
+        />
       </DialogContent>
     </Dialog>
   );
