@@ -11,6 +11,7 @@ import {
 import { Plus } from "lucide-react";
 import EntryForm from "./EntryForm";
 import { cn } from "@/lib/utils";
+import { useEntries } from "@/hooks/useEntries";
 
 interface EntryFormDialogProps {
   date?: Date;
@@ -30,6 +31,7 @@ const EntryFormDialog = ({
   fullWidth = true,
 }: EntryFormDialogProps) => {
   const [open, setOpen] = useState(false);
+  const { addEntry } = useEntries();
 
   const handleSubmitComplete = (keepOpen: boolean) => {
     if (!keepOpen) {
@@ -71,6 +73,7 @@ const EntryFormDialog = ({
           compact={true} 
           initialDate={date} 
           onSubmitComplete={handleSubmitComplete}
+          addEntry={addEntry}
         />
       </DialogContent>
     </Dialog>

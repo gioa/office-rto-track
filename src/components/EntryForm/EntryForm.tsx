@@ -9,16 +9,21 @@ import { toast } from "@/components/ui/use-toast";
 import { formSchema, FormValues, formatEntryType } from "./EntryFormSchema";
 import CompactEntryForm from "./CompactEntryForm";
 import FullEntryForm from "./FullEntryForm";
-import { addUserEntry, addBadgeEntry } from "@/services/dataService";
-import { currentUser } from "@/lib/data/currentUser";
+import { UseMutationResult } from "@tanstack/react-query";
 
 interface EntryFormProps {
   compact?: boolean;
   initialDate?: Date;
   onSubmitComplete?: (keepOpen: boolean) => void;
+  addEntry?: UseMutationResult<any, Error, { type: string; date: Date; note?: string }, unknown>;
 }
 
-const EntryForm = ({ compact = false, initialDate, onSubmitComplete }: EntryFormProps) => {
+const EntryForm = ({ 
+  compact = false, 
+  initialDate, 
+  onSubmitComplete,
+  addEntry 
+}: EntryFormProps) => {
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedType, setSelectedType] = useState<string>("office-visit");
@@ -36,101 +41,83 @@ const EntryForm = ({ compact = false, initialDate, onSubmitComplete }: EntryForm
   const onSubmit = async (values: FormValues) => {
     setIsSubmitting(true);
     
-    // Handle the different date formats (single date or date range)
-    const date = typeof values.date === 'object' && 'from' in values.date 
-      ? values.date.from 
-      : values.date as Date;
-    
-    // If it's a date range, we need to handle it differently
-    if (typeof values.date === 'object' && 'from' in values.date && values.date.to) {
-      // Create an entry for each day in the range
-      // This is a simplified implementation
-      const startDate = new Date(values.date.from);
-      const endDate = new Date(values.date.to);
+    try {
+      // Handle the different date formats (single date or date range)
+      const date = typeof values.date === 'object' && 'from' in values.date 
+        ? values.date.from 
+        : values.date as Date;
       
-      for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
-        // Skip weekends
-        const dayOfWeek = d.getDay();
-        if (dayOfWeek === 0 || dayOfWeek === 6) continue;
+      // If it's a date range and we have the addEntry mutation
+      if (typeof values.date === 'object' && 'from' in values.date && values.date.to && addEntry) {
+        // Create an entry for each day in the range
+        const startDate = new Date(values.date.from);
+        const endDate = new Date(values.date.to);
         
-        // Add entry to our data model
-        if (values.type === 'office-visit') {
-          addBadgeEntry({
-            email: currentUser.email,
-            date: new Date(d),
-            dayOfWeek,
-            officeLocation: 'Default Office'
-          });
-        } else {
-          addUserEntry({
-            email: currentUser.email,
-            date: new Date(d),
-            dayOfWeek,
-            type: values.type,
-            note: values.note
+        for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+          // Skip weekends
+          const dayOfWeek = d.getDay();
+          if (dayOfWeek === 0 || dayOfWeek === 6) continue;
+          
+          // Use the addEntry mutation from useEntries hook
+          await addEntry.mutateAsync({ 
+            type: values.type, 
+            date: new Date(d), 
+            note: values.note 
           });
         }
+      } else if (addEntry) {
+        // Single day entry using the addEntry mutation
+        await addEntry.mutateAsync({ 
+          type: values.type, 
+          date, 
+          note: values.note 
+        });
       }
-    } else {
-      // Single day entry
-      const dayOfWeek = date.getDay();
       
-      // Add entry to our data model
-      if (values.type === 'office-visit') {
-        addBadgeEntry({
-          email: currentUser.email,
-          date,
-          dayOfWeek,
-          officeLocation: 'Default Office'
-        });
-      } else {
-        addUserEntry({
-          email: currentUser.email,
-          date,
-          dayOfWeek,
-          type: values.type,
-          note: values.note
+      // Show success message
+      toast({
+        title: "Entry added successfully",
+        description: (
+          <div className="mt-2 w-[340px] rounded-md p-4">
+            <div className="flex items-center gap-2">
+              <Check className="h-4 w-4 text-green-500" />
+              <span>
+                {typeof values.date === 'object' && 'from' in values.date 
+                  ? `${format(values.date.from, "MMMM d, yyyy")} ${values.date.to ? `- ${format(values.date.to, "MMMM d, yyyy")}` : ''}`
+                  : format(values.date as Date, "MMMM d, yyyy")} - {formatEntryType(values.type)}
+              </span>
+            </div>
+          </div>
+        ),
+      });
+    } catch (error) {
+      toast({
+        title: "Error adding entry",
+        description: error instanceof Error ? error.message : "An unknown error occurred",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+      
+      // Keep modal open if adding another entry, otherwise close it
+      if (onSubmitComplete) {
+        onSubmitComplete(addAnother);
+      }
+      
+      // Reset form if we're adding another entry or if we're in standalone mode
+      if (addAnother || !compact) {
+        form.reset({
+          date: initialDate || new Date(),
+          type: values.type, // Maintain the same type for convenience
+          note: "",
         });
       }
-    }
-    
-    // Show success message
-    toast({
-      title: "Entry added successfully",
-      description: (
-        <div className="mt-2 w-[340px] rounded-md p-4">
-          <div className="flex items-center gap-2">
-            <Check className="h-4 w-4 text-green-500" />
-            <span>
-              {typeof values.date === 'object' && 'from' in values.date 
-                ? `${format(values.date.from, "MMMM d, yyyy")} ${values.date.to ? `- ${format(values.date.to, "MMMM d, yyyy")}` : ''}`
-                : format(values.date as Date, "MMMM d, yyyy")} - {formatEntryType(values.type)}
-            </span>
-          </div>
-        </div>
-      ),
-    });
-    
-    setIsSubmitting(false);
-    
-    // Keep modal open if adding another entry, otherwise close it
-    if (onSubmitComplete) {
-      onSubmitComplete(addAnother);
-    }
-    
-    // Reset form if we're adding another entry or if we're in standalone mode
-    if (addAnother || !compact) {
-      form.reset({
-        date: initialDate || new Date(),
-        type: values.type, // Maintain the same type for convenience
-        note: "",
-      });
-    }
-    
-    // In compact mode (sidebar), don't navigate away if not adding another
-    // Only navigate away if we're in the full form mode and not adding another
-    if (!compact && !addAnother) {
-      navigate("/");
+      
+      // In compact mode (sidebar), don't navigate away if not adding another
+      // Only navigate away if we're in the full form mode and not adding another
+      if (!compact && !addAnother) {
+        navigate("/");
+      }
     }
   };
 
