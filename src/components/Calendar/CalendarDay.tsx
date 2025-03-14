@@ -106,7 +106,6 @@ const CalendarDay = ({
             dayIsWeekend={dayIsWeekend}
             entryType={entryType}
             isPlannedDay={isPlannedDay}
-            day={day}
           />
         </button>
       </TooltipTrigger>
