@@ -75,10 +75,35 @@ export const useEntries = (filterOptions?: FilterOptions) => {
     },
   });
   
+  // Mutation for deleting an entry
+  const deleteEntry = useMutation({
+    mutationFn: async (entryId: string) => {
+      // We'll use the entry ID to determine if it's a badge or user entry
+      // This is a simplification - in a real app you might want to be more explicit
+      return dataService.deleteEntry(entryId);
+    },
+    onSuccess: () => {
+      // Invalidate and refetch entries
+      queryClient.invalidateQueries({ queryKey: [ENTRIES_QUERY_KEY] });
+      toast({
+        title: 'Entry deleted',
+        description: 'The entry has been successfully deleted.',
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Error deleting entry',
+        description: error instanceof Error ? error.message : 'An unknown error occurred',
+        variant: 'destructive',
+      });
+    },
+  });
+  
   return {
     entries: filteredEntries,
     isLoading,
     error,
     addEntry,
+    deleteEntry,
   };
 };

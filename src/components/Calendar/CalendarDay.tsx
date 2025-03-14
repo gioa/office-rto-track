@@ -1,6 +1,6 @@
 
 import { isSameDay, isSameMonth, format, isAfter, isToday } from "date-fns";
-import { CircleCheck, Plus } from "lucide-react";
+import { CircleCheck, Plus, Trash2 } from "lucide-react";
 import { Entry, PlannedDay } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
@@ -8,6 +8,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import EntryFormDialog from "@/components/EntryForm/EntryFormDialog";
 import { getEntriesForDay, getFirstEntryType, formatEntryType, isWeekend } from "./utils";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { useEntries } from "@/hooks/entries";
 
 interface CalendarDayProps {
   day: Date;
@@ -28,6 +30,7 @@ const CalendarDay = ({
 }: CalendarDayProps) => {
   // Use the consistent isWeekend helper
   const dayIsWeekend = isWeekend(day);
+  const { addEntry } = useEntries();
   
   // Force empty entries array for weekend days
   const filteredEntries = dayIsWeekend ? [] : getEntriesForDay(entries, day);
@@ -43,6 +46,12 @@ const CalendarDay = ({
   // Check if this day is a planned office day - never on weekends
   const isPlannedDay = !dayIsWeekend && isAfter(day, new Date()) && 
     plannedDays.some(pd => pd.weekday === day.getDay());
+  
+  // Check if the entry is an office visit which can't be deleted
+  const isOfficeVisit = entryType === 'office-visit';
+  
+  // Check if we have a user entry (sick, pto, event, holiday) that can be deleted
+  const isDeletableEntry = hasEntry && !isOfficeVisit;
   
   const getDateClasses = (day: Date) => {
     const isCurrentToday = isToday(day);
@@ -123,12 +132,19 @@ const CalendarDay = ({
               ))}
             </div>
             <div className="mt-2 pt-2 border-t border-border">
-              <EntryFormDialog date={day} buttonVariant="outline" buttonSize="sm" fullWidth>
-                <Button variant="outline" size="sm" className="w-full text-xs">
-                  <Plus className="h-3 w-3 mr-1" />
-                  Add Entry
-                </Button>
-              </EntryFormDialog>
+              {/* Show different buttons based on entry type */}
+              {isOfficeVisit ? (
+                <p className="text-xs text-muted-foreground text-center">Office visit entries cannot be modified</p>
+              ) : isDeletableEntry && filteredEntries[0] ? (
+                <DeleteEntryButton entry={filteredEntries[0]} />
+              ) : (
+                <EntryFormDialog date={day} buttonVariant="outline" buttonSize="sm" fullWidth>
+                  <Button variant="outline" size="sm" className="w-full text-xs">
+                    <Plus className="h-3 w-3 mr-1" />
+                    Add Entry
+                  </Button>
+                </EntryFormDialog>
+              )}
             </div>
           </div>
         ) : isPlannedDay && !dayIsWeekend ? (
@@ -169,6 +185,47 @@ const CalendarDay = ({
         )}
       </TooltipContent>
     </Tooltip>
+  );
+};
+
+// Delete Entry Button Component
+const DeleteEntryButton = ({ entry }: { entry: Entry }) => {
+  const { deleteEntry } = useEntries();
+  
+  const handleDelete = async () => {
+    await deleteEntry.mutateAsync(entry.id);
+  };
+  
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <Button variant="outline" size="sm" className="w-full text-xs text-destructive hover:text-destructive">
+          <Trash2 className="h-3 w-3 mr-1" />
+          Delete Entry
+        </Button>
+      </AlertDialogTrigger>
+      <AlertDialogContent onClick={(e) => e.stopPropagation()}>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Delete Entry</AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to delete this {formatEntryType(entry.type).toLowerCase()} entry? 
+            This action cannot be undone.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel onClick={(e) => e.stopPropagation()}>Cancel</AlertDialogCancel>
+          <AlertDialogAction 
+            onClick={(e) => {
+              e.stopPropagation();
+              handleDelete();
+            }}
+            className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+          >
+            Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 };
 
