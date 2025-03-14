@@ -37,6 +37,7 @@ const IndexContent = () => {
   const [includeSick, setIncludeSick] = useState(true);
   const [includePto, setIncludePto] = useState(true);
   const [includeEvents, setIncludeEvents] = useState(true);
+  const [includeHolidays, setIncludeHolidays] = useState(true);
   
   // Filter options
   const filterOptions: FilterOptions = {
@@ -44,6 +45,7 @@ const IndexContent = () => {
     includeSick,
     includePto,
     includeEvents,
+    includeHolidays,
   };
   
   // Get entries using the hook
@@ -90,6 +92,8 @@ const IndexContent = () => {
                   setIncludePto={setIncludePto}
                   includeEvents={includeEvents}
                   setIncludeEvents={setIncludeEvents}
+                  includeHolidays={includeHolidays}
+                  setIncludeHolidays={setIncludeHolidays}
                 />
               </ScaleIn>
               

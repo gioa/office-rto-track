@@ -8,7 +8,8 @@ import {
   Check, 
   Thermometer,
   Plane,
-  Flag
+  Flag,
+  CalendarDays
 } from 'lucide-react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
@@ -17,10 +18,6 @@ import { cn } from '@/lib/utils';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { 
-  ToggleGroup, 
-  ToggleGroupItem 
-} from '@/components/ui/toggle-group';
 
 interface FilterBarProps {
   dateRange: DateRange;
@@ -31,6 +28,8 @@ interface FilterBarProps {
   setIncludePto: (include: boolean) => void;
   includeEvents: boolean;
   setIncludeEvents: (include: boolean) => void;
+  includeHolidays?: boolean;
+  setIncludeHolidays?: (include: boolean) => void;
 }
 
 const FilterBar = ({
@@ -41,7 +40,9 @@ const FilterBar = ({
   includePto,
   setIncludePto,
   includeEvents,
-  setIncludeEvents
+  setIncludeEvents,
+  includeHolidays = true,
+  setIncludeHolidays = () => {}
 }: FilterBarProps) => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
@@ -77,9 +78,20 @@ const FilterBar = ({
     setIsCalendarOpen(false);
   };
   
+  // Check if any filters are active
+  const hasActiveFilters = !includeSick || !includePto || !includeEvents || !includeHolidays;
+  
+  // Handle toggling all filters
+  const toggleAllFilters = (value: boolean) => {
+    setIncludeSick(value);
+    setIncludePto(value);
+    setIncludeEvents(value);
+    setIncludeHolidays(value);
+  };
+  
   return (
     <div className="space-y-4 mb-6 animate-slide-up">
-      {/* Combined Date Range Controls */}
+      {/* Combined Date Range and Filters */}
       <div className="flex flex-col sm:flex-row gap-2">
         <Popover open={isCalendarOpen} onOpenChange={setIsCalendarOpen}>
           <PopoverTrigger asChild>
@@ -107,12 +119,10 @@ const FilterBar = ({
                 setDateRange({ from: range?.from, to: range?.to });
               }}
               numberOfMonths={2}
-              className={cn("p-3 pointer-events-auto")}
+              className="p-3"
             />
-            {/* Preset date ranges at the bottom of the calendar */}
-            <div className="flex items-center justify-between p-3 border-t">
-              <span className="text-sm font-medium">Quick select:</span>
-              <div className="flex gap-2">
+            <div className="flex items-center p-3 border-t">
+              <div className="flex gap-2 mx-auto">
                 <Button variant="outline" size="sm" onClick={() => handlePresetChange("1m")}>1M</Button>
                 <Button variant="outline" size="sm" onClick={() => handlePresetChange("3m")}>3M</Button>
                 <Button variant="outline" size="sm" onClick={() => handlePresetChange("6m")}>6M</Button>
@@ -129,62 +139,64 @@ const FilterBar = ({
               className="w-full sm:w-auto relative"
             >
               <Filter className="mr-2 h-4 w-4" />
-              <span className="hidden sm:inline">Filters</span>
-              <span className="sm:hidden">Filters</span>
-              {(!includeSick || !includePto || !includeEvents) && (
+              <span>Filters</span>
+              {hasActiveFilters && (
                 <Badge variant="secondary" className="absolute -top-2 -right-2 h-5 w-5 p-0 flex items-center justify-center">
                   <Check className="h-3 w-3" />
                 </Badge>
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-80" align="start">
+          <PopoverContent className="w-60" align="start">
             <div className="space-y-4">
-              <h4 className="font-medium mb-2">Include in calculations:</h4>
+              <h4 className="font-medium">Show entry types:</h4>
               
-              <div className="space-y-2">
-                <div className="flex items-center space-x-3 p-2 rounded-md hover:bg-muted">
+              <div className="grid grid-cols-1 gap-2">
+                <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="include-sick" 
                     checked={includeSick} 
                     onCheckedChange={(checked) => setIncludeSick(checked === true)}
                   />
-                  <Label htmlFor="include-sick" className="flex flex-1 items-center cursor-pointer">
-                    <Badge variant={includeSick ? "default" : "outline"} className="gap-1 mr-2">
-                      <Thermometer className="h-3 w-3" />
-                      <span>Sick</span>
-                    </Badge>
-                    <span className="text-sm text-muted-foreground">Include sick days</span>
+                  <Label htmlFor="include-sick" className="flex items-center gap-2 cursor-pointer">
+                    <Thermometer className="h-3.5 w-3.5" />
+                    <span>Sick Days</span>
                   </Label>
                 </div>
                 
-                <div className="flex items-center space-x-3 p-2 rounded-md hover:bg-muted">
+                <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="include-pto" 
                     checked={includePto} 
                     onCheckedChange={(checked) => setIncludePto(checked === true)}
                   />
-                  <Label htmlFor="include-pto" className="flex flex-1 items-center cursor-pointer">
-                    <Badge variant={includePto ? "default" : "outline"} className="gap-1 mr-2">
-                      <Plane className="h-3 w-3" />
-                      <span>PTO</span>
-                    </Badge>
-                    <span className="text-sm text-muted-foreground">Include PTO</span>
+                  <Label htmlFor="include-pto" className="flex items-center gap-2 cursor-pointer">
+                    <Plane className="h-3.5 w-3.5" />
+                    <span>PTO</span>
                   </Label>
                 </div>
                 
-                <div className="flex items-center space-x-3 p-2 rounded-md hover:bg-muted">
+                <div className="flex items-center space-x-2">
                   <Checkbox 
                     id="include-events" 
                     checked={includeEvents} 
                     onCheckedChange={(checked) => setIncludeEvents(checked === true)}
                   />
-                  <Label htmlFor="include-events" className="flex flex-1 items-center cursor-pointer">
-                    <Badge variant={includeEvents ? "default" : "outline"} className="gap-1 mr-2">
-                      <Flag className="h-3 w-3" />
-                      <span>Events</span>
-                    </Badge>
-                    <span className="text-sm text-muted-foreground">Include company events</span>
+                  <Label htmlFor="include-events" className="flex items-center gap-2 cursor-pointer">
+                    <Flag className="h-3.5 w-3.5" />
+                    <span>Company Events</span>
+                  </Label>
+                </div>
+                
+                <div className="flex items-center space-x-2">
+                  <Checkbox 
+                    id="include-holidays" 
+                    checked={includeHolidays} 
+                    onCheckedChange={(checked) => setIncludeHolidays?.(checked === true)}
+                  />
+                  <Label htmlFor="include-holidays" className="flex items-center gap-2 cursor-pointer">
+                    <CalendarDays className="h-3.5 w-3.5" />
+                    <span>Holidays</span>
                   </Label>
                 </div>
               </div>
@@ -193,22 +205,14 @@ const FilterBar = ({
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={() => {
-                    setIncludeSick(true);
-                    setIncludePto(true);
-                    setIncludeEvents(true);
-                  }}
+                  onClick={() => toggleAllFilters(true)}
                 >
                   Select All
                 </Button>
                 <Button 
                   variant="outline" 
                   size="sm" 
-                  onClick={() => {
-                    setIncludeSick(false);
-                    setIncludePto(false);
-                    setIncludeEvents(false);
-                  }}
+                  onClick={() => toggleAllFilters(false)}
                 >
                   Clear All
                 </Button>
@@ -219,27 +223,21 @@ const FilterBar = ({
       </div>
 
       {/* Active Filters Display */}
-      {(!includeSick || !includePto || !includeEvents) && (
-        <div className="flex flex-wrap gap-2">
-          <span className="text-sm text-muted-foreground">Active filters:</span>
+      {hasActiveFilters && (
+        <div className="flex flex-wrap gap-2 items-center">
+          <span className="text-sm text-muted-foreground">Filters:</span>
           <div className="flex flex-wrap gap-2">
             {!includeSick && (
-              <Badge variant="secondary" className="gap-1">
-                <Thermometer className="h-3 w-3" />
-                <span>No Sick Days</span>
-              </Badge>
+              <Badge variant="secondary">No Sick Days</Badge>
             )}
             {!includePto && (
-              <Badge variant="secondary" className="gap-1">
-                <Plane className="h-3 w-3" />
-                <span>No PTO</span>
-              </Badge>
+              <Badge variant="secondary">No PTO</Badge>
             )}
             {!includeEvents && (
-              <Badge variant="secondary" className="gap-1">
-                <Flag className="h-3 w-3" />
-                <span>No Events</span>
-              </Badge>
+              <Badge variant="secondary">No Events</Badge>
+            )}
+            {!includeHolidays && (
+              <Badge variant="secondary">No Holidays</Badge>
             )}
           </div>
         </div>

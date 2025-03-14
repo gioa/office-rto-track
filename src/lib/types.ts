@@ -1,3 +1,4 @@
+
 export type EntryType = 'office-visit' | 'sick' | 'pto' | 'event' | 'holiday';
 
 export interface Entry {
@@ -27,6 +28,7 @@ export interface FilterOptions {
   includeSick: boolean;
   includePto: boolean;
   includeEvents: boolean;
+  includeHolidays: boolean;
 }
 
 export interface WeeklyStats {

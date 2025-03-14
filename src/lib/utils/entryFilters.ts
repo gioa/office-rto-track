@@ -50,7 +50,8 @@ export const getFilteredEntries = (
     dateRange?: { from?: Date, to?: Date },
     includeSick?: boolean,
     includePto?: boolean,
-    includeEvents?: boolean
+    includeEvents?: boolean,
+    includeHolidays?: boolean
   }
 ): Entry[] => {
   // Create a defensive copy of entries to avoid mutation
@@ -72,6 +73,7 @@ export const getFilteredEntries = (
     if (entry.type === 'sick' && filters.includeSick === false) return false;
     if (entry.type === 'pto' && filters.includePto === false) return false;
     if (entry.type === 'event' && filters.includeEvents === false) return false;
+    if (entry.type === 'holiday' && filters.includeHolidays === false) return false;
     
     return true;
   });
