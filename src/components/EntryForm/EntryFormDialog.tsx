@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -52,15 +53,14 @@ const EntryFormDialog = ({
             variant={buttonVariant} 
             size={buttonSize}
             className={cn(
-              "shadow-md hover:shadow-lg transition-all duration-300 bg-primary hover:bg-primary/90 font-medium", 
-              "hover:translate-y-[-2px]",
+              "shadow-md transition-all duration-300 font-medium", 
+              "hover:shadow-lg hover:translate-y-[-2px] hover:bg-primary/90",
               "mt-6",
-              "text-white",
               className, 
               fullWidth ? "w-full" : ""
             )}
           >
-            <Plus className="h-4 w-4 mr-2 text-white" />
+            <Plus className="h-4 w-4 mr-2" />
             Add Entry
           </Button>
         )}
