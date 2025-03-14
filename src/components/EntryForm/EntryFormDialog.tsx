@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -37,9 +36,15 @@ const EntryFormDialog = ({
     }
   };
 
+  const handleTriggerClick = (e: React.MouseEvent) => {
+    if (children) {
+      e.stopPropagation();
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
+      <DialogTrigger asChild onClick={handleTriggerClick}>
         {children ? (
           children
         ) : (
@@ -50,17 +55,17 @@ const EntryFormDialog = ({
               "shadow-md hover:shadow-lg transition-all duration-300 bg-primary hover:bg-primary/90 font-medium", 
               "hover:translate-y-[-2px]",
               "mt-6",
-              "text-white", // Add explicit text-white class
+              "text-white",
               className, 
               fullWidth ? "w-full" : ""
             )}
           >
-            <Plus className="h-4 w-4 mr-2 text-white" /> {/* Add text-white to the icon */}
+            <Plus className="h-4 w-4 mr-2 text-white" />
             Add Entry
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px]" onClick={(e) => e.stopPropagation()}>
         <DialogHeader>
           <DialogTitle>Add New Entry</DialogTitle>
         </DialogHeader>

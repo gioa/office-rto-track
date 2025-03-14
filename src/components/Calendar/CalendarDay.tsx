@@ -53,6 +53,11 @@ const CalendarDay = ({
     );
   };
   
+  // Added a handler to stop propagation on the tooltip content
+  const handleTooltipContentClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+  };
+  
   return (
     <Tooltip delayDuration={300}>
       <TooltipTrigger asChild>
@@ -86,7 +91,7 @@ const CalendarDay = ({
         </button>
       </TooltipTrigger>
       
-      <TooltipContent align="center" className="p-0 w-64">
+      <TooltipContent align="center" className="p-0 w-64" onClick={handleTooltipContentClick}>
         {dayEntries.length > 0 ? (
           <div className="p-2">
             <p className="text-sm font-medium mb-1">{format(day, 'EEEE, MMMM d, yyyy')}</p>
