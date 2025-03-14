@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -10,12 +11,13 @@ import { formSchema, FormValues, formatEntryType } from "./EntryFormSchema";
 import CompactEntryForm from "./CompactEntryForm";
 import FullEntryForm from "./FullEntryForm";
 import { UseMutationResult } from "@tanstack/react-query";
+import { currentUser } from "@/lib/data/currentUser";
 
 interface EntryFormProps {
   compact?: boolean;
   initialDate?: Date;
   onSubmitComplete?: (keepOpen: boolean) => void;
-  addEntry?: UseMutationResult<any, Error, { type: string; date: Date; note?: string }, unknown>;
+  addEntry?: UseMutationResult<any, Error, { type: string; date: Date; note?: string; officeLocation?: string }, unknown>;
 }
 
 const EntryForm = ({ 
@@ -46,6 +48,10 @@ const EntryForm = ({
         ? values.date.from 
         : values.date as Date;
       
+      // Default office location based on user or random selection
+      const officeLocations = ['San Francisco', 'New York', 'Mountain View'];
+      const defaultOffice = officeLocations[Math.floor(Math.random() * officeLocations.length)];
+      
       if (typeof values.date === 'object' && 'from' in values.date && values.date.to && addEntry) {
         const startDate = new Date(values.date.from);
         const endDate = new Date(values.date.to);
@@ -57,14 +63,16 @@ const EntryForm = ({
           await addEntry.mutateAsync({ 
             type: values.type, 
             date: new Date(d), 
-            note: values.note 
+            note: values.note,
+            officeLocation: values.type === 'office-visit' ? defaultOffice : undefined
           });
         }
       } else if (addEntry) {
         await addEntry.mutateAsync({ 
           type: values.type, 
           date, 
-          note: values.note 
+          note: values.note,
+          officeLocation: values.type === 'office-visit' ? defaultOffice : undefined
         });
       }
       

@@ -1,3 +1,4 @@
+
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -5,6 +6,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Plus } from "lucide-react";
@@ -67,6 +69,9 @@ const EntryFormDialog = ({
       <DialogContent className="sm:max-w-[425px]" onClick={(e) => e.stopPropagation()}>
         <DialogHeader>
           <DialogTitle>Add New Entry</DialogTitle>
+          <DialogDescription>
+            Record a new office visit, sick day, PTO, or company event
+          </DialogDescription>
         </DialogHeader>
         <EntryForm 
           compact={true} 

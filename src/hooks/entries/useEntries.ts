@@ -7,6 +7,7 @@ import { toast } from '@/components/ui/use-toast';
 import { Entry, FilterOptions } from '@/lib/types';
 import { getFilteredEntries } from '@/lib/utils/entryFilters';
 import * as localStorageService from '@/services/localStorageService';
+import { currentUser } from '@/lib/data/currentUser';
 
 // Query key for entries
 export const ENTRIES_QUERY_KEY = 'entries';
@@ -28,19 +29,28 @@ export const useEntries = (filterOptions?: FilterOptions) => {
   
   // Mutation for adding a new entry
   const addEntry = useMutation({
-    mutationFn: async ({ type, date, note }: { type: Entry['type'], date: Date, note?: string }) => {
+    mutationFn: async ({ type, date, note, officeLocation }: { 
+      type: Entry['type'], 
+      date: Date, 
+      note?: string,
+      officeLocation?: string 
+    }) => {
+      const userEmail = currentUser.email; // Get current user email
+      
       if (type === 'office-visit') {
-        // Wrap in Promise.resolve to ensure it returns a Promise
+        // For office visits, create a badge entry
         return Promise.resolve(localStorageService.addBadgeEntry({
-          email: 'user@example.com', // In a real app, get from auth context
+          email: userEmail,
           date,
           dayOfWeek: date.getDay(),
-          officeLocation: 'Default Office',
+          officeLocation: officeLocation || 'Default Office',
+          checkinTime: new Date(new Date(date).setHours(9, 0, 0, 0)),
+          checkoutTime: new Date(new Date(date).setHours(17, 0, 0, 0))
         }));
       } else {
-        // Wrap in Promise.resolve to ensure it returns a Promise
+        // For other types, create a user entry
         return Promise.resolve(localStorageService.addUserEntry({
-          email: 'user@example.com', // In a real app, get from auth context
+          email: userEmail,
           date,
           dayOfWeek: date.getDay(),
           type,

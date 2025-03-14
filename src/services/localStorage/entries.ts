@@ -6,6 +6,7 @@ import { Entry } from "@/lib/types";
 import { getBadgeEntries } from "./badgeEntries";
 import { getUserEntries } from "./userEntries";
 import { generateWeeklyStats } from "@/lib/data/statsGenerator";
+import { currentUser } from "@/lib/data/currentUser";
 
 // Get all entries in Entry format (for compatibility with current components)
 export const getAllEntries = (): Entry[] => {
@@ -17,7 +18,7 @@ export const getAllEntries = (): Entry[] => {
     id: badge.id,
     date: new Date(badge.date),
     type: 'office-visit',
-    userId: badge.email,
+    userId: badge.email === currentUser.email ? currentUser.id : badge.email,
   }));
   
   // Convert user entries to Entry format
@@ -26,7 +27,7 @@ export const getAllEntries = (): Entry[] => {
     date: new Date(entry.date),
     type: entry.type,
     note: entry.note,
-    userId: entry.email,
+    userId: entry.email === currentUser.email ? currentUser.id : entry.email,
   }));
   
   return [...officeVisits, ...otherEntries];

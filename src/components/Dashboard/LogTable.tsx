@@ -69,6 +69,21 @@ const LogTable = ({ entries }: LogTableProps) => {
     }
   };
 
+  // Get office location from entry ID
+  const getOfficeLocation = (entry: Entry): string => {
+    if (entry.type !== 'office-visit' && entry.type !== 'event') {
+      return 'N/A';
+    }
+    
+    const id = entry.id;
+    if (id.includes('sf')) return 'SF';
+    if (id.includes('ny')) return 'NYC';
+    if (id.includes('mtv')) return 'MTV';
+    
+    // For new entries that don't have location in ID
+    return id.substring(0, 2).toUpperCase();
+  };
+
   const handleNextPage = () => {
     if (page < totalPages - 1) {
       setPage(page + 1);
@@ -122,11 +137,8 @@ const LogTable = ({ entries }: LogTableProps) => {
                   <TableRow key={entry.id}>
                     <TableCell>{format(new Date(entry.date), 'MMM d, yyyy')}</TableCell>
                     <TableCell>{getDayOfWeek(entry.date)}</TableCell>
-                    <TableCell>{entry.userId === currentUser.id ? currentUser.email : 'company@example.com'}</TableCell>
-                    <TableCell>{entry.type === 'office-visit' || entry.type === 'event' ? 
-                      (entry.id.includes('sf') ? 'SF' : 
-                       entry.id.includes('ny') ? 'NYC' : 'MTV') : 
-                      'N/A'}</TableCell>
+                    <TableCell>{entry.userId === currentUser.id ? currentUser.email : entry.userId}</TableCell>
+                    <TableCell>{getOfficeLocation(entry)}</TableCell>
                     <TableCell>{formatEntryType(entry.type)}</TableCell>
                     <TableCell className="max-w-[200px] truncate">{entry.note || '-'}</TableCell>
                   </TableRow>
