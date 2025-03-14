@@ -6,7 +6,7 @@ import { LucideIcon } from "lucide-react";
 interface StatsCardProps {
   title: string;
   value: string | number;
-  description: string;
+  description: React.ReactNode;
   icon: LucideIcon;
   children?: React.ReactNode;
 }
@@ -20,7 +20,7 @@ const StatsCard = ({ title, value, description, icon: Icon, children }: StatsCar
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{value}</div>
-        <p className="text-xs text-muted-foreground">{description}</p>
+        <div className="text-xs text-muted-foreground">{description}</div>
         {children}
       </CardContent>
     </Card>

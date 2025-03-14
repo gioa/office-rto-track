@@ -78,17 +78,16 @@ const TopOfficesCard = () => {
     };
   }, []);
 
+  // Format the description text instead of using JSX elements
+  const descriptionText = topOffices.map(office => 
+    `${office.name}: ${office.count}`
+  ).join(', ');
+
   return (
     <StatsCard
       title="Top Offices"
       value={topOffices[0]?.name || "N/A"}
-      description={
-        topOffices.map((office, index) => (
-          <span key={office.name}>
-            {office.name}: {office.count}{index < topOffices.length - 1 ? ', ' : ''}
-          </span>
-        ))
-      }
+      description={descriptionText}
       icon={Building}
     />
   );
