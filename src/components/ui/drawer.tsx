@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import { Drawer as DrawerPrimitive } from "vaul"
 
@@ -44,6 +45,18 @@ const DrawerContent = React.forwardRef<
         "fixed inset-x-0 bottom-0 z-50 mt-24 flex h-auto flex-col rounded-t-[10px] border bg-background",
         className
       )}
+      onInteractOutside={(e) => {
+        // Prevent closing when clicking on calendar-related elements
+        const target = e.target as HTMLElement;
+        if (
+          target.closest('.calendar') ||
+          target.closest('.calendar-day') ||
+          target.closest('.tooltip-content') ||
+          target.closest('[role="dialog"]')
+        ) {
+          e.preventDefault();
+        }
+      }}
       {...props}
     >
       <div className="mx-auto mt-4 h-2 w-[100px] rounded-full bg-muted" />

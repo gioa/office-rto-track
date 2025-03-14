@@ -1,4 +1,3 @@
-
 import * as SheetPrimitive from "@radix-ui/react-dialog"
 import { cva, type VariantProps } from "class-variance-authority"
 import { X } from "lucide-react"
@@ -57,17 +56,7 @@ const SheetContent = React.forwardRef<
   SheetContentProps
 >(({ side = "right", className, children, ...props }, ref) => (
   <SheetPortal>
-    <SheetOverlay onPointerDownOutside={(e) => {
-      // Prevent closing when clicking on calendar-related elements
-      const target = e.target as HTMLElement;
-      if (
-        target.closest('.calendar') ||
-        target.closest('.tooltip-content') ||
-        target.closest('[role="dialog"]')
-      ) {
-        e.preventDefault();
-      }
-    }} />
+    <SheetOverlay />
     <SheetPrimitive.Content
       ref={ref}
       className={cn(sheetVariants({ side }), className)}
