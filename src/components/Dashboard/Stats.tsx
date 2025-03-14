@@ -31,10 +31,10 @@ const Stats = ({ entries, dateRange }: StatsProps) => {
   useEffect(() => {
     const fetchTopOffices = async () => {
       try {
-        // Get all badge entries from Supabase
+        // Get all badge entries from Supabase - excluding weekends
         const { data, error } = await supabase
           .from('badge_entries')
-          .select('office_location, count')
+          .select('office_location')
           .not('office_location', 'is', null)
           .filter('day_of_week', 'neq', 0)  // Exclude Sunday
           .filter('day_of_week', 'neq', 6);  // Exclude Saturday
@@ -44,7 +44,7 @@ const Stats = ({ entries, dateRange }: StatsProps) => {
         // Create a map to count occurrences of each office
         const officeMap = new Map<string, number>();
         
-        // For database query results that don't have aggregation
+        // Process results
         if (data && Array.isArray(data)) {
           data.forEach(entry => {
             if (entry.office_location) {
@@ -74,22 +74,28 @@ const Stats = ({ entries, dateRange }: StatsProps) => {
   
   // Recalculate stats when entries or dateRange changes
   useEffect(() => {
+    // Filter out weekend entries first
+    const weekdayEntries = entries.filter(entry => {
+      const day = new Date(entry.date).getDay();
+      return day !== 0 && day !== 6; // 0 = Sunday, 6 = Saturday
+    });
+    
     // Calculate metrics - count events as office visits for stats
-    const officeVisits = entries.filter(entry => entry.type === 'office-visit').length;
-    const eventDays = entries.filter(entry => entry.type === 'event').length;
+    const officeVisits = weekdayEntries.filter(entry => entry.type === 'office-visit').length;
+    const eventDays = weekdayEntries.filter(entry => entry.type === 'event').length;
     const totalOfficeVisits = officeVisits + eventDays;
     
-    const totalSickDays = countEntriesByType(entries, 'sick');
-    const totalPTO = countEntriesByType(entries, 'pto');
+    const totalSickDays = countEntriesByType(weekdayEntries, 'sick');
+    const totalPTO = countEntriesByType(weekdayEntries, 'pto');
     
     // Calculate weekly average (if date range is set)
     let weeklyAverage = 0;
     if (dateRange.from && dateRange.to) {
-      const daysDiff = Math.round((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24));
-      const weeks = Math.max(1, Math.round(daysDiff / 7));
+      const workdays = countWorkdays(dateRange.from, dateRange.to);
+      const weeks = Math.max(1, Math.round(workdays / 5));
       
       // Count office visits and events in the date range
-      const officeVisitsInRange = entries.filter(entry => {
+      const officeVisitsInRange = weekdayEntries.filter(entry => {
         const entryDate = new Date(entry.date);
         return (entry.type === 'office-visit' || entry.type === 'event') && 
                entryDate >= dateRange.from && 
@@ -103,7 +109,7 @@ const Stats = ({ entries, dateRange }: StatsProps) => {
     let complianceRate = 0;
     if (dateRange.from && dateRange.to) {
       // Count both office visits and events toward compliance
-      const officeVisitsInRange = entries.filter(entry => {
+      const officeVisitsInRange = weekdayEntries.filter(entry => {
         const entryDate = new Date(entry.date);
         return (entry.type === 'office-visit' || entry.type === 'event') && 
                entryDate >= dateRange.from && 
