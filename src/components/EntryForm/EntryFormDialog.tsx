@@ -66,7 +66,24 @@ const EntryFormDialog = ({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]" onClick={(e) => e.stopPropagation()}>
+      <DialogContent 
+        className="sm:max-w-[425px]" 
+        onClick={(e) => e.stopPropagation()}
+        onPointerDownOutside={(e) => {
+          // Prevent closing when clicking inside calendar elements
+          const target = e.target as HTMLElement;
+          if (
+            target.closest('.calendar') ||
+            target.closest('.rdp') ||
+            target.closest('.rdp-day') ||
+            target.closest('[role="dialog"]') ||
+            target.closest('.popover-content') ||
+            target.closest('.tooltip-content')
+          ) {
+            e.preventDefault();
+          }
+        }}
+      >
         <DialogHeader>
           <DialogTitle>Add New Entry</DialogTitle>
           <DialogDescription>

@@ -2,8 +2,22 @@
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import EntryForm from "@/components/EntryForm/EntryForm";
+import { useToast } from "@/hooks/use-toast";
+import { useEntries } from "@/hooks/entries";
 
 const AddEntry = () => {
+  const { toast } = useToast();
+  const { addEntry } = useEntries();
+
+  const handleSubmitComplete = (success: boolean) => {
+    if (success) {
+      toast({
+        title: "Entry added",
+        description: "Your entry has been successfully recorded.",
+      });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30">
       <Header />
@@ -18,7 +32,10 @@ const AddEntry = () => {
               </p>
             </div>
             
-            <EntryForm />
+            <EntryForm 
+              onSubmitComplete={handleSubmitComplete}
+              addEntry={addEntry}
+            />
           </div>
         </main>
       </div>
