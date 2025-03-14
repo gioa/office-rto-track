@@ -7,8 +7,8 @@
  * but in a real app, it would be replaced with API calls.
  */
 
-import { BadgeEntry, Entry, PlannedDay, UserEntry, UserPlannedDays } from "@/lib/types";
-import * as localStorageService from "./localStorageService";
+import { PlannedDay, UserPlannedDays } from "@/lib/types";
+import * as localStorageService from "./localStorage";
 
 // Re-export data methods from localStorage service
 // In a real app, these would make API calls instead

@@ -3,7 +3,7 @@
  * API service for fetching weekly statistics data
  */
 import { WeeklyStats } from "@/lib/types";
-import { getWeeklyStats } from "./localStorageService";
+import { getWeeklyStats } from "./localStorage/entries";
 
 /**
  * Fetches weekly stats data with fallback to local data
