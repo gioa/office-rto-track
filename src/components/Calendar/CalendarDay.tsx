@@ -99,7 +99,7 @@ const CalendarDay = ({
         </button>
       </TooltipTrigger>
       
-      <TooltipContent align="center" className="p-0 w-64" onClick={handleTooltipContentClick}>
+      <TooltipContent align="center" className="p-0 w-64 max-w-[300px]" side="top" onClick={handleTooltipContentClick}>
         {filteredEntries.length > 0 && !dayIsWeekend ? (
           <div className="p-2">
             <p className="text-sm font-medium mb-1">{format(day, 'EEEE, MMMM d, yyyy')}</p>
