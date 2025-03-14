@@ -1,69 +1,65 @@
-# Welcome to your Lovable project
 
-## Project info
+# Return to Office App
 
-**URL**: https://lovable.dev/projects/f1293a7b-916f-47ba-a689-c1d8c2244921
+A web application for managing office visits and remote work.
 
-## How can I edit this code?
+## Local Development Setup
 
-There are several ways of editing your application.
+### Prerequisites
+- Node.js (v14 or higher)
+- npm or yarn
 
-**Use Lovable**
+### Installation
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f1293a7b-916f-47ba-a689-c1d8c2244921) and start prompting.
+1. Clone the repository
+   ```bash
+   git clone <repository-url>
+   cd <project-directory>
+   ```
 
-Changes made via Lovable will be committed automatically to this repo.
+2. Install dependencies
+   ```bash
+   npm install
+   # or
+   yarn
+   ```
 
-**Use your preferred IDE**
+3. Set up environment variables
+   ```bash
+   cp .env.example .env
+   ```
+   
+   Edit the `.env` file and add your Supabase credentials:
+   ```
+   VITE_SUPABASE_URL=your_supabase_url_here
+   VITE_SUPABASE_ANON_KEY=your_supabase_anon_key_here
+   ```
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+4. Start the development server
+   ```bash
+   npm run dev
+   # or
+   yarn dev
+   ```
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## Building for Production
 
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```bash
+npm run build
+# or
+yarn build
 ```
 
-**Edit a file directly in GitHub**
+## Deployment
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+When deploying, make sure to set the environment variables in your hosting platform:
 
-**Use GitHub Codespaces**
+- For Netlify/Vercel: Set the environment variables in their dashboard
+- For other platforms: Refer to their documentation on how to set environment variables
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Important Security Notes
 
-## What technologies are used for this project?
+- **NEVER** commit your `.env` file to Git
+- **NEVER** commit the `dist` directory to Git
+- Always use environment variables for secrets
 
-This project is built with .
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/f1293a7b-916f-47ba-a689-c1d8c2244921) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
