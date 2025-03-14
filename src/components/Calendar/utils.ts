@@ -13,10 +13,10 @@ export const formatEntryType = (type: Entry['type']): string => {
   }
 };
 
-// Helper to correctly determine if a date is a weekend
+// Helper to correctly determine if a date is a weekend - Sunday (0) or Saturday (6)
 export const isWeekend = (date: Date): boolean => {
   const day = date.getDay();
-  return day === 0 || day === 6; // 0 is Sunday, 6 is Saturday (fixed weekend logic)
+  return day === 0 || day === 6; // 0 is Sunday, 6 is Saturday
 };
 
 // Ensure ALL entries for weekend days are filtered out
