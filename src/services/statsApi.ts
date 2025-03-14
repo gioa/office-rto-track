@@ -3,44 +3,26 @@
  * API service for fetching weekly statistics data
  */
 import { WeeklyStats } from "@/lib/types";
-import { mockWeeklyStats } from "@/lib/mockData";
+import { getWeeklyStats } from "./localStorageService";
 
 /**
- * Fetches weekly stats data with fallback to mock data
+ * Fetches weekly stats data with fallback to local data
  */
 export const fetchWeeklyStats = async (weeks: number = 10): Promise<WeeklyStats[]> => {
   try {
     // In a real application, we would fetch from an API
-    // For now, we'll simulate an API call but use mock data
+    // const response = await fetch('https://your-real-api-endpoint.com/stats');
+    // if (!response.ok) throw new Error(`API request failed: ${response.status}`);
+    // const data = await response.json();
+    // return formatApiResponse(data);
     
-    // For demo purposes, we'll just use our mock data directly
-    // No real API call is made to avoid CORS and network issues
-    
-    // Uncomment this code when you have a real API endpoint
-    /*
-    const response = await fetch('https://your-real-api-endpoint.com/stats', {
-      method: 'GET',
-      headers: { 'Content-Type': 'application/json' }
-    });
-    
-    if (!response.ok) {
-      throw new Error(`API request failed: ${response.status}`);
-    }
-    
-    const data = await response.json();
-    return formatApiResponse(data);
-    */
-    
-    // Simulate API latency
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    // Return mock data
-    return mockWeeklyStats;
+    // For now, get data from local storage
+    return getWeeklyStats();
     
   } catch (error) {
-    console.error("Error fetching data:", error);
-    // Always fall back to mock data
-    return mockWeeklyStats;
+    console.error("Error fetching stats data:", error);
+    // Fall back to local data
+    return getWeeklyStats();
   }
 };
 
@@ -63,5 +45,5 @@ const formatApiResponse = (data: any): WeeklyStats[] => {
   }
   
   console.error("Unable to process API response format", data);
-  return mockWeeklyStats; // Fallback to mock data
+  return getWeeklyStats(); // Fallback to local data
 };
