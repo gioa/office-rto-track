@@ -1,3 +1,4 @@
+
 import { Entry, WeeklyStats } from '../types';
 
 // Generate weekly statistics for the dashboard
@@ -17,10 +18,10 @@ export const generateWeeklyStats = (entries: Entry[]): WeeklyStats[] => {
     const weekStart = new Date(weekEnd);
     weekStart.setDate(weekEnd.getDate() - 6);
     
-    // Count days in office for this week
+    // Count days in office for this week (including events as office visits)
     const daysInOffice = entries.filter(entry => {
       const entryDate = new Date(entry.date);
-      return entry.type === 'office-visit' && 
+      return (entry.type === 'office-visit' || entry.type === 'event') && 
              entryDate >= weekStart && 
              entryDate <= weekEnd;
     }).length;
@@ -41,7 +42,7 @@ export const generateWeeklyStats = (entries: Entry[]): WeeklyStats[] => {
              entryDate <= weekEnd;
     }).length;
     
-    // Count event days for this week
+    // Count event days for this week (still track separately for stats display)
     const eventDays = entries.filter(entry => {
       const entryDate = new Date(entry.date);
       return entry.type === 'event' && 

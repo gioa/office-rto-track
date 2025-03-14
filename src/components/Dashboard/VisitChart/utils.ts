@@ -23,10 +23,10 @@ export const transformWeeklyStats = (data: WeeklyStats[]): EnhancedWeeklyStats[]
     const weekStart = startOfWeek(new Date(week.weekOf), { weekStartsOn: 0 });
     
     // Calculate how many days we still need to reach the 3-day target
+    // Note: daysInOffice already includes event days from statsGenerator
     const remainingNeeded = Math.max(0, 3 - week.daysInOffice);
     
     // Use the sickDays, ptoDays, etc. that are already in the weekly stats
-    // These values are now generated correctly based on filtered entries
     const sickDays = week.sickDays || 0;
     const ptoDays = week.ptoDays || 0;
     const eventDays = week.eventDays || 0;
@@ -39,7 +39,8 @@ export const transformWeeklyStats = (data: WeeklyStats[]): EnhancedWeeklyStats[]
     
     let remaining = remainingNeeded;
     
-    // Only include sick/pto/event/holiday days if we haven't reached 3 days yet
+    // Since events are already counted in daysInOffice, we don't need to count them again
+    // But we still want to track sick/pto/holiday days
     if (remaining > 0) {
       displaySickDays = Math.min(remaining, sickDays);
       remaining -= displaySickDays;
@@ -51,16 +52,11 @@ export const transformWeeklyStats = (data: WeeklyStats[]): EnhancedWeeklyStats[]
     }
     
     if (remaining > 0) {
-      displayEventDays = Math.min(remaining, eventDays);
-      remaining -= displayEventDays;
-    }
-    
-    if (remaining > 0) {
       displayHolidayDays = Math.min(remaining, holidayDays);
     }
     
     // Calculate compliance percentage - counting all types toward the target
-    const totalCountedDays = Math.min(3, week.daysInOffice + displaySickDays + displayPtoDays + displayEventDays + displayHolidayDays);
+    const totalCountedDays = Math.min(3, week.daysInOffice + displaySickDays + displayPtoDays + displayHolidayDays);
     const compliancePercentage = Math.min(100, Math.round((totalCountedDays / 3) * 100));
     
     // Add "Current" label for current week

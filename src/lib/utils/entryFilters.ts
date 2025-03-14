@@ -1,8 +1,12 @@
 
 import { Entry, FilterOptions } from '../types';
 
-// Count entries by type
+// Count entries by type (with special handling for office visits that include events)
 export const countEntriesByType = (entries: Entry[], type: Entry['type']): number => {
+  if (type === 'office-visit') {
+    // Count both office visits and events
+    return entries.filter(entry => entry.type === 'office-visit' || entry.type === 'event').length;
+  }
   return entries.filter(entry => entry.type === type).length;
 };
 
@@ -17,7 +21,12 @@ export const countEntriesInDateRange = (
   
   return entries.filter(entry => {
     const entryDate = new Date(entry.date);
-    const matchesType = type ? entry.type === type : true;
+    // Special handling for office visits to include events
+    const matchesType = type 
+      ? (type === 'office-visit' 
+         ? (entry.type === 'office-visit' || entry.type === 'event') 
+         : entry.type === type)
+      : true;
     return matchesType && entryDate >= from && entryDate <= to;
   }).length;
 };

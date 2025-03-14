@@ -12,6 +12,14 @@ import {
 } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { currentUser } from "@/lib/mockData";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 
 interface LogTableProps {
   entries: Entry[];
@@ -21,6 +29,7 @@ const LogTable = ({ entries }: LogTableProps) => {
   const [page, setPage] = useState(0);
   const [paginatedEntries, setPaginatedEntries] = useState<Entry[]>([]);
   const itemsPerPage = 5;
+  const totalPages = Math.ceil(entries.length / itemsPerPage);
   
   // Reset pagination when entries change
   useEffect(() => {
@@ -60,6 +69,18 @@ const LogTable = ({ entries }: LogTableProps) => {
     }
   };
 
+  const handleNextPage = () => {
+    if (page < totalPages - 1) {
+      setPage(p => p + 1);
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (page > 0) {
+      setPage(p => p - 1);
+    }
+  };
+
   return (
     <Card className="glass subtle-shadow animate-slide-up animation-delay-300">
       <CardHeader className="pb-2">
@@ -85,7 +106,7 @@ const LogTable = ({ entries }: LogTableProps) => {
                     <TableCell>{format(new Date(entry.date), 'MMM d, yyyy')}</TableCell>
                     <TableCell>{getDayOfWeek(entry.date)}</TableCell>
                     <TableCell>{entry.userId === currentUser.id ? currentUser.email : 'company@example.com'}</TableCell>
-                    <TableCell>{entry.type === 'office-visit' ? 
+                    <TableCell>{entry.type === 'office-visit' || entry.type === 'event' ? 
                       (entry.id.includes('sf') ? 'SF' : 
                        entry.id.includes('ny') ? 'NYC' : 'MTV') : 
                       'N/A'}</TableCell>
@@ -108,22 +129,39 @@ const LogTable = ({ entries }: LogTableProps) => {
             <div className="text-sm text-muted-foreground">
               Showing {entries.length > 0 ? page * itemsPerPage + 1 : 0} to {Math.min((page + 1) * itemsPerPage, entries.length)} of {entries.length} entries
             </div>
-            <div className="flex gap-2">
-              <button 
-                onClick={() => setPage(p => Math.max(0, p - 1))}
-                disabled={page === 0}
-                className="px-2 py-1 text-sm border rounded disabled:opacity-50"
-              >
-                Previous
-              </button>
-              <button 
-                onClick={() => setPage(p => p + 1)}
-                disabled={(page + 1) * itemsPerPage >= entries.length}
-                className="px-2 py-1 text-sm border rounded disabled:opacity-50"
-              >
-                Next
-              </button>
-            </div>
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={handlePrevPage} 
+                    className={page === 0 ? 'pointer-events-none opacity-50' : ''}
+                  />
+                </PaginationItem>
+                
+                {Array.from({ length: Math.min(3, totalPages) }).map((_, i) => {
+                  const pageNum = i;
+                  const isActive = pageNum === page;
+                  
+                  return (
+                    <PaginationItem key={i}>
+                      <PaginationLink 
+                        onClick={() => setPage(pageNum)}
+                        isActive={isActive}
+                      >
+                        {pageNum + 1}
+                      </PaginationLink>
+                    </PaginationItem>
+                  );
+                })}
+                
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={handleNextPage}
+                    className={page >= totalPages - 1 ? 'pointer-events-none opacity-50' : ''}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
           </div>
         )}
       </CardContent>

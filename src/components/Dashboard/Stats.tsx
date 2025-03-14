@@ -28,8 +28,11 @@ const Stats = ({ entries, dateRange }: StatsProps) => {
 
   // Recalculate stats when entries or dateRange changes
   useEffect(() => {
-    // Calculate metrics
-    const totalOfficeVisits = countEntriesByType(entries, 'office-visit');
+    // Calculate metrics - count events as office visits for stats
+    const officeVisits = entries.filter(entry => entry.type === 'office-visit').length;
+    const eventDays = entries.filter(entry => entry.type === 'event').length;
+    const totalOfficeVisits = officeVisits + eventDays;
+    
     const totalSickDays = countEntriesByType(entries, 'sick');
     const totalPTO = countEntriesByType(entries, 'pto');
     
@@ -38,14 +41,29 @@ const Stats = ({ entries, dateRange }: StatsProps) => {
     if (dateRange.from && dateRange.to) {
       const daysDiff = Math.round((dateRange.to.getTime() - dateRange.from.getTime()) / (1000 * 60 * 60 * 24));
       const weeks = Math.max(1, Math.round(daysDiff / 7));
-      const officeVisitsInRange = countEntriesInDateRange(entries, dateRange.from, dateRange.to, 'office-visit');
+      
+      // Count office visits and events in the date range
+      const officeVisitsInRange = entries.filter(entry => {
+        const entryDate = new Date(entry.date);
+        return (entry.type === 'office-visit' || entry.type === 'event') && 
+               entryDate >= dateRange.from && 
+               entryDate <= dateRange.to;
+      }).length;
+      
       weeklyAverage = Math.round((officeVisitsInRange / weeks) * 10) / 10;
     }
     
     // Calculate compliance
     let complianceRate = 0;
     if (dateRange.from && dateRange.to) {
-      const officeVisitsInRange = countEntriesInDateRange(entries, dateRange.from, dateRange.to, 'office-visit');
+      // Count both office visits and events toward compliance
+      const officeVisitsInRange = entries.filter(entry => {
+        const entryDate = new Date(entry.date);
+        return (entry.type === 'office-visit' || entry.type === 'event') && 
+               entryDate >= dateRange.from && 
+               entryDate <= dateRange.to;
+      }).length;
+      
       const workdays = countWorkdays(dateRange.from, dateRange.to);
       const weeks = Math.max(1, Math.round(workdays / 5));
       const requiredDays = weeks * 3; // 3 days per week policy
