@@ -41,9 +41,10 @@ const EntryFormDialog = ({
   };
 
   const handleTriggerClick = (e: React.MouseEvent) => {
-    if (children) {
-      e.stopPropagation();
-    }
+    // Stop propagation to prevent parent elements from capturing the click
+    e.stopPropagation();
+    // Set the dialog to open
+    setOpen(true);
   };
 
   return (
