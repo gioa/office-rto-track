@@ -1,6 +1,6 @@
 
 import { WeeklyStats } from "@/lib/types";
-import { format, startOfWeek, endOfWeek } from "date-fns";
+import { format, isThisWeek, startOfWeek, endOfWeek } from "date-fns";
 
 export interface EnhancedWeeklyStats extends WeeklyStats {
   weekLabel: string;
@@ -17,8 +17,8 @@ export interface EnhancedWeeklyStats extends WeeklyStats {
 
 export const transformWeeklyStats = (data: WeeklyStats[]): EnhancedWeeklyStats[] => {
   return data.map(week => {
-    // Use the provided data directly without refiltering from mockEntries
-    // This ensures filtered data is correctly represented
+    // Check if this is the current week
+    const isCurrentWeek = isThisWeek(new Date(week.weekOf));
     
     const weekStart = startOfWeek(new Date(week.weekOf), { weekStartsOn: 0 });
     
@@ -63,9 +63,14 @@ export const transformWeeklyStats = (data: WeeklyStats[]): EnhancedWeeklyStats[]
     const totalCountedDays = Math.min(3, week.daysInOffice + displaySickDays + displayPtoDays + displayEventDays + displayHolidayDays);
     const compliancePercentage = Math.min(100, Math.round((totalCountedDays / 3) * 100));
     
+    // Add "Current" label for current week
+    const weekLabel = isCurrentWeek 
+      ? "Current" 
+      : format(new Date(week.weekOf), 'MMM d');
+    
     return {
       ...week,
-      weekLabel: format(new Date(week.weekOf), 'MMM d'),
+      weekLabel,
       sickDays,
       ptoDays,
       eventDays,

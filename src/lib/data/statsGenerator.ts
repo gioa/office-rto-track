@@ -1,4 +1,3 @@
-
 import { Entry, WeeklyStats } from '../types';
 
 // Generate weekly statistics for the dashboard
@@ -6,10 +5,14 @@ export const generateWeeklyStats = (entries: Entry[]): WeeklyStats[] => {
   const stats: WeeklyStats[] = [];
   const today = new Date();
   
-  // Generate stats for the last 10 weeks
+  // Generate stats for the last 10 weeks including current week
   for (let i = 0; i < 10; i++) {
     const weekEnd = new Date(today);
-    weekEnd.setDate(today.getDate() - (today.getDay() + 7 * i));
+    // If we're on the first iteration (i=0), use today as the end of the week
+    // Otherwise, set to the end of the previous weeks
+    if (i > 0) {
+      weekEnd.setDate(today.getDate() - (today.getDay() + 7 * (i - 1)));
+    }
     
     const weekStart = new Date(weekEnd);
     weekStart.setDate(weekEnd.getDate() - 6);
