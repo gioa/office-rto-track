@@ -29,22 +29,24 @@ export const useEntries = (filterOptions?: FilterOptions) => {
   
   // Mutation for adding a new entry
   const addEntry = useMutation({
-    mutationFn: ({ type, date, note }: { type: Entry['type'], date: Date, note?: string }) => {
+    mutationFn: async ({ type, date, note }: { type: Entry['type'], date: Date, note?: string }) => {
       if (type === 'office-visit') {
-        return localStorageService.addBadgeEntry({
+        // Wrap in Promise.resolve to ensure it returns a Promise
+        return Promise.resolve(localStorageService.addBadgeEntry({
           email: 'user@example.com', // In a real app, get from auth context
           date,
           dayOfWeek: date.getDay(),
           officeLocation: 'Default Office',
-        });
+        }));
       } else {
-        return localStorageService.addUserEntry({
+        // Wrap in Promise.resolve to ensure it returns a Promise
+        return Promise.resolve(localStorageService.addUserEntry({
           email: 'user@example.com', // In a real app, get from auth context
           date,
           dayOfWeek: date.getDay(),
           type,
           note,
-        });
+        }));
       }
     },
     onSuccess: () => {
