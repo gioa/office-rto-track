@@ -1,3 +1,4 @@
+
 import { Entry, WeeklyStats } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceLine, Legend, ResponsiveContainer } from "recharts";
@@ -6,7 +7,7 @@ import ChartTooltip from "./ChartTooltip";
 import { chartConfig } from "./config";
 import { useWeeklyStats } from "@/hooks/useWeeklyStats";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { generateWeeklyStats } from "@/lib/data/statsGenerator";
 
 interface VisitChartProps {
@@ -19,19 +20,21 @@ interface VisitChartProps {
 
 const VisitChart = ({ entries, dateRange }: VisitChartProps) => {
   const { data: apiData, isLoading, error } = useWeeklyStats(10);
+  const [chartData, setChartData] = useState<any[]>([]);
   
-  // Generate weekly stats from filtered entries if provided
-  const filteredStats = useMemo(() => {
+  // Regenerate chart data whenever entries or dateRange changes
+  useEffect(() => {
     if (entries) {
-      return generateWeeklyStats(entries);
+      const filteredStats = generateWeeklyStats(entries);
+      setChartData(transformWeeklyStats(filteredStats));
+    } else if (apiData) {
+      setChartData(transformWeeklyStats(apiData));
+    } else {
+      setChartData([]);
     }
-    return null;
-  }, [entries]);
+  }, [entries, dateRange, apiData]);
   
-  // Ensure we have data to display - prioritize filtered data if available
-  const chartData = transformWeeklyStats(filteredStats || apiData || []);
-  
-  if (isLoading && !entries && !filteredStats) {
+  if (isLoading && !entries && chartData.length === 0) {
     return (
       <Card className="col-span-4 glass subtle-shadow animate-slide-up animation-delay-200">
         <CardHeader>
@@ -49,7 +52,7 @@ const VisitChart = ({ entries, dateRange }: VisitChartProps) => {
     );
   }
   
-  if (error && !entries && !filteredStats && (!chartData || chartData.length === 0)) {
+  if (error && !entries && chartData.length === 0) {
     return (
       <Card className="col-span-4 glass subtle-shadow animate-slide-up animation-delay-200">
         <CardHeader>

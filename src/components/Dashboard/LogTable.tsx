@@ -19,6 +19,7 @@ interface LogTableProps {
 
 const LogTable = ({ entries }: LogTableProps) => {
   const [page, setPage] = useState(0);
+  const [paginatedEntries, setPaginatedEntries] = useState<Entry[]>([]);
   const itemsPerPage = 5;
   
   // Reset pagination when entries change
@@ -26,16 +27,21 @@ const LogTable = ({ entries }: LogTableProps) => {
     setPage(0);
   }, [entries]);
   
-  // Sort entries by date (newest first)
-  const sortedEntries = [...entries].sort((a, b) => 
-    new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
-  
-  // Get entries for current page
-  const paginatedEntries = sortedEntries.slice(
-    page * itemsPerPage,
-    (page + 1) * itemsPerPage
-  );
+  // Update paginated entries when page or entries change
+  useEffect(() => {
+    // Sort entries by date (newest first)
+    const sortedEntries = [...entries].sort((a, b) => 
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+    
+    // Get entries for current page
+    const newPaginatedEntries = sortedEntries.slice(
+      page * itemsPerPage,
+      (page + 1) * itemsPerPage
+    );
+    
+    setPaginatedEntries(newPaginatedEntries);
+  }, [entries, page]);
   
   // Get day of week
   const getDayOfWeek = (date: Date): string => {
@@ -97,10 +103,10 @@ const LogTable = ({ entries }: LogTableProps) => {
         </div>
         
         {/* Pagination controls */}
-        {sortedEntries.length > itemsPerPage && (
+        {entries.length > itemsPerPage && (
           <div className="flex justify-between items-center mt-4">
             <div className="text-sm text-muted-foreground">
-              Showing {sortedEntries.length > 0 ? page * itemsPerPage + 1 : 0} to {Math.min((page + 1) * itemsPerPage, sortedEntries.length)} of {sortedEntries.length} entries
+              Showing {entries.length > 0 ? page * itemsPerPage + 1 : 0} to {Math.min((page + 1) * itemsPerPage, entries.length)} of {entries.length} entries
             </div>
             <div className="flex gap-2">
               <button 
@@ -112,7 +118,7 @@ const LogTable = ({ entries }: LogTableProps) => {
               </button>
               <button 
                 onClick={() => setPage(p => p + 1)}
-                disabled={(page + 1) * itemsPerPage >= sortedEntries.length}
+                disabled={(page + 1) * itemsPerPage >= entries.length}
                 className="px-2 py-1 text-sm border rounded disabled:opacity-50"
               >
                 Next

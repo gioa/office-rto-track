@@ -48,7 +48,13 @@ export const getFilteredEntries = (
     // Date range filter
     if (filters.dateRange?.from && filters.dateRange?.to) {
       const entryDate = new Date(entry.date);
-      if (entryDate < filters.dateRange.from || entryDate > filters.dateRange.to) {
+      entryDate.setHours(0, 0, 0, 0);
+      const fromDate = new Date(filters.dateRange.from);
+      fromDate.setHours(0, 0, 0, 0);
+      const toDate = new Date(filters.dateRange.to);
+      toDate.setHours(23, 59, 59, 999);
+      
+      if (entryDate < fromDate || entryDate > toDate) {
         return false;
       }
     }
