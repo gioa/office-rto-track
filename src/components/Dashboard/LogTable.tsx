@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { Entry } from "@/lib/types";
@@ -81,8 +80,21 @@ const LogTable = ({ entries }: LogTableProps) => {
     }
   };
 
-  const handlePageClick = (pageNumber: number) => {
-    setPage(pageNumber);
+  // Generate array of page numbers to display
+  const getPageNumbers = () => {
+    if (totalPages <= 3) {
+      // If 3 or fewer pages, show all
+      return Array.from({ length: totalPages }, (_, i) => i);
+    } else if (page < 1) {
+      // If on first page, show first 3
+      return [0, 1, 2];
+    } else if (page >= totalPages - 2) {
+      // If on last 2 pages, show last 3
+      return [totalPages - 3, totalPages - 2, totalPages - 1];
+    } else {
+      // Otherwise show current page and neighbors
+      return [page - 1, page, page + 1];
+    }
   };
 
   return (
@@ -137,55 +149,25 @@ const LogTable = ({ entries }: LogTableProps) => {
               <PaginationContent>
                 <PaginationItem>
                   <PaginationPrevious 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handlePrevPage();
-                    }} 
+                    onClick={handlePrevPage} 
                     className={page === 0 ? 'pointer-events-none opacity-50' : ''}
                   />
                 </PaginationItem>
                 
-                {Array.from({ length: Math.min(totalPages, 3) }).map((_, i) => {
-                  // Calculate page numbers to show (current page and neighbors)
-                  // For totalPages > 3, we need to adjust which pages are shown
-                  let pageNum = i;
-                  
-                  // If we have more than 3 pages and we're not at the start:
-                  if (totalPages > 3 && page > 0) {
-                    // Start from current page - 1, unless we're at the last pages
-                    if (page >= totalPages - 1) {
-                      pageNum = totalPages - 3 + i;  // Show last 3 pages
-                    } else {
-                      pageNum = page - 1 + i;  // Show current page and neighbors
-                    }
-                  }
-                  
-                  // Ensure pageNum is within valid range
-                  pageNum = Math.max(0, Math.min(pageNum, totalPages - 1));
-                  
-                  const isActive = pageNum === page;
-                  
-                  return (
-                    <PaginationItem key={i}>
-                      <PaginationLink 
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handlePageClick(pageNum);
-                        }}
-                        isActive={isActive}
-                      >
-                        {pageNum + 1}
-                      </PaginationLink>
-                    </PaginationItem>
-                  );
-                })}
+                {getPageNumbers().map((pageNum) => (
+                  <PaginationItem key={pageNum}>
+                    <PaginationLink 
+                      onClick={() => setPage(pageNum)}
+                      isActive={pageNum === page}
+                    >
+                      {pageNum + 1}
+                    </PaginationLink>
+                  </PaginationItem>
+                ))}
                 
                 <PaginationItem>
                   <PaginationNext 
-                    onClick={(e) => {
-                      e.preventDefault();
-                      handleNextPage();
-                    }}
+                    onClick={handleNextPage}
                     className={page >= totalPages - 1 ? 'pointer-events-none opacity-50' : ''}
                   />
                 </PaginationItem>
