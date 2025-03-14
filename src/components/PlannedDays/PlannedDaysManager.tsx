@@ -8,6 +8,8 @@ import { PlannedDay } from "@/lib/types";
 import WeekdaySelector from "./WeekdaySelector";
 import PeoplePlanner from "./PeoplePlanner";
 import { UserCheck, Users, Save } from "lucide-react";
+import { saveUserPlannedDays, getUserPlannedDaysByUserId, convertToPlannedDays } from "@/services/dataService";
+import { currentUser } from "@/lib/data/currentUser";
 
 interface PlannedDaysManagerProps {
   onDaysChange: (plannedDays: PlannedDay[]) => void;
@@ -21,28 +23,42 @@ const PlannedDaysManager = ({ onDaysChange }: PlannedDaysManagerProps) => {
   
   // Initialize planned days on component mount
   useEffect(() => {
-    const currentUserDays = selectedDays.map(day => ({
-      userId: "current-user",
-      userName: "You",
-      weekday: day
-    }));
-    
-    onDaysChange(currentUserDays);
+    // Get existing planned days for current user
+    const userPlan = getUserPlannedDaysByUserId(currentUser.id);
+    if (userPlan) {
+      setSelectedDays(userPlan.plannedDays);
+      
+      // Convert to PlannedDay[] format for the calendar
+      const plannedDays = userPlan.plannedDays.map(day => ({
+        userId: currentUser.id,
+        userName: "You",
+        weekday: day
+      }));
+      
+      onDaysChange(plannedDays);
+    }
   }, []);
   
   const handleSavePlannedDays = () => {
     setIsSubmitting(true);
     
+    // Save planned days to our data model
+    saveUserPlannedDays(
+      currentUser.id,
+      currentUser.email,
+      selectedDays
+    );
+    
     // Convert selected days to PlannedDay objects for the current user
     const plannedDays = selectedDays.map(day => ({
-      userId: "current-user", 
+      userId: currentUser.id, 
       userName: "You",
       weekday: day
     }));
     
-    // Simulate API call
+    // Update the calendar with the new planned days
     setTimeout(() => {
-      onDaysChange(plannedDays);
+      onDaysChange([...plannedDays, ...otherPlannedDays]);
       setIsSubmitting(false);
       setIsDirty(false);
       toast({
@@ -62,7 +78,7 @@ const PlannedDaysManager = ({ onDaysChange }: PlannedDaysManagerProps) => {
     
     // Add these days to the calendar view
     const currentUserDays = selectedDays.map(day => ({
-      userId: "current-user",
+      userId: currentUser.id,
       userName: "You",
       weekday: day
     }));

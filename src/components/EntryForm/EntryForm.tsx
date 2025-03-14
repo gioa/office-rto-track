@@ -10,6 +10,8 @@ import { toast } from "@/components/ui/use-toast";
 import { formSchema, FormValues, formatEntryType } from "./EntryFormSchema";
 import CompactEntryForm from "./CompactEntryForm";
 import FullEntryForm from "./FullEntryForm";
+import { addUserEntry, addBadgeEntry } from "@/services/dataService";
+import { currentUser } from "@/lib/data/currentUser";
 
 interface EntryFormProps {
   compact?: boolean;
@@ -33,9 +35,65 @@ const EntryForm = ({ compact = false, initialDate }: EntryFormProps) => {
   const onSubmit = async (values: FormValues) => {
     setIsSubmitting(true);
     
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Handle the different date formats (single date or date range)
+    const date = typeof values.date === 'object' && 'from' in values.date 
+      ? values.date.from 
+      : values.date as Date;
     
+    // If it's a date range, we need to handle it differently
+    if (typeof values.date === 'object' && 'from' in values.date && values.date.to) {
+      // Create an entry for each day in the range
+      // This is a simplified implementation
+      const startDate = new Date(values.date.from);
+      const endDate = new Date(values.date.to);
+      
+      for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+        // Skip weekends
+        const dayOfWeek = d.getDay();
+        if (dayOfWeek === 0 || dayOfWeek === 6) continue;
+        
+        // Add entry to our data model
+        if (values.type === 'office-visit') {
+          addBadgeEntry({
+            email: currentUser.email,
+            date: new Date(d),
+            dayOfWeek,
+            officeLocation: 'Default Office'
+          });
+        } else {
+          addUserEntry({
+            email: currentUser.email,
+            date: new Date(d),
+            dayOfWeek,
+            type: values.type,
+            note: values.note
+          });
+        }
+      }
+    } else {
+      // Single day entry
+      const dayOfWeek = date.getDay();
+      
+      // Add entry to our data model
+      if (values.type === 'office-visit') {
+        addBadgeEntry({
+          email: currentUser.email,
+          date,
+          dayOfWeek,
+          officeLocation: 'Default Office'
+        });
+      } else {
+        addUserEntry({
+          email: currentUser.email,
+          date,
+          dayOfWeek,
+          type: values.type,
+          note: values.note
+        });
+      }
+    }
+    
+    // Show success message
     toast({
       title: "Entry added successfully",
       description: (

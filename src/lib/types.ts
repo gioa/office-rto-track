@@ -42,3 +42,33 @@ export interface PlannedDay {
   weekday: number; // 0 for Sunday, 1 for Monday, etc.
   department?: string;
 }
+
+// New interfaces for our data model
+
+export interface BadgeEntry {
+  id: string;
+  email: string;
+  date: Date;
+  dayOfWeek: number; // 0-6 representing Sunday-Saturday
+  officeLocation?: string;
+  checkinTime?: Date;
+  checkoutTime?: Date;
+}
+
+export interface UserEntry {
+  id: string;
+  email: string;
+  date: Date;
+  dayOfWeek: number; // 0-6 representing Sunday-Saturday
+  type: EntryType; // Using the existing EntryType for consistency
+  note?: string;
+}
+
+export interface UserPlannedDays {
+  id: string;
+  userId: string;
+  email: string;
+  plannedDays: number[]; // Array of weekday numbers (0-6)
+  effectiveFrom?: Date; // Optional start date for this plan
+  effectiveTo?: Date; // Optional end date for this plan
+}
