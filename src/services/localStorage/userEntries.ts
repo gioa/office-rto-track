@@ -1,6 +1,6 @@
+
 import { v4 as uuidv4 } from 'uuid';
 import { Entry, UserEntry } from '@/lib/types';
-import { getUserEntriesKey } from './config';
 import { supabase } from '@/integrations/supabase/client';
 
 // Get user entries from Supabase
@@ -14,7 +14,15 @@ export const getUserEntries = async (): Promise<UserEntry[]> => {
       throw new Error(`Error getting user entries: ${error.message}`);
     }
     
-    return data || [];
+    // Transform the database fields to match our interface
+    return (data || []).map(entry => ({
+      id: entry.id,
+      email: entry.email,
+      date: new Date(entry.date),
+      dayOfWeek: entry.day_of_week,
+      type: entry.type as UserEntry['type'],
+      note: entry.note || undefined
+    }));
   } catch (error) {
     console.error('Error getting user entries:', error);
     return [];
@@ -33,7 +41,15 @@ export const getUserEntriesByEmail = async (email: string): Promise<UserEntry[]>
       throw new Error(`Error getting user entries by email: ${error.message}`);
     }
     
-    return data || [];
+    // Transform the database fields to match our interface
+    return (data || []).map(entry => ({
+      id: entry.id,
+      email: entry.email,
+      date: new Date(entry.date),
+      dayOfWeek: entry.day_of_week,
+      type: entry.type as UserEntry['type'],
+      note: entry.note || undefined
+    }));
   } catch (error) {
     console.error('Error getting user entries by email:', error);
     return [];
@@ -43,10 +59,21 @@ export const getUserEntriesByEmail = async (email: string): Promise<UserEntry[]>
 // Add a user entry to Supabase
 export const addUserEntry = async (entry: Omit<UserEntry, 'id'>): Promise<UserEntry | null> => {
   try {
-    const newEntry = { ...entry, id: uuidv4() };
+    const newEntryId = uuidv4();
+    
+    // Transform our interface to match database fields
+    const dbEntry = {
+      id: newEntryId,
+      email: entry.email,
+      date: entry.date.toISOString(),
+      day_of_week: entry.dayOfWeek,
+      type: entry.type,
+      note: entry.note
+    };
+    
     const { data, error } = await supabase
       .from('user_entries')
-      .insert([newEntry])
+      .insert([dbEntry])
       .select('*')
       .single();
     
@@ -54,7 +81,15 @@ export const addUserEntry = async (entry: Omit<UserEntry, 'id'>): Promise<UserEn
       throw new Error(`Error adding user entry: ${error.message}`);
     }
     
-    return data;
+    // Transform back to our interface format
+    return {
+      id: data.id,
+      email: data.email,
+      date: new Date(data.date),
+      dayOfWeek: data.day_of_week,
+      type: data.type as UserEntry['type'],
+      note: data.note || undefined
+    };
   } catch (error) {
     console.error('Error adding user entry:', error);
     return null;
