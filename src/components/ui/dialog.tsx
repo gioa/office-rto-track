@@ -46,7 +46,11 @@ const DialogContent = React.forwardRef<
         if (
           target.closest('.calendar') ||
           target.closest('.calendar-day') ||
-          target.closest('.tooltip-content')
+          target.closest('.tooltip-content') ||
+          target.closest('.rdp') ||
+          target.closest('.rdp-day') ||
+          target.closest('[role="dialog"]') ||
+          target.closest('.popover-content')
         ) {
           e.preventDefault();
         }

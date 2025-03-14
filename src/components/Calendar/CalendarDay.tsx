@@ -59,9 +59,14 @@ const CalendarDay = ({
     );
   };
   
-  // Added a handler to stop propagation on the tooltip content
+  // Added handlers to stop propagation on the tooltip content and its children
   const handleTooltipContentClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+  };
+
+  const handleButtonClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    e.preventDefault();
   };
   
   return (
@@ -124,7 +129,12 @@ const CalendarDay = ({
             </div>
             <div className="mt-2 pt-2 border-t border-border">
               <EntryFormDialog date={day} buttonVariant="outline" buttonSize="sm" fullWidth>
-                <Button variant="outline" size="sm" className="w-full text-xs">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full text-xs" 
+                  onClick={handleButtonClick}
+                >
                   <Plus className="h-3 w-3 mr-1" />
                   Add Entry
                 </Button>
@@ -142,7 +152,12 @@ const CalendarDay = ({
             ))}
             <div className="mt-2 pt-2 border-t border-border">
               <EntryFormDialog date={day} buttonVariant="outline" buttonSize="sm" fullWidth>
-                <Button variant="outline" size="sm" className="w-full text-xs">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="w-full text-xs"
+                  onClick={handleButtonClick}
+                >
                   <Plus className="h-3 w-3 mr-1" />
                   Add Entry
                 </Button>
@@ -158,7 +173,12 @@ const CalendarDay = ({
             {!dayIsWeekend && (
               <div className="mt-2 pt-2 border-t border-border">
                 <EntryFormDialog date={day} buttonVariant="outline" buttonSize="sm" fullWidth>
-                  <Button variant="outline" size="sm" className="w-full text-xs">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="w-full text-xs"
+                    onClick={handleButtonClick}
+                  >
                     <Plus className="h-3 w-3 mr-1" />
                     Add Entry
                   </Button>

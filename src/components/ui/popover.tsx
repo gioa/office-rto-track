@@ -28,7 +28,11 @@ const PopoverContent = React.forwardRef<
           target.closest('[role="dialog"]') ||
           target.closest('[data-state="open"]') ||
           target.closest('.calendar-day') ||
-          target.closest('.tooltip-content')
+          target.closest('.tooltip-content') ||
+          target.closest('.rdp') ||
+          target.closest('.rdp-day') ||
+          target.closest('.popover-content') ||
+          target.closest('.calendar')
         ) {
           e.preventDefault();
         }
