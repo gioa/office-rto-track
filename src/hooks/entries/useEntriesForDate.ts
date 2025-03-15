@@ -21,13 +21,17 @@ export const useEntriesForDate = (date: Date) => {
         return;
       }
       
+      // Normalize input date by getting start of day to avoid time issues
+      const normalizedDate = startOfDay(date);
+      
       // Filter entries for the selected date and current user
-      // Using isSameDay instead of comparing dates directly to handle timezone differences
+      // Using isSameDay to reliably compare dates regardless of time
       const filtered = entries.filter(entry => {
+        // Ensure we're comparing full Date objects
         const entryDate = new Date(entry.date);
         return (
           (entry.userId === currentUser.id || entry.userId === currentUser.email) &&
-          isSameDay(entryDate, date)
+          isSameDay(entryDate, normalizedDate)
         );
       });
       

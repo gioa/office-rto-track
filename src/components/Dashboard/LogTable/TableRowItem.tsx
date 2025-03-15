@@ -10,10 +10,13 @@ interface TableRowItemProps {
 }
 
 const TableRowItem = ({ entry }: TableRowItemProps) => {
+  // Ensure we're using the normalized date from entry
+  const entryDate = new Date(entry.date);
+  
   return (
     <TableRow key={entry.id}>
-      <TableCell>{format(new Date(entry.date), 'MMM d, yyyy')}</TableCell>
-      <TableCell>{format(new Date(entry.date), 'EEEE')}</TableCell>
+      <TableCell>{format(entryDate, 'MMM d, yyyy')}</TableCell>
+      <TableCell>{format(entryDate, 'EEEE')}</TableCell>
       <TableCell>{entry.userId === currentUser.id ? currentUser.email : entry.userId}</TableCell>
       <TableCell>{getOfficeLocation(entry)}</TableCell>
       <TableCell>{formatEntryType(entry.type)}</TableCell>

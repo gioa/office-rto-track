@@ -1,10 +1,10 @@
-
 /**
  * Supabase operations for badge entries
  */
 import { BadgeEntry } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 import { initializeStorage } from "./initialize";
+import { startOfDay } from "date-fns";
 
 // Badge entries methods
 export const getBadgeEntries = async (): Promise<BadgeEntry[]> => {
@@ -22,7 +22,7 @@ export const getBadgeEntries = async (): Promise<BadgeEntry[]> => {
   return (data || []).map(entry => ({
     id: entry.id,
     email: entry.email,
-    date: new Date(entry.date),
+    date: startOfDay(new Date(entry.date)), // Normalize the date
     dayOfWeek: entry.day_of_week,
     officeLocation: entry.office_location,
     checkinTime: entry.checkin_time ? new Date(entry.checkin_time) : undefined,
@@ -44,7 +44,7 @@ export const getBadgeEntriesByEmail = async (email: string): Promise<BadgeEntry[
   return (data || []).map(entry => ({
     id: entry.id,
     email: entry.email,
-    date: new Date(entry.date),
+    date: startOfDay(new Date(entry.date)), // Normalize the date
     dayOfWeek: entry.day_of_week,
     officeLocation: entry.office_location,
     checkinTime: entry.checkin_time ? new Date(entry.checkin_time) : undefined,
