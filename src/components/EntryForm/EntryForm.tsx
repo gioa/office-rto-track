@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -124,11 +123,24 @@ const EntryForm = ({
     form.setValue("type", value as any);
     setSelectedType(value);
     
-    if (value === "pto" || value === "event") {
-      form.setValue("date", { from: new Date(), to: undefined });
-    } else {
-      form.setValue("date", new Date());
+    // Get current date value from form
+    const currentDate = form.getValues("date");
+    
+    // Only transform the date structure if the type is changing between single/range types
+    // and preserve the current date selection
+    if ((value === "pto" || value === "event") && 
+        !(typeof currentDate === 'object' && 'from' in currentDate)) {
+      // Convert single date to date range
+      form.setValue("date", { 
+        from: typeof currentDate === 'object' ? new Date(currentDate as Date) : new Date(), 
+        to: undefined 
+      });
+    } else if (value !== "pto" && value !== "event" && 
+              typeof currentDate === 'object' && 'from' in currentDate) {
+      // Convert date range to single date, using 'from' date as the value
+      form.setValue("date", new Date(currentDate.from));
     }
+    // Otherwise keep the current date value
   };
 
   if (compact) {
