@@ -3,6 +3,7 @@ import { useState } from "react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import MonthView from "@/components/Calendar/MonthView";
+import { mockEntries, getEntriesForDate } from "@/lib/mockData";
 import { Entry } from "@/lib/types";
 import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
@@ -12,23 +13,17 @@ import { Button } from "@/components/ui/button";
 import { Calendar, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { currentUser } from "@/lib/data/currentUser";
-import { useEntries } from "@/hooks/entries";
-import { useEntriesForDate } from "@/hooks/entries/useEntriesForDate";
 
 const CalendarPage = () => {
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(new Date());
   
-  // Get all entries without filtering by date range
-  const { entries: allEntries } = useEntries();
-  
   // Filter entries to only show the current user's entries
-  const userEntries = allEntries.filter(entry => 
+  const userEntries = mockEntries.filter(entry => 
     entry.userId === currentUser.id || entry.userId === currentUser.email
   );
   
-  // Use the useEntriesForDate hook to get entries for the selected date
-  const { entriesForDate } = useEntriesForDate(selectedDate);
+  const selectedEntries = getEntriesForDate(userEntries, selectedDate);
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30">
@@ -75,11 +70,11 @@ const CalendarPage = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {entriesForDate.length > 0 ? (
+                    {selectedEntries.length > 0 ? (
                       <div className="space-y-4">
                         <h4 className="text-sm font-medium">Entries</h4>
                         <div className="space-y-2">
-                          {entriesForDate.map((entry: Entry, index: number) => (
+                          {selectedEntries.map((entry: Entry, index: number) => (
                             <div key={index} className="flex items-start p-2 rounded-md bg-background/50">
                               <Badge 
                                 variant="outline" 
@@ -138,4 +133,3 @@ const formatEntryType = (type: Entry['type']): string => {
 };
 
 export default CalendarPage;
-
