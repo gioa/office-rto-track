@@ -1,5 +1,5 @@
 
-import { CircleCheck, Ticket } from "lucide-react";
+import { CircleCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface CalendarDayMarkerProps {
@@ -18,16 +18,13 @@ const CalendarDayMarker = ({
   isTempBadge
 }: CalendarDayMarkerProps) => {
   if (hasEntry && !dayIsWeekend) {
-    // For office visits from user entries, always use the Ticket icon
-    // and assume all manually added office visits are temp badges
-    const Icon = entryType === 'office-visit' ? Ticket : CircleCheck;
-    
+    // Always use CircleCheck icon for all entry types
     return (
       <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
-        <Icon 
+        <CircleCheck 
           className={cn(
             "h-5 w-5",
-            entryType === 'office-visit' && "text-teal-500", // Change all office visits to teal
+            entryType === 'office-visit' && "text-teal-500", // Keep teal color for office visits
             entryType === 'sick' && "text-amber-500",
             entryType === 'pto' && "text-blue-500",
             (entryType === 'event' || entryType === 'holiday') && "text-purple-500"
