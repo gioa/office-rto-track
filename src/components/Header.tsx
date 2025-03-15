@@ -11,7 +11,14 @@ const Header = () => {
 
   return (
     <header className="h-16 px-6 border-b border-border/40 flex items-center justify-between bg-background/80 backdrop-blur-md z-10 sticky top-0">
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
+        <div className="flex items-center">
+          <img 
+            src="/lovable-uploads/5c8338d2-a7c3-400d-b76e-c57325ef3a97.png" 
+            alt="Databricks Logo" 
+            className="h-6 mr-2" 
+          />
+        </div>
         <h1 className="text-xl font-medium tracking-tight">
           <span className="text-primary">RTO</span> Tracker
         </h1>
