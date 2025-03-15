@@ -69,13 +69,13 @@ const CalendarDay = ({
   
   const getDateClasses = (day: Date) => {
     const isCurrentToday = isToday(day);
-    const isSelected = isSameDay(day, selectedDate);
+    // Remove the isSelected check to prevent focused style
     const isCurrentMonth = isSameMonth(day, currentMonth);
     
     return cn(
       "calendar-day w-full h-12 sm:h-16 p-1 relative",
       isCurrentToday && "calendar-day-today",
-      isSelected && "calendar-day-active",
+      // Removed: isSelected && "calendar-day-active",
       !isCurrentMonth && "calendar-day-disabled",
       dayIsWeekend && "text-muted-foreground",
       isPlannedDay && "planned"
