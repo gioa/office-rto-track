@@ -31,14 +31,14 @@ const CompactEntryForm = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <EntryTypeSelector 
-          control={form.control} 
-          onTypeChange={handleTypeChange} 
-        />
-        
         <EntryDateSelector 
           control={form.control} 
           selectedType={selectedType} 
+        />
+        
+        <EntryTypeSelector 
+          control={form.control} 
+          onTypeChange={handleTypeChange} 
         />
         
         <EntryNoteField 

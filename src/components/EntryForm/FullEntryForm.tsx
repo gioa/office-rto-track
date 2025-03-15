@@ -34,14 +34,14 @@ const FullEntryForm = ({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        <EntryTypeSelector 
-          control={form.control} 
-          onTypeChange={handleTypeChange} 
-        />
-        
         <EntryDateSelector 
           control={form.control} 
           selectedType={selectedType} 
+        />
+        
+        <EntryTypeSelector 
+          control={form.control} 
+          onTypeChange={handleTypeChange} 
         />
         
         <EntryNoteField 
