@@ -51,7 +51,8 @@ const CalendarDayContent = ({
                   entry.type === 'office-visit' && "bg-green-500/10 text-green-600 border-green-200",
                   entry.type === 'sick' && "bg-amber-500/10 text-amber-600 border-amber-200",
                   entry.type === 'pto' && "bg-blue-500/10 text-blue-600 border-blue-200",
-                  (entry.type === 'event' || entry.type === 'holiday') && "bg-purple-500/10 text-purple-600 border-purple-200",
+                  entry.type === 'event' && "bg-purple-500/10 text-purple-600 border-purple-200",
+                  entry.type === 'holiday' && "bg-pink-500/10 text-pink-600 border-pink-200"
                 )}
               >
                 {formatEntryType(entry.type)}

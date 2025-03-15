@@ -18,7 +18,11 @@ const CalendarLegend = () => {
       </div>
       <div className="flex items-center gap-1">
         <CircleCheck className="h-4 w-4 text-purple-500" />
-        <span className="text-xs">Event</span>
+        <span className="text-xs">Company Event</span>
+      </div>
+      <div className="flex items-center gap-1">
+        <CircleCheck className="h-4 w-4 text-pink-500" />
+        <span className="text-xs">Holiday</span>
       </div>
     </div>
   );

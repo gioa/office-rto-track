@@ -27,7 +27,8 @@ const CalendarDayMarker = ({
             entryType === 'office-visit' && "text-teal-500", // Keep teal color for office visits
             entryType === 'sick' && "text-amber-500",
             entryType === 'pto' && "text-blue-500",
-            (entryType === 'event' || entryType === 'holiday') && "text-purple-500"
+            entryType === 'event' && "text-purple-500", // Purple for company events
+            entryType === 'holiday' && "text-pink-500" // Pink for holidays
           )} 
         />
       </div>
