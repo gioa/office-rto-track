@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { Entry } from '@/lib/types';
 import { useEntries } from './useEntries';
 import { isWeekend } from '@/components/Calendar/utils';
+import { currentUser } from '@/lib/data/currentUser';
 
 export const useEntriesForDate = (date: Date) => {
   const { entries, isLoading, error } = useEntries();
@@ -19,10 +20,11 @@ export const useEntriesForDate = (date: Date) => {
         return;
       }
       
-      // Filter entries for the selected date
+      // Filter entries for the selected date and current user
       const filtered = entries.filter(entry => {
         const entryDate = new Date(entry.date);
         return (
+          (entry.userId === currentUser.id || entry.userId === currentUser.email) &&
           entryDate.getDate() === date.getDate() &&
           entryDate.getMonth() === date.getMonth() &&
           entryDate.getFullYear() === date.getFullYear()

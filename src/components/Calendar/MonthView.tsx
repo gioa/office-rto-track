@@ -8,6 +8,7 @@ import CalendarDay from "./CalendarDay";
 import CalendarLegend from "./CalendarLegend";
 import EntryFormDialog from "@/components/EntryForm/EntryFormDialog";
 import { isWeekend } from "./utils";
+import { currentUser } from "@/lib/data/currentUser";
 
 interface MonthViewProps {
   entries: Entry[];
@@ -40,11 +41,21 @@ const MonthView = ({
   // Define dayNames with Sunday first to match the weekStartsOn=0 setting
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
+  // Filter entries to only show the current user's entries
+  const userEntries = entries.filter(entry => 
+    entry.userId === currentUser.id || entry.userId === currentUser.email
+  );
+
   // Filter entries to remove any on weekend days
-  const filteredEntries = entries.filter(entry => {
+  const filteredEntries = userEntries.filter(entry => {
     const entryDate = new Date(entry.date);
     return !isWeekend(entryDate);
   });
+
+  // Filter planned days to only show the current user's planned days
+  const userPlannedDays = plannedDays.filter(day => 
+    day.userId === currentUser.id
+  );
 
   // Get the planned weekdays as an array to use for styling
   const getPlannedDaysModifier = () => {
@@ -56,7 +67,7 @@ const MonthView = ({
     daysInMonth.forEach(day => {
       if (day.getTime() > today.getTime() && // Only future dates
           !isWeekend(day) &&                 // Never include weekend days 
-          plannedDays.some(pd => pd.weekday === day.getDay())) { // Is a planned day
+          userPlannedDays.some(pd => pd.weekday === day.getDay())) { // Is a planned day
         futureDates[format(day, 'yyyy-MM-dd')] = day;
       }
     });
@@ -79,7 +90,7 @@ const MonthView = ({
               currentMonth={currentMonth} 
               selectedDate={selectedDate} 
               entries={filteredEntries} 
-              plannedDays={plannedDays} 
+              plannedDays={userPlannedDays} 
               setSelectedDate={setSelectedDate} 
             />
           ))}

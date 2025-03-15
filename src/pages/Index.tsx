@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getFilteredEntries, getEntriesForDate } from "@/lib/utils/entryFilters";
 import { useEntries } from "@/hooks/entries";
 import { FadeIn, ScaleIn } from "@/utils/animations";
+import { currentUser } from "@/lib/data/currentUser";
 
 // Create a query client instance
 const queryClient = new QueryClient({
@@ -49,7 +50,12 @@ const IndexContent = () => {
   };
   
   // Get entries using the hook
-  const { entries: filteredEntries, isLoading } = useEntries(filterOptions);
+  const { entries: allEntries, isLoading } = useEntries(filterOptions);
+  
+  // Filter entries to only show the current user's entries
+  const filteredEntries = allEntries.filter(entry => 
+    entry.userId === currentUser.id || entry.userId === currentUser.email
+  );
   
   // Set up selected date for calendar
   const [selectedDate, setSelectedDate] = useState(new Date());

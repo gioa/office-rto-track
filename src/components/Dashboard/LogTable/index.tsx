@@ -7,6 +7,7 @@ import TableHeader from "./TableHeader";
 import TableContent from "./TableContent";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { currentUser } from "@/lib/data/currentUser";
 
 interface LogTableProps {
   entries: Entry[];
@@ -17,7 +18,11 @@ const LogTable = ({ entries }: LogTableProps) => {
   
   // Update local entries whenever props change
   useEffect(() => {
-    setLocalEntries(entries);
+    // Filter entries to only show the current user's entries
+    const userEntries = entries.filter(entry => 
+      entry.userId === currentUser.id || entry.userId === currentUser.email
+    );
+    setLocalEntries(userEntries);
   }, [entries]);
   
   // Sort and filter entries to exclude weekends

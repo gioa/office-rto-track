@@ -1,4 +1,3 @@
-
 import { Entry, WeeklyStats } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceLine, Legend, ResponsiveContainer } from "recharts";
@@ -9,6 +8,7 @@ import { useWeeklyStats } from "@/hooks/useWeeklyStats";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useMemo, useEffect, useState } from "react";
 import { generateWeeklyStats } from "@/lib/data/statsGenerator";
+import { currentUser } from "@/lib/data/currentUser";
 
 interface VisitChartProps {
   entries?: Entry[];
@@ -22,13 +22,17 @@ const VisitChart = ({ entries, dateRange }: VisitChartProps) => {
   const { data: apiData, isLoading, error } = useWeeklyStats(10);
   const [chartData, setChartData] = useState<any[]>([]);
   
-  // Regenerate chart data whenever entries or dateRange changes
   useEffect(() => {
-    if (entries && entries.length > 0) {
-      const filteredStats = generateWeeklyStats(entries);
+    const userEntries = entries ? entries.filter(entry => 
+      entry.userId === currentUser.id || entry.userId === currentUser.email
+    ) : [];
+    
+    if (userEntries && userEntries.length > 0) {
+      const filteredStats = generateWeeklyStats(userEntries);
       setChartData(transformWeeklyStats(filteredStats));
     } else if (apiData) {
-      setChartData(transformWeeklyStats(apiData));
+      const userApiData = apiData.filter(stat => stat.userId === currentUser.id);
+      setChartData(transformWeeklyStats(userApiData));
     } else {
       setChartData([]);
     }
@@ -71,7 +75,6 @@ const VisitChart = ({ entries, dateRange }: VisitChartProps) => {
     );
   }
   
-  // If we have no data even after all fallbacks, show a message
   if (!chartData || chartData.length === 0) {
     return (
       <Card className="col-span-4 glass subtle-shadow animate-slide-up animation-delay-200">

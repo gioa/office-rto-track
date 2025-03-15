@@ -12,11 +12,18 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Calendar, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { currentUser } from "@/lib/data/currentUser";
 
 const CalendarPage = () => {
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const selectedEntries = getEntriesForDate(mockEntries, selectedDate);
+  
+  // Filter entries to only show the current user's entries
+  const userEntries = mockEntries.filter(entry => 
+    entry.userId === currentUser.id || entry.userId === currentUser.email
+  );
+  
+  const selectedEntries = getEntriesForDate(userEntries, selectedDate);
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30">
@@ -45,7 +52,7 @@ const CalendarPage = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
                 <MonthView 
-                  entries={mockEntries} 
+                  entries={userEntries} 
                   selectedDate={selectedDate}
                   setSelectedDate={setSelectedDate}
                 />
