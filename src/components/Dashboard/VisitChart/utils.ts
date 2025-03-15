@@ -1,6 +1,6 @@
 
 import { WeeklyStats } from "@/lib/types";
-import { format, isThisWeek, startOfWeek, endOfWeek } from "date-fns";
+import { format, isThisWeek, startOfWeek, endOfWeek, isSameDay, isBefore, isAfter, addWeeks, subWeeks } from "date-fns";
 
 export interface EnhancedWeeklyStats extends WeeklyStats {
   weekLabel: string;
@@ -15,8 +15,33 @@ export interface EnhancedWeeklyStats extends WeeklyStats {
   compliancePercentage: number;
 }
 
-export const transformWeeklyStats = (data: WeeklyStats[]): EnhancedWeeklyStats[] => {
-  return data.map(week => {
+export const transformWeeklyStats = (data: WeeklyStats[], dateRange?: { from?: Date, to?: Date }): EnhancedWeeklyStats[] => {
+  // If we have a date range, filter stats to only include weeks within the range
+  let filteredData = data;
+  
+  if (dateRange?.from || dateRange?.to) {
+    filteredData = data.filter(week => {
+      const weekDate = new Date(week.weekOf);
+      const weekStart = startOfWeek(weekDate, { weekStartsOn: 0 });
+      const weekEnd = endOfWeek(weekDate, { weekStartsOn: 0 });
+      
+      // Check if week overlaps with date range
+      if (dateRange.from && dateRange.to) {
+        return (
+          (isSameDay(weekStart, dateRange.from) || isAfter(weekStart, dateRange.from)) &&
+          (isSameDay(weekEnd, dateRange.to) || isBefore(weekEnd, dateRange.to))
+        );
+      } else if (dateRange.from) {
+        return isSameDay(weekStart, dateRange.from) || isAfter(weekStart, dateRange.from);
+      } else if (dateRange.to) {
+        return isSameDay(weekEnd, dateRange.to) || isBefore(weekEnd, dateRange.to);
+      }
+      
+      return true;
+    });
+  }
+  
+  return filteredData.map(week => {
     // Check if this is the current week
     const isCurrentWeek = isThisWeek(new Date(week.weekOf));
     

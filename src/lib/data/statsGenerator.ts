@@ -1,33 +1,40 @@
-
 import { Entry, WeeklyStats } from '../types';
+import { startOfWeek, endOfWeek, addWeeks, format, isSameDay } from 'date-fns';
 
 // Generate weekly statistics for the dashboard
-export const generateWeeklyStats = (entries: Entry[]): WeeklyStats[] => {
+export const generateWeeklyStats = (entries: Entry[], weekStartDates?: Date[]): WeeklyStats[] => {
   const stats: WeeklyStats[] = [];
   const today = new Date();
   
-  // Generate stats for the last 10 weeks including current week
-  for (let i = 0; i < 10; i++) {
-    const weekEnd = new Date(today);
-    // If we're on the first iteration (i=0), use today as the end of the week
-    // Otherwise, set to the end of the previous weeks
-    if (i > 0) {
-      weekEnd.setDate(today.getDate() - (today.getDay() + 7 * (i - 1)));
+  // If no week start dates provided, generate stats for the last 10 weeks
+  if (!weekStartDates || weekStartDates.length === 0) {
+    weekStartDates = [];
+    // Generate stats for the last 10 weeks including current week
+    for (let i = 0; i < 10; i++) {
+      const weekEnd = new Date(today);
+      // If we're on the first iteration (i=0), use today as the end of the week
+      // Otherwise, set to the end of the previous weeks
+      if (i > 0) {
+        weekEnd.setDate(today.getDate() - (today.getDay() + 7 * (i - 1)));
+      }
+      
+      const weekStart = startOfWeek(weekEnd, { weekStartsOn: 0 });
+      weekStartDates.unshift(weekStart); // Add to beginning so most recent is last
     }
-    
-    const weekStart = new Date(weekEnd);
-    weekStart.setDate(weekEnd.getDate() - 6);
-    
-    // The entries should already be filtered for weekends at this point,
-    // but we'll double-check here to ensure consistency
+  }
+  
+  // Process each week
+  for (const weekStart of weekStartDates) {
+    const weekEnd = endOfWeek(weekStart, { weekStartsOn: 0 });
     
     // Count days in office for this week (including events as office visits)
     const daysInOffice = entries.filter(entry => {
       const entryDate = new Date(entry.date);
       const dayOfWeek = entryDate.getDay(); // 0 = Sunday, 6 = Saturday
+      
       return (entry.type === 'office-visit' || entry.type === 'event') && 
-             entryDate >= weekStart && 
-             entryDate <= weekEnd &&
+             (isSameDay(entryDate, weekStart) || isSameDay(entryDate, weekEnd) || 
+              (entryDate >= weekStart && entryDate <= weekEnd)) &&
              dayOfWeek !== 0 && dayOfWeek !== 6; // Ensure no weekends
     }).length;
     
@@ -35,9 +42,10 @@ export const generateWeeklyStats = (entries: Entry[]): WeeklyStats[] => {
     const sickDays = entries.filter(entry => {
       const entryDate = new Date(entry.date);
       const dayOfWeek = entryDate.getDay();
+      
       return entry.type === 'sick' && 
-             entryDate >= weekStart && 
-             entryDate <= weekEnd &&
+             (isSameDay(entryDate, weekStart) || isSameDay(entryDate, weekEnd) || 
+              (entryDate >= weekStart && entryDate <= weekEnd)) &&
              dayOfWeek !== 0 && dayOfWeek !== 6;
     }).length;
     
@@ -45,9 +53,10 @@ export const generateWeeklyStats = (entries: Entry[]): WeeklyStats[] => {
     const ptoDays = entries.filter(entry => {
       const entryDate = new Date(entry.date);
       const dayOfWeek = entryDate.getDay();
+      
       return entry.type === 'pto' && 
-             entryDate >= weekStart && 
-             entryDate <= weekEnd &&
+             (isSameDay(entryDate, weekStart) || isSameDay(entryDate, weekEnd) || 
+              (entryDate >= weekStart && entryDate <= weekEnd)) &&
              dayOfWeek !== 0 && dayOfWeek !== 6;
     }).length;
     
@@ -55,9 +64,10 @@ export const generateWeeklyStats = (entries: Entry[]): WeeklyStats[] => {
     const eventDays = entries.filter(entry => {
       const entryDate = new Date(entry.date);
       const dayOfWeek = entryDate.getDay();
+      
       return entry.type === 'event' && 
-             entryDate >= weekStart && 
-             entryDate <= weekEnd &&
+             (isSameDay(entryDate, weekStart) || isSameDay(entryDate, weekEnd) || 
+              (entryDate >= weekStart && entryDate <= weekEnd)) &&
              dayOfWeek !== 0 && dayOfWeek !== 6;
     }).length;
     
@@ -65,9 +75,10 @@ export const generateWeeklyStats = (entries: Entry[]): WeeklyStats[] => {
     const holidayDays = entries.filter(entry => {
       const entryDate = new Date(entry.date);
       const dayOfWeek = entryDate.getDay();
+      
       return entry.type === 'holiday' && 
-             entryDate >= weekStart && 
-             entryDate <= weekEnd &&
+             (isSameDay(entryDate, weekStart) || isSameDay(entryDate, weekEnd) || 
+              (entryDate >= weekStart && entryDate <= weekEnd)) &&
              dayOfWeek !== 0 && dayOfWeek !== 6;
     }).length;
     
@@ -90,5 +101,5 @@ export const generateWeeklyStats = (entries: Entry[]): WeeklyStats[] => {
     });
   }
   
-  return stats.reverse(); // Most recent week first
+  return stats;
 };

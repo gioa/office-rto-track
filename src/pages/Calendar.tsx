@@ -26,7 +26,7 @@ const CalendarPage = () => {
     entry.userId === currentUser.id || entry.userId === currentUser.email
   );
   
-  // Get entries for the selected date
+  // Get entries for the selected date - using isSameDay to handle timezone issues
   const selectedEntries = userEntries.filter(entry => {
     const entryDate = new Date(entry.date);
     return isSameDay(entryDate, selectedDate);

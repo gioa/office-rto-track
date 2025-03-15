@@ -22,6 +22,7 @@ export const useEntriesForDate = (date: Date) => {
       }
       
       // Filter entries for the selected date and current user
+      // Using isSameDay instead of comparing dates directly to handle timezone differences
       const filtered = entries.filter(entry => {
         const entryDate = new Date(entry.date);
         return (

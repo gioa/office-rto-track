@@ -1,5 +1,6 @@
+
 import { useState } from "react";
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, startOfWeek } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, startOfWeek, isSameDay } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
 import { Entry, PlannedDay } from "@/lib/types";
 import CalendarHeader from "./CalendarHeader";

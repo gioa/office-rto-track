@@ -44,21 +44,21 @@ export type Database = {
       }
       employee_office_utilization: {
         Row: {
-          date: string
+          date: string | null
           day_of_week: string | null
-          email: string
+          email: string | null
           office_location: string | null
         }
         Insert: {
-          date: string
+          date?: string | null
           day_of_week?: string | null
-          email: string
+          email?: string | null
           office_location?: string | null
         }
         Update: {
-          date?: string
+          date?: string | null
           day_of_week?: string | null
-          email?: string
+          email?: string | null
           office_location?: string | null
         }
         Relationships: []
