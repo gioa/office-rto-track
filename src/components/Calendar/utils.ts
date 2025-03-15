@@ -4,7 +4,7 @@ import { isSameDay } from "date-fns";
 
 export const formatEntryType = (type: Entry['type']): string => {
   switch (type) {
-    case 'office-visit': return 'Office (Temp Badge)';
+    case 'office-visit': return 'Office';
     case 'sick': return 'Sick';
     case 'pto': return 'PTO';
     case 'event': return 'Company Event';

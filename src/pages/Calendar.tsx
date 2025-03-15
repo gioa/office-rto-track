@@ -3,9 +3,8 @@ import { useState } from "react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import MonthView from "@/components/Calendar/MonthView";
-import { mockEntries, getEntriesForDate } from "@/lib/mockData";
 import { Entry } from "@/lib/types";
-import { format } from "date-fns";
+import { format, isSameDay } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
@@ -13,17 +12,25 @@ import { Button } from "@/components/ui/button";
 import { Calendar, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { currentUser } from "@/lib/data/currentUser";
+import { useEntries } from "@/hooks/entries";
 
 const CalendarPage = () => {
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(new Date());
   
+  // Get all entries
+  const { entries: allEntries } = useEntries();
+  
   // Filter entries to only show the current user's entries
-  const userEntries = mockEntries.filter(entry => 
+  const userEntries = allEntries.filter(entry => 
     entry.userId === currentUser.id || entry.userId === currentUser.email
   );
   
-  const selectedEntries = getEntriesForDate(userEntries, selectedDate);
+  // Get entries for the selected date
+  const selectedEntries = userEntries.filter(entry => {
+    const entryDate = new Date(entry.date);
+    return isSameDay(entryDate, selectedDate);
+  });
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30">
