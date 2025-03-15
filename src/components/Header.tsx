@@ -1,7 +1,6 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { currentUser } from "@/lib/data/currentUser";
-import { Database } from "lucide-react";
 
 const Header = () => {
   const initials = currentUser.name
@@ -13,7 +12,11 @@ const Header = () => {
   return (
     <header className="h-16 px-6 border-b border-border/40 flex items-center justify-between bg-background/80 backdrop-blur-md z-10 sticky top-0">
       <div className="flex items-center gap-2">
-        <Database className="h-6 w-6 text-primary" />
+        <img 
+          src="/lovable-uploads/6bee558b-bfa1-4623-9abc-ee85b6d9a7ae.png" 
+          alt="Databricks Logo" 
+          className="h-6 w-6 text-primary" 
+        />
         <h1 className="text-xl font-medium tracking-tight">
           <span className="text-primary">RTO</span> Tracker
         </h1>
