@@ -3,6 +3,7 @@ import { ShieldCheck } from "lucide-react";
 import StatsCard from "./StatsCard";
 import { Entry, DateRange } from "@/lib/types";
 import { useEffect, useState } from "react";
+import { format, startOfWeek, endOfWeek, isSameWeek, addWeeks } from "date-fns";
 
 interface ComplianceRateCardProps {
   entries: Entry[];
@@ -11,50 +12,96 @@ interface ComplianceRateCardProps {
 
 const ComplianceRateCard = ({ entries, dateRange }: ComplianceRateCardProps) => {
   const [complianceRate, setComplianceRate] = useState(0);
+  const [complianceText, setComplianceText] = useState("of required office days");
 
   useEffect(() => {
-    // Calculate compliance
-    let compliance = 0;
+    // Calculate compliance based on weeks meeting the requirement
     if (dateRange.from && dateRange.to) {
-      // Count both office visits and events toward compliance
-      const officeVisitsInRange = entries.filter(entry => {
-        const entryDate = new Date(entry.date);
-        return (entry.type === 'office-visit' || entry.type === 'event') && 
-               entryDate >= dateRange.from && 
-               entryDate <= dateRange.to;
-      }).length;
+      const weeks = getWeeksInRange(dateRange.from, dateRange.to);
+      const totalWeeks = weeks.length;
       
-      const workdays = countWorkdays(dateRange.from, dateRange.to);
-      const weeks = Math.max(1, Math.round(workdays / 5));
-      const requiredDays = weeks * 3; // 3 days per week policy
-      compliance = Math.min(100, Math.round((officeVisitsInRange / requiredDays) * 100));
+      if (totalWeeks === 0) {
+        setComplianceRate(0);
+        setComplianceText("of required office days");
+        return;
+      }
+      
+      // Count compliant weeks (weeks with at least 3 days)
+      let compliantWeeks = 0;
+      
+      weeks.forEach(week => {
+        // Filter entries within this week
+        const weekEntries = entries.filter(entry => {
+          const entryDate = new Date(entry.date);
+          return isSameWeek(entryDate, week.start);
+        });
+        
+        // Count badge entries (non-temp badges)
+        const badgeEntries = weekEntries.filter(entry => 
+          entry.type === 'office-visit' && !entry.isTempBadge
+        ).length;
+        
+        // Count how many additional days we need
+        const additionalDaysNeeded = Math.max(0, 3 - badgeEntries);
+        
+        // Count other entry types that can be used to meet the requirement
+        const altEntries = weekEntries.filter(entry => 
+          (entry.type === 'office-visit' && entry.isTempBadge) || // temp badges
+          entry.type === 'sick' || 
+          entry.type === 'pto' || 
+          entry.type === 'event' || 
+          entry.type === 'holiday'
+        );
+        
+        // Use additional days up to what's needed
+        const additionalDaysUsed = Math.min(additionalDaysNeeded, altEntries.length);
+        
+        // Total for this week
+        const totalDays = badgeEntries + additionalDaysUsed;
+        
+        // Week is compliant if total days >= 3
+        if (totalDays >= 3) {
+          compliantWeeks++;
+        }
+      });
+      
+      // Calculate compliance percentage
+      const compliance = Math.round((compliantWeeks / totalWeeks) * 100);
+      setComplianceRate(compliance);
+      setComplianceText(`(${compliantWeeks}/${totalWeeks} weeks)`);
+    } else {
+      setComplianceRate(0);
+      setComplianceText("of required office days");
     }
-    
-    setComplianceRate(compliance);
   }, [entries, dateRange]);
 
   return (
     <StatsCard
       title="Compliance Rate"
       value={`${complianceRate}%`}
-      description="of required office days"
+      description={complianceText}
       icon={ShieldCheck}
     />
   );
 };
 
-// Helper function to count workdays in a date range (excluding weekends)
-const countWorkdays = (start: Date, end: Date): number => {
-  let count = 0;
-  const curDate = new Date(start.getTime());
+// Helper function to get all weeks in a date range
+const getWeeksInRange = (start: Date, end: Date): { start: Date, end: Date }[] => {
+  const weeks: { start: Date, end: Date }[] = [];
+  let currentWeekStart = startOfWeek(start, { weekStartsOn: 0 });
   
-  while (curDate <= end) {
-    const dayOfWeek = curDate.getDay();
-    if (dayOfWeek !== 0 && dayOfWeek !== 6) count++;
-    curDate.setDate(curDate.getDate() + 1);
+  while (currentWeekStart <= end) {
+    const currentWeekEnd = endOfWeek(currentWeekStart, { weekStartsOn: 0 });
+    weeks.push({
+      start: currentWeekStart,
+      end: currentWeekEnd > end ? end : currentWeekEnd
+    });
+    
+    // Move to next week
+    currentWeekStart = addWeeks(currentWeekStart, 1);
   }
   
-  return count;
+  return weeks;
 };
 
 export default ComplianceRateCard;

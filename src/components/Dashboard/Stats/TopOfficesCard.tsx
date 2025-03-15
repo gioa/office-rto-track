@@ -11,10 +11,12 @@ interface OfficeLocation {
 
 const TopOfficesCard = () => {
   const [topOffices, setTopOffices] = useState<OfficeLocation[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Calculate top office locations from badge entries
   useEffect(() => {
     const fetchTopOffices = async () => {
+      setIsLoading(true);
       try {
         // Get all badge entries from Supabase - excluding weekends
         const { data, error } = await supabase
@@ -51,6 +53,8 @@ const TopOfficesCard = () => {
       } catch (error) {
         console.error("Error fetching top offices:", error);
         setTopOffices([{ name: "Error", count: 0 }]);
+      } finally {
+        setIsLoading(false);
       }
     };
     
@@ -78,16 +82,22 @@ const TopOfficesCard = () => {
     };
   }, []);
 
-  // Format the description text instead of using JSX elements
-  const descriptionText = topOffices.map(office => 
-    `${office.name}: ${office.count}`
-  ).join(', ');
+  // Format the description text
+  const formatDescription = () => {
+    if (isLoading) return "Loading...";
+    if (topOffices.length === 0) return "No data available";
+    
+    return topOffices
+      .slice(0, 3)
+      .map(office => `${office.name}: ${office.count}`)
+      .join(', ');
+  };
 
   return (
     <StatsCard
       title="Top Offices"
-      value={topOffices[0]?.name || "N/A"}
-      description={descriptionText}
+      value={isLoading ? "Loading..." : (topOffices[0]?.name || "N/A")}
+      description={formatDescription()}
       icon={Building}
     />
   );

@@ -3,6 +3,7 @@ import { Activity } from "lucide-react";
 import StatsCard from "./StatsCard";
 import { Entry, DateRange } from "@/lib/types";
 import { useEffect, useState } from "react";
+import { format, startOfWeek, endOfWeek, isSameWeek, addWeeks } from "date-fns";
 
 interface WeeklyAverageCardProps {
   entries: Entry[];
@@ -13,24 +14,56 @@ const WeeklyAverageCard = ({ entries, dateRange }: WeeklyAverageCardProps) => {
   const [weeklyAverage, setWeeklyAverage] = useState(0);
 
   useEffect(() => {
-    // Calculate weekly average (if date range is set)
-    let average = 0;
+    // Calculate weekly average using the new rules
     if (dateRange.from && dateRange.to) {
-      const workdays = countWorkdays(dateRange.from, dateRange.to);
-      const weeks = Math.max(1, Math.round(workdays / 5));
+      const weeks = getWeeksInRange(dateRange.from, dateRange.to);
+      const totalWeeks = weeks.length;
       
-      // Count office visits and events in the date range
-      const officeVisitsInRange = entries.filter(entry => {
-        const entryDate = new Date(entry.date);
-        return (entry.type === 'office-visit' || entry.type === 'event') && 
-               entryDate >= dateRange.from && 
-               entryDate <= dateRange.to;
-      }).length;
+      if (totalWeeks === 0) {
+        setWeeklyAverage(0);
+        return;
+      }
       
-      average = Math.round((officeVisitsInRange / weeks) * 10) / 10;
+      // Calculate entries per week
+      const weeklyTotals = weeks.map(week => {
+        // Filter entries within this week
+        const weekEntries = entries.filter(entry => {
+          const entryDate = new Date(entry.date);
+          return isSameWeek(entryDate, week.start);
+        });
+        
+        // Count badge entries (non-temp badges)
+        const badgeEntries = weekEntries.filter(entry => 
+          entry.type === 'office-visit' && !entry.isTempBadge
+        ).length;
+        
+        // Count how many additional days we need
+        const additionalDaysNeeded = Math.max(0, 3 - badgeEntries);
+        
+        // Count other entry types that can be used to meet the requirement
+        const altEntries = weekEntries.filter(entry => 
+          (entry.type === 'office-visit' && entry.isTempBadge) || // temp badges
+          entry.type === 'sick' || 
+          entry.type === 'pto' || 
+          entry.type === 'event' || 
+          entry.type === 'holiday'
+        );
+        
+        // Use additional days up to what's needed
+        const additionalDaysUsed = Math.min(additionalDaysNeeded, altEntries.length);
+        
+        // Total for this week (capped at 3)
+        return Math.min(3, badgeEntries + additionalDaysUsed);
+      });
+      
+      // Calculate average
+      const totalDays = weeklyTotals.reduce((sum, days) => sum + days, 0);
+      const average = totalDays / totalWeeks;
+      
+      setWeeklyAverage(Math.round(average * 10) / 10); // Round to 1 decimal place
+    } else {
+      setWeeklyAverage(0);
     }
-    
-    setWeeklyAverage(average);
   }, [entries, dateRange]);
 
   return (
@@ -43,18 +76,23 @@ const WeeklyAverageCard = ({ entries, dateRange }: WeeklyAverageCardProps) => {
   );
 };
 
-// Helper function to count workdays in a date range (excluding weekends)
-const countWorkdays = (start: Date, end: Date): number => {
-  let count = 0;
-  const curDate = new Date(start.getTime());
+// Helper function to get all weeks in a date range
+const getWeeksInRange = (start: Date, end: Date): { start: Date, end: Date }[] => {
+  const weeks: { start: Date, end: Date }[] = [];
+  let currentWeekStart = startOfWeek(start, { weekStartsOn: 0 });
   
-  while (curDate <= end) {
-    const dayOfWeek = curDate.getDay();
-    if (dayOfWeek !== 0 && dayOfWeek !== 6) count++;
-    curDate.setDate(curDate.getDate() + 1);
+  while (currentWeekStart <= end) {
+    const currentWeekEnd = endOfWeek(currentWeekStart, { weekStartsOn: 0 });
+    weeks.push({
+      start: currentWeekStart,
+      end: currentWeekEnd > end ? end : currentWeekEnd
+    });
+    
+    // Move to next week
+    currentWeekStart = addWeeks(currentWeekStart, 1);
   }
   
-  return count;
+  return weeks;
 };
 
 export default WeeklyAverageCard;
