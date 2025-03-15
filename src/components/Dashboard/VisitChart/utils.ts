@@ -53,15 +53,16 @@ export const transformWeeklyStats = (data: WeeklyStats[]): EnhancedWeeklyStats[]
       remaining -= displayPtoDays;
     }
     
-    // Then count holiday days towards the target - fixed to include holidays
+    // Then count holiday days towards the target
     if (remaining > 0) {
       displayHolidayDays = Math.min(remaining, holidayDays);
       remaining -= displayHolidayDays;
     }
     
-    // Also count event days if needed
+    // Also count event days if needed (though normally these are already in daysInOffice)
     if (remaining > 0) {
       displayEventDays = Math.min(remaining, eventDays);
+      remaining -= displayEventDays;
     }
     
     // Calculate compliance percentage - counting all types toward the target

@@ -3,13 +3,19 @@ import { Building } from "lucide-react";
 import StatsCard from "./StatsCard";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { DateRange } from "@/lib/types";
+import { currentUser } from "@/lib/data/currentUser";
 
 interface OfficeLocation {
   name: string;
   count: number;
 }
 
-const TopOfficesCard = () => {
+interface TopOfficesCardProps {
+  dateRange?: DateRange;
+}
+
+const TopOfficesCard = ({ dateRange }: TopOfficesCardProps) => {
   const [topOffices, setTopOffices] = useState<OfficeLocation[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -18,13 +24,25 @@ const TopOfficesCard = () => {
     const fetchTopOffices = async () => {
       setIsLoading(true);
       try {
-        // Get all badge entries from Supabase - excluding weekends
-        const { data, error } = await supabase
+        // Build the query with all filters
+        let query = supabase
           .from('badge_entries')
           .select('office_location')
           .not('office_location', 'is', null)
           .filter('day_of_week', 'neq', 0)  // Exclude Sunday
-          .filter('day_of_week', 'neq', 6);  // Exclude Saturday
+          .filter('day_of_week', 'neq', 6)  // Exclude Saturday
+          .eq('email', currentUser.email); // Filter by current user's email
+        
+        // Apply date range filter if provided
+        if (dateRange?.from) {
+          query = query.gte('date', dateRange.from.toISOString());
+        }
+        
+        if (dateRange?.to) {
+          query = query.lte('date', dateRange.to.toISOString());
+        }
+        
+        const { data, error } = await query;
         
         if (error) throw error;
         
@@ -80,7 +98,7 @@ const TopOfficesCard = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [dateRange]);
 
   // Format the description text
   const formatDescription = () => {

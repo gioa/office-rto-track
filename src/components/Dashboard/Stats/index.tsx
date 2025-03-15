@@ -28,7 +28,7 @@ const Stats = ({ entries, dateRange }: StatsProps) => {
       <WeeklyAverageCard entries={weekdayEntries} dateRange={dateRange} />
       <ComplianceRateCard entries={weekdayEntries} dateRange={dateRange} />
       <TimeOffCard entries={weekdayEntries} />
-      <TopOfficesCard />
+      <TopOfficesCard dateRange={dateRange} />
     </div>
   );
 };
