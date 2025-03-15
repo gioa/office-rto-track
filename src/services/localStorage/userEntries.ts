@@ -22,7 +22,8 @@ export const getUserEntries = async (): Promise<UserEntry[]> => {
       dayOfWeek: entry.day_of_week,
       type: entry.type as UserEntry['type'],
       note: entry.note || undefined,
-      isTempBadge: entry.is_temp_badge || false
+      // If it's an office visit, it's a temp badge for user entered data
+      isTempBadge: entry.type === 'office-visit' ? true : undefined
     }));
   } catch (error) {
     console.error('Error getting user entries:', error);
@@ -50,7 +51,8 @@ export const getUserEntriesByEmail = async (email: string): Promise<UserEntry[]>
       dayOfWeek: entry.day_of_week,
       type: entry.type as UserEntry['type'],
       note: entry.note || undefined,
-      isTempBadge: entry.is_temp_badge || false
+      // If it's an office visit, it's a temp badge for user entered data
+      isTempBadge: entry.type === 'office-visit' ? true : undefined
     }));
   } catch (error) {
     console.error('Error getting user entries by email:', error);
@@ -71,7 +73,6 @@ export const addUserEntry = async (entry: Omit<UserEntry, 'id'>): Promise<UserEn
       day_of_week: entry.dayOfWeek,
       type: entry.type,
       note: entry.note,
-      is_temp_badge: entry.isTempBadge || false
     };
     
     const { data, error } = await supabase
@@ -92,7 +93,8 @@ export const addUserEntry = async (entry: Omit<UserEntry, 'id'>): Promise<UserEn
       dayOfWeek: data.day_of_week,
       type: data.type as UserEntry['type'],
       note: data.note || undefined,
-      isTempBadge: data.is_temp_badge || false
+      // If it's an office visit, it's a temp badge for user entered data
+      isTempBadge: data.type === 'office-visit' ? true : undefined
     };
   } catch (error) {
     console.error('Error adding user entry:', error);
@@ -128,7 +130,6 @@ export const updateUserEntry = async (entryId: string, updates: Partial<Omit<Use
     
     if (updates.type) dbUpdates.type = updates.type;
     if (updates.note !== undefined) dbUpdates.note = updates.note;
-    if (updates.isTempBadge !== undefined) dbUpdates.is_temp_badge = updates.isTempBadge;
     
     const { data, error } = await supabase
       .from('user_entries')
@@ -149,7 +150,8 @@ export const updateUserEntry = async (entryId: string, updates: Partial<Omit<Use
       dayOfWeek: data.day_of_week,
       type: data.type as UserEntry['type'],
       note: data.note || undefined,
-      isTempBadge: data.is_temp_badge || false
+      // If it's an office visit, it's a temp badge for user entered data
+      isTempBadge: data.type === 'office-visit' ? true : undefined
     };
   } catch (error) {
     console.error('Error updating user entry:', error);

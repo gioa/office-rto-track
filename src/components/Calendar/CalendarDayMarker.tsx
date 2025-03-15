@@ -18,16 +18,16 @@ const CalendarDayMarker = ({
   isTempBadge
 }: CalendarDayMarkerProps) => {
   if (hasEntry && !dayIsWeekend) {
-    // Choose icon based on entry type
-    const Icon = entryType === 'office-visit' && isTempBadge ? Ticket : CircleCheck;
+    // For office visits from user entries, always use the Ticket icon
+    // and assume all manually added office visits are temp badges
+    const Icon = entryType === 'office-visit' ? Ticket : CircleCheck;
     
     return (
       <div className="absolute bottom-1 left-1/2 transform -translate-x-1/2">
         <Icon 
           className={cn(
             "h-5 w-5",
-            entryType === 'office-visit' && !isTempBadge && "text-green-500",
-            entryType === 'office-visit' && isTempBadge && "text-teal-500",
+            entryType === 'office-visit' && "text-teal-500", // Change all office visits to teal
             entryType === 'sick' && "text-amber-500",
             entryType === 'pto' && "text-blue-500",
             (entryType === 'event' || entryType === 'holiday') && "text-purple-500"

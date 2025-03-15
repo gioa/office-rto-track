@@ -24,7 +24,7 @@ const EntryTypeSelector = ({ control, onTypeChange }: EntryTypeSelectorProps) =>
               </SelectTrigger>
             </FormControl>
             <SelectContent>
-              <SelectItem value="office-visit">Office Visit</SelectItem>
+              <SelectItem value="office-visit">Office Visit (Temp Badge)</SelectItem>
               <SelectItem value="sick">Sick Day</SelectItem>
               <SelectItem value="pto">PTO</SelectItem>
               <SelectItem value="event">Company Event</SelectItem>

@@ -2,12 +2,12 @@
 /**
  * Combined entries operations (badges + user entries)
  */
-import { Entry } from "@/lib/types";
-import { getBadgeEntries } from "./badgeEntries";
-import { getUserEntries } from "./userEntries";
-import { generateWeeklyStats } from "@/lib/data/statsGenerator";
-import { currentUser } from "@/lib/data/currentUser";
-import { deleteUserEntry } from "./userEntries";
+import { Entry } from '@/lib/types';
+import { getBadgeEntries } from './badgeEntries';
+import { getUserEntries } from './userEntries';
+import { generateWeeklyStats } from '@/lib/data/statsGenerator';
+import { currentUser } from '@/lib/data/currentUser';
+import { deleteUserEntry } from './userEntries';
 
 // Get all entries in Entry format (for compatibility with current components)
 export const getAllEntries = async (): Promise<Entry[]> => {
@@ -31,7 +31,8 @@ export const getAllEntries = async (): Promise<Entry[]> => {
     type: entry.type,
     note: entry.note,
     userId: entry.email === currentUser.email ? currentUser.id : entry.email,
-    isTempBadge: entry.type === 'office-visit' ? (entry.isTempBadge || false) : undefined
+    // For user-entered office visits, they're always temp badges
+    isTempBadge: entry.type === 'office-visit' ? true : undefined
   }));
   
   // Combine all entries, but filter out weekend entries for consistency
