@@ -7,7 +7,6 @@ import { Entry } from '@/lib/types';
 import { useEntries } from './useEntries';
 import { isWeekend } from '@/components/Calendar/utils';
 import { currentUser } from '@/lib/data/currentUser';
-import { startOfDay, isSameDay } from 'date-fns';
 
 export const useEntriesForDate = (date: Date) => {
   const { entries, isLoading, error } = useEntries();
@@ -26,7 +25,9 @@ export const useEntriesForDate = (date: Date) => {
         const entryDate = new Date(entry.date);
         return (
           (entry.userId === currentUser.id || entry.userId === currentUser.email) &&
-          isSameDay(entryDate, date)
+          entryDate.getDate() === date.getDate() &&
+          entryDate.getMonth() === date.getMonth() &&
+          entryDate.getFullYear() === date.getFullYear()
         );
       });
       

@@ -4,7 +4,7 @@ import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import MonthView from "@/components/Calendar/MonthView";
 import { Entry } from "@/lib/types";
-import { format, isSameDay } from "date-fns";
+import { format } from "date-fns";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useNavigate } from "react-router-dom";
@@ -13,12 +13,13 @@ import { Calendar, Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { currentUser } from "@/lib/data/currentUser";
 import { useEntries } from "@/hooks/entries";
+import { useEntriesForDate } from "@/hooks/entries/useEntriesForDate";
 
 const CalendarPage = () => {
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState(new Date());
   
-  // Get all entries
+  // Get all entries without filtering by date range
   const { entries: allEntries } = useEntries();
   
   // Filter entries to only show the current user's entries
@@ -26,11 +27,8 @@ const CalendarPage = () => {
     entry.userId === currentUser.id || entry.userId === currentUser.email
   );
   
-  // Get entries for the selected date
-  const selectedEntries = userEntries.filter(entry => {
-    const entryDate = new Date(entry.date);
-    return isSameDay(entryDate, selectedDate);
-  });
+  // Use the useEntriesForDate hook to get entries for the selected date
+  const { entriesForDate } = useEntriesForDate(selectedDate);
   
   return (
     <div className="min-h-screen bg-gradient-to-b from-background to-secondary/30">
@@ -77,11 +75,11 @@ const CalendarPage = () => {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    {selectedEntries.length > 0 ? (
+                    {entriesForDate.length > 0 ? (
                       <div className="space-y-4">
                         <h4 className="text-sm font-medium">Entries</h4>
                         <div className="space-y-2">
-                          {selectedEntries.map((entry: Entry, index: number) => (
+                          {entriesForDate.map((entry: Entry, index: number) => (
                             <div key={index} className="flex items-start p-2 rounded-md bg-background/50">
                               <Badge 
                                 variant="outline" 
@@ -140,3 +138,4 @@ const formatEntryType = (type: Entry['type']): string => {
 };
 
 export default CalendarPage;
+
