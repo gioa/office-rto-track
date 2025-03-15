@@ -27,7 +27,7 @@ const TopOfficesCard = ({ dateRange }: TopOfficesCardProps) => {
         // Build the query with all filters
         let query = supabase
           .from('Employee_Office_Utilization')
-          .select('Checked-In Office')
+          .select('*')
           .not('Checked-In Office', 'is', null)
           .eq('Email', currentUser.email); // Filter by current user's email
         
