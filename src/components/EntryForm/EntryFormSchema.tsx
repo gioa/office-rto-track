@@ -1,20 +1,10 @@
 
 import { z } from "zod";
-import { DateRange } from "@/lib/types";
 
 export const formSchema = z.object({
-  date: z.union([
-    z.date({
-      required_error: "Please select a date.",
-    }),
-    z.object({
-      from: z.date(),
-      to: z.date().optional(),
-    }).transform((data): DateRange => ({
-      from: data.from,
-      to: data.to || undefined
-    })),
-  ]),
+  date: z.date({
+    required_error: "Please select a date.",
+  }),
   type: z.enum(["office-visit", "sick", "pto", "event", "holiday"], {
     required_error: "Please select an entry type.",
   }),
