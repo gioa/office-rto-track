@@ -6,7 +6,7 @@ import { Entry, EntryType } from "@/lib/types";
  */
 export const formatEntryType = (type: EntryType): string => {
   switch (type) {
-    case 'office-visit': return 'Office Visit (Temp Badge)';  // Updated to show temp badge
+    case 'office-visit': return 'Office Visit';  // Removed (Temp Badge)
     case 'sick': return 'Sick Day';
     case 'pto': return 'PTO';
     case 'event': return 'Company Event';
