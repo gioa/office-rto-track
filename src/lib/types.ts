@@ -8,6 +8,7 @@ export interface Entry {
   note?: string;
   userId: string; // For actual user identification in a real app
   officeLocation?: string; // Added office location property
+  isTempBadge?: boolean; // Indicates if it's a temp badge or actual badge swipe
 }
 
 export interface User {
@@ -68,6 +69,7 @@ export interface UserEntry {
   dayOfWeek: number; // 0-6 representing Sunday-Saturday
   type: EntryType; // Using the existing EntryType for consistency
   note?: string;
+  isTempBadge?: boolean; // New field to distinguish manually entered office visits
 }
 
 export interface UserPlannedDays {

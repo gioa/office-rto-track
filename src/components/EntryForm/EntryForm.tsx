@@ -17,7 +17,7 @@ interface EntryFormProps {
   compact?: boolean;
   initialDate?: Date;
   onSubmitComplete?: (keepOpen: boolean) => void;
-  addEntry?: UseMutationResult<any, Error, { type: string; date: Date; note?: string; officeLocation?: string }, unknown>;
+  addEntry?: UseMutationResult<any, Error, { type: string; date: Date; note?: string; officeLocation?: string; isTempBadge?: boolean }, unknown>;
 }
 
 const EntryForm = ({ 
@@ -64,7 +64,8 @@ const EntryForm = ({
             type: values.type, 
             date: new Date(d), 
             note: values.note,
-            officeLocation: values.type === 'office-visit' ? defaultOffice : undefined
+            officeLocation: values.type === 'office-visit' ? defaultOffice : undefined,
+            isTempBadge: values.type === 'office-visit' ? true : undefined
           });
         }
       } else if (addEntry) {
@@ -72,7 +73,8 @@ const EntryForm = ({
           type: values.type, 
           date, 
           note: values.note,
-          officeLocation: values.type === 'office-visit' ? defaultOffice : undefined
+          officeLocation: values.type === 'office-visit' ? defaultOffice : undefined,
+          isTempBadge: values.type === 'office-visit' ? true : undefined
         });
       }
       

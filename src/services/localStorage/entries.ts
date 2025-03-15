@@ -1,3 +1,4 @@
+
 /**
  * Combined entries operations (badges + user entries)
  */
@@ -20,6 +21,7 @@ export const getAllEntries = async (): Promise<Entry[]> => {
     type: 'office-visit',
     userId: badge.email === currentUser.email ? currentUser.id : badge.email,
     officeLocation: badge.officeLocation || 'Unknown', // Include the office location
+    isTempBadge: false // Badge entries are not temp badges
   }));
   
   // Convert user entries to Entry format
@@ -29,6 +31,7 @@ export const getAllEntries = async (): Promise<Entry[]> => {
     type: entry.type,
     note: entry.note,
     userId: entry.email === currentUser.email ? currentUser.id : entry.email,
+    isTempBadge: entry.type === 'office-visit' ? (entry.isTempBadge || false) : undefined
   }));
   
   // Combine all entries, but filter out weekend entries for consistency

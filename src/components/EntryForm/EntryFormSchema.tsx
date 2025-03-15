@@ -26,7 +26,7 @@ export type FormValues = z.infer<typeof formSchema>;
 // Helper to format entry types for display
 export const formatEntryType = (type: string): string => {
   switch (type) {
-    case 'office-visit': return 'Office Visit';
+    case 'office-visit': return 'Office Visit (Temp Badge)';
     case 'sick': return 'Sick Day';
     case 'pto': return 'PTO';
     case 'event': return 'Company Event';

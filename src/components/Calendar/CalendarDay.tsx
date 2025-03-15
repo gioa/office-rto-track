@@ -40,6 +40,10 @@ const CalendarDay = ({
   
   // Ensure no entry type is reported for weekends
   const entryType = dayIsWeekend ? null : getFirstEntryType(entries, day);
+
+  // Check if this is a temp badge entry
+  const firstEntry = filteredEntries[0];
+  const isTempBadge = firstEntry?.type === 'office-visit' && firstEntry?.isTempBadge;
   
   // Check if this day is a planned office day - never on weekends
   const isPlannedDay = !dayIsWeekend && isAfter(day, new Date()) && 
@@ -106,6 +110,7 @@ const CalendarDay = ({
             dayIsWeekend={dayIsWeekend}
             entryType={entryType}
             isPlannedDay={isPlannedDay}
+            isTempBadge={isTempBadge}
           />
         </button>
       </TooltipTrigger>

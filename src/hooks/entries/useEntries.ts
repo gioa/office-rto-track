@@ -68,30 +68,60 @@ export const useEntries = (filterOptions?: FilterOptions) => {
   
   // Mutation for adding a new entry
   const addEntry = useMutation({
-    mutationFn: async ({ type, date, note, officeLocation }: { 
+    mutationFn: async ({ 
+      type, 
+      date, 
+      note, 
+      officeLocation,
+      isTempBadge 
+    }: { 
       type: Entry['type'], 
       date: Date, 
       note?: string,
-      officeLocation?: string 
+      officeLocation?: string,
+      isTempBadge?: boolean
     }) => {
-      const userEmail = currentUser.email; // Get current user email
+      const userEmail = currentUser.email;
+      const dayOfWeek = date.getDay();
       
+      // First check for badge entries on this date - these cannot be overridden
+      const badgeEntries = await dataService.getBadgeEntriesByEmail(userEmail);
+      const badgeEntryForDate = badgeEntries.find(entry => 
+        new Date(entry.date).toDateString() === date.toDateString()
+      );
+      
+      if (badgeEntryForDate) {
+        throw new Error("You already have a badge entry for this date. Cannot add a manual entry.");
+      }
+      
+      // Check for existing user entries for this date
+      const userEntries = await dataService.getUserEntriesByEmail(userEmail);
+      const userEntryForDate = userEntries.find(entry => 
+        new Date(entry.date).toDateString() === date.toDateString()
+      );
+      
+      if (userEntryForDate) {
+        // If an entry already exists for this date, update it instead of creating a new one
+        // Note: This would require adding an updateUserEntry function to dataService
+        throw new Error("You already have an entry for this date. Please delete it first if you want to change it.");
+      }
+      
+      // For office visits, create a user entry with temp badge flag
       if (type === 'office-visit') {
-        // For office visits, create a badge entry
-        return dataService.addBadgeEntry({
+        return dataService.addUserEntry({
           email: userEmail,
           date,
-          dayOfWeek: date.getDay(),
-          officeLocation: officeLocation || 'Default Office',
-          checkinTime: new Date(new Date(date).setHours(9, 0, 0, 0)),
-          checkoutTime: new Date(new Date(date).setHours(17, 0, 0, 0))
+          dayOfWeek,
+          type,
+          note,
+          isTempBadge: true
         });
       } else {
         // For other types, create a user entry
         return dataService.addUserEntry({
           email: userEmail,
           date,
-          dayOfWeek: date.getDay(),
+          dayOfWeek,
           type,
           note,
         });
