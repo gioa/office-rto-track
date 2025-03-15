@@ -41,6 +41,7 @@ export interface WeeklyStats {
   ptoDays?: number;
   eventDays?: number;
   holidayDays?: number;
+  userId?: string; // Added userId property to support filtering by user
 }
 
 export interface PlannedDay {

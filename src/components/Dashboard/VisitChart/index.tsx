@@ -1,3 +1,4 @@
+
 import { Entry, WeeklyStats } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ReferenceLine, Legend, ResponsiveContainer } from "recharts";
@@ -31,7 +32,12 @@ const VisitChart = ({ entries, dateRange }: VisitChartProps) => {
       const filteredStats = generateWeeklyStats(userEntries);
       setChartData(transformWeeklyStats(filteredStats));
     } else if (apiData) {
-      const userApiData = apiData.filter(stat => stat.userId === currentUser.id);
+      // Filter by currentUser.id if userId exists in the data, otherwise use all data
+      // This prevents errors when the API data doesn't include userId
+      const userApiData = apiData.filter(stat => 
+        // If stat has userId property, filter by it, otherwise include all stats
+        stat.userId ? (stat.userId === currentUser.id) : true
+      );
       setChartData(transformWeeklyStats(userApiData));
     } else {
       setChartData([]);
