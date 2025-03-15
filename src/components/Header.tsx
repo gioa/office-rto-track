@@ -1,6 +1,6 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { currentUser } from "@/lib/mockData";
+import { currentUser } from "@/lib/data/currentUser";
 
 const Header = () => {
   const initials = currentUser.name

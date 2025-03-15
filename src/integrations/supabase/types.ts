@@ -42,6 +42,27 @@ export type Database = {
         }
         Relationships: []
       }
+      employee_office_utilization: {
+        Row: {
+          date: string
+          day_of_week: string | null
+          email: string
+          office_location: string | null
+        }
+        Insert: {
+          date: string
+          day_of_week?: string | null
+          email: string
+          office_location?: string | null
+        }
+        Update: {
+          date?: string
+          day_of_week?: string | null
+          email?: string
+          office_location?: string | null
+        }
+        Relationships: []
+      }
       user_entries: {
         Row: {
           created_at: string

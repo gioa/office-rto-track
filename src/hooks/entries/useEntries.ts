@@ -1,4 +1,3 @@
-
 /**
  * Hook for working with all entries data
  */

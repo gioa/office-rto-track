@@ -3,7 +3,7 @@ import { format } from "date-fns";
 import { Entry } from "@/lib/types";
 import { TableCell, TableRow } from "@/components/ui/table";
 import { formatEntryType, getOfficeLocation } from "./entryFormatters";
-import { currentUser } from "@/lib/mockData";
+import { currentUser } from "@/lib/data/currentUser";
 
 interface TableRowItemProps {
   entry: Entry;

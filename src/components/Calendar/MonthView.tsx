@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, startOfWeek } from "date-fns";
 import { Card, CardContent } from "@/components/ui/card";
@@ -27,10 +26,8 @@ const MonthView = ({
   const firstDayOfMonth = startOfMonth(currentMonth);
   const lastDayOfMonth = endOfMonth(currentMonth);
   
-  // Generate days for the calendar view, ensuring we start from the first day of the week
-  // containing the first of the month, ensuring correct alignment
   const daysInMonth = eachDayOfInterval({
-    start: startOfWeek(firstDayOfMonth, { weekStartsOn: 0 }), // Explicitly use Sunday (0) as start
+    start: startOfWeek(firstDayOfMonth, { weekStartsOn: 0 }),
     end: lastDayOfMonth
   });
   
@@ -38,36 +35,29 @@ const MonthView = ({
   const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
   const goToday = () => setCurrentMonth(new Date());
   
-  // Define dayNames with Sunday first to match the weekStartsOn=0 setting
   const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
-  // Filter entries to only show the current user's entries
   const userEntries = entries.filter(entry => 
     entry.userId === currentUser.id || entry.userId === currentUser.email
   );
 
-  // Filter entries to remove any on weekend days
   const filteredEntries = userEntries.filter(entry => {
     const entryDate = new Date(entry.date);
     return !isWeekend(entryDate);
   });
 
-  // Filter planned days to only show the current user's planned days
   const userPlannedDays = plannedDays.filter(day => 
     day.userId === currentUser.id
   );
 
-  // Get the planned weekdays as an array to use for styling
   const getPlannedDaysModifier = () => {
     const today = new Date();
     const futureDates: Record<string, Date> = {};
 
-    // Create a map of planned days in the future
-    // For each day in the current month, check if it's a planned office day
     daysInMonth.forEach(day => {
-      if (day.getTime() > today.getTime() && // Only future dates
-          !isWeekend(day) &&                 // Never include weekend days 
-          userPlannedDays.some(pd => pd.weekday === day.getDay())) { // Is a planned day
+      if (day.getTime() > today.getTime() && 
+          !isWeekend(day) && 
+          userPlannedDays.some(pd => pd.weekday === day.getDay())) {
         futureDates[format(day, 'yyyy-MM-dd')] = day;
       }
     });
@@ -98,7 +88,6 @@ const MonthView = ({
         
         <CalendarLegend />
         
-        {/* Add Entry button below the legends */}
         <div className="mt-4 flex justify-center">
           <EntryFormDialog buttonVariant="outline" buttonSize="sm" />
         </div>
