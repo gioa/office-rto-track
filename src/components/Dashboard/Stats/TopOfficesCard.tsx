@@ -26,20 +26,20 @@ const TopOfficesCard = ({ dateRange }: TopOfficesCardProps) => {
       try {
         // Build the query with all filters
         let query = supabase
-          .from('badge_entries')
-          .select('office_location')
-          .not('office_location', 'is', null)
-          .filter('day_of_week', 'neq', 0)  // Exclude Sunday
-          .filter('day_of_week', 'neq', 6)  // Exclude Saturday
-          .eq('email', currentUser.email); // Filter by current user's email
+          .from('Employee_Office_Utilization')
+          .select('Checked-In Office')
+          .not('Checked-In Office', 'is', null)
+          .eq('Email', currentUser.email); // Filter by current user's email
         
         // Apply date range filter if provided
         if (dateRange?.from) {
-          query = query.gte('date', dateRange.from.toISOString());
+          const fromDate = dateRange.from.toISOString().split('T')[0];
+          query = query.gte('Date', fromDate);
         }
         
         if (dateRange?.to) {
-          query = query.lte('date', dateRange.to.toISOString());
+          const toDate = dateRange.to.toISOString().split('T')[0];
+          query = query.lte('Date', toDate);
         }
         
         const { data, error } = await query;
@@ -52,8 +52,8 @@ const TopOfficesCard = ({ dateRange }: TopOfficesCardProps) => {
         // Process results
         if (data && Array.isArray(data)) {
           data.forEach(entry => {
-            if (entry.office_location) {
-              const location = entry.office_location;
+            if (entry['Checked-In Office']) {
+              const location = entry['Checked-In Office'];
               officeMap.set(location, (officeMap.get(location) || 0) + 1);
             }
           });
@@ -86,7 +86,7 @@ const TopOfficesCard = ({ dateRange }: TopOfficesCardProps) => {
         {
           event: '*',
           schema: 'public',
-          table: 'badge_entries'
+          table: 'Employee_Office_Utilization'
         },
         () => {
           // Refetch top offices when badge entries change

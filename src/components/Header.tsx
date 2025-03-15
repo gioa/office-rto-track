@@ -1,6 +1,7 @@
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { currentUser } from "@/lib/mockData";
+import { currentUser } from "@/lib/data/currentUser";
+import { Databricks } from "lucide-react";
 
 const Header = () => {
   const initials = currentUser.name
@@ -11,7 +12,8 @@ const Header = () => {
 
   return (
     <header className="h-16 px-6 border-b border-border/40 flex items-center justify-between bg-background/80 backdrop-blur-md z-10 sticky top-0">
-      <div className="flex items-center">
+      <div className="flex items-center gap-2">
+        <Databricks className="h-6 w-6 text-primary" />
         <h1 className="text-xl font-medium tracking-tight">
           <span className="text-primary">RTO</span> Tracker
         </h1>

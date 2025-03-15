@@ -34,7 +34,7 @@ export const useEntries = (filterOptions?: FilterOptions) => {
         {
           event: '*', // Listen to all events (INSERT, UPDATE, DELETE)
           schema: 'public',
-          table: 'badge_entries'
+          table: 'Employee_Office_Utilization'
         },
         () => {
           // Invalidate and refetch when badge_entries change
