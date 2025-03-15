@@ -26,19 +26,20 @@ const TopOfficesCard = ({ dateRange }: TopOfficesCardProps) => {
       try {
         // Build the query with all filters
         let query = supabase
-          .from('Employee_Office_Utilization')
-          .select('*')
-          .not('Checked-In Office', 'is', null);
+          .from('badge_entries')
+          .select('office_location')
+          .not('office_location', 'is', null)
+          .filter('day_of_week', 'neq', 0)  // Exclude Sunday
+          .filter('day_of_week', 'neq', 6)  // Exclude Saturday
+          .eq('email', currentUser.email); // Filter by current user's email
         
         // Apply date range filter if provided
         if (dateRange?.from) {
-          const fromDate = dateRange.from.toISOString().split('T')[0];
-          query = query.gte('Date', fromDate);
+          query = query.gte('date', dateRange.from.toISOString());
         }
         
         if (dateRange?.to) {
-          const toDate = dateRange.to.toISOString().split('T')[0];
-          query = query.lte('Date', toDate);
+          query = query.lte('date', dateRange.to.toISOString());
         }
         
         const { data, error } = await query;
@@ -51,8 +52,8 @@ const TopOfficesCard = ({ dateRange }: TopOfficesCardProps) => {
         // Process results
         if (data && Array.isArray(data)) {
           data.forEach(entry => {
-            if (entry['Checked-In Office']) {
-              const location = entry['Checked-In Office'];
+            if (entry.office_location) {
+              const location = entry.office_location;
               officeMap.set(location, (officeMap.get(location) || 0) + 1);
             }
           });
@@ -85,7 +86,7 @@ const TopOfficesCard = ({ dateRange }: TopOfficesCardProps) => {
         {
           event: '*',
           schema: 'public',
-          table: 'Employee_Office_Utilization'
+          table: 'badge_entries'
         },
         () => {
           // Refetch top offices when badge entries change

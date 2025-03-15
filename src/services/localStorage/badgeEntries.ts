@@ -10,9 +10,8 @@ import { initializeStorage } from "./initialize";
 export const getBadgeEntries = async (): Promise<BadgeEntry[]> => {
   initializeStorage();
   
-  // Use the Employee_Office_Utilization table instead of badge_entries
   const { data, error } = await supabase
-    .from('Employee_Office_Utilization')
+    .from('badge_entries')
     .select('*');
     
   if (error) {
@@ -21,21 +20,21 @@ export const getBadgeEntries = async (): Promise<BadgeEntry[]> => {
   }
   
   return (data || []).map(entry => ({
-    id: entry.Email + '-' + entry.Date, // Create a composite ID since the table doesn't have an id field
-    email: entry.Email,
-    date: new Date(entry.Date),
-    dayOfWeek: entry['Day of Week'] ? parseInt(entry['Day of Week']) : new Date(entry.Date).getDay(),
-    officeLocation: entry['Checked-In Office'] || undefined,
-    checkinTime: undefined, // These fields aren't in the new table
-    checkoutTime: undefined
+    id: entry.id,
+    email: entry.email,
+    date: new Date(entry.date),
+    dayOfWeek: entry.day_of_week,
+    officeLocation: entry.office_location,
+    checkinTime: entry.checkin_time ? new Date(entry.checkin_time) : undefined,
+    checkoutTime: entry.checkout_time ? new Date(entry.checkout_time) : undefined
   }));
 };
 
 export const getBadgeEntriesByEmail = async (email: string): Promise<BadgeEntry[]> => {
   const { data, error } = await supabase
-    .from('Employee_Office_Utilization')
+    .from('badge_entries')
     .select('*')
-    .eq('Email', email);
+    .eq('email', email);
     
   if (error) {
     console.error('Error fetching badge entries by email:', error);
@@ -43,24 +42,26 @@ export const getBadgeEntriesByEmail = async (email: string): Promise<BadgeEntry[
   }
   
   return (data || []).map(entry => ({
-    id: entry.Email + '-' + entry.Date,
-    email: entry.Email,
-    date: new Date(entry.Date),
-    dayOfWeek: entry['Day of Week'] ? parseInt(entry['Day of Week']) : new Date(entry.Date).getDay(),
-    officeLocation: entry['Checked-In Office'] || undefined,
-    checkinTime: undefined,
-    checkoutTime: undefined
+    id: entry.id,
+    email: entry.email,
+    date: new Date(entry.date),
+    dayOfWeek: entry.day_of_week,
+    officeLocation: entry.office_location,
+    checkinTime: entry.checkin_time ? new Date(entry.checkin_time) : undefined,
+    checkoutTime: entry.checkout_time ? new Date(entry.checkout_time) : undefined
   }));
 };
 
 export const addBadgeEntry = async (entry: Omit<BadgeEntry, 'id'>): Promise<BadgeEntry> => {
   const { data, error } = await supabase
-    .from('Employee_Office_Utilization')
+    .from('badge_entries')
     .insert({
-      Email: entry.email,
-      Date: entry.date.toISOString().split('T')[0], // Just use the date part
-      'Checked-In Office': entry.officeLocation,
-      'Day of Week': entry.dayOfWeek.toString()
+      email: entry.email,
+      date: entry.date.toISOString(),
+      day_of_week: entry.dayOfWeek,
+      office_location: entry.officeLocation,
+      checkin_time: entry.checkinTime?.toISOString(),
+      checkout_time: entry.checkoutTime?.toISOString()
     })
     .select()
     .single();
@@ -71,12 +72,12 @@ export const addBadgeEntry = async (entry: Omit<BadgeEntry, 'id'>): Promise<Badg
   }
   
   return {
-    id: data.Email + '-' + data.Date,
-    email: data.Email,
-    date: new Date(data.Date),
-    dayOfWeek: data['Day of Week'] ? parseInt(data['Day of Week']) : new Date(data.Date).getDay(),
-    officeLocation: data['Checked-In Office'] || undefined,
-    checkinTime: undefined,
-    checkoutTime: undefined
+    id: data.id,
+    email: data.email,
+    date: new Date(data.date),
+    dayOfWeek: data.day_of_week,
+    officeLocation: data.office_location,
+    checkinTime: data.checkin_time ? new Date(data.checkin_time) : undefined,
+    checkoutTime: data.checkout_time ? new Date(data.checkout_time) : undefined
   };
 };
