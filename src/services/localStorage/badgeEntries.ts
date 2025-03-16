@@ -1,10 +1,10 @@
+
 /**
  * Supabase operations for badge entries
  */
 import { BadgeEntry } from "@/lib/types";
 import { supabase } from "@/integrations/supabase/client";
 import { initializeStorage } from "./initialize";
-import { startOfDay } from "date-fns";
 
 // Badge entries methods
 export const getBadgeEntries = async (): Promise<BadgeEntry[]> => {
@@ -22,7 +22,8 @@ export const getBadgeEntries = async (): Promise<BadgeEntry[]> => {
   return (data || []).map(entry => ({
     id: entry.id,
     email: entry.email,
-    date: startOfDay(new Date(entry.date)), // Normalize the date
+    // Create date without time component to avoid timezone issues
+    date: new Date(new Date(entry.date).toDateString()),
     dayOfWeek: entry.day_of_week,
     officeLocation: entry.office_location,
     checkinTime: entry.checkin_time ? new Date(entry.checkin_time) : undefined,
@@ -44,7 +45,8 @@ export const getBadgeEntriesByEmail = async (email: string): Promise<BadgeEntry[
   return (data || []).map(entry => ({
     id: entry.id,
     email: entry.email,
-    date: startOfDay(new Date(entry.date)), // Normalize the date
+    // Create date without time component to avoid timezone issues
+    date: new Date(new Date(entry.date).toDateString()),
     dayOfWeek: entry.day_of_week,
     officeLocation: entry.office_location,
     checkinTime: entry.checkin_time ? new Date(entry.checkin_time) : undefined,
@@ -74,7 +76,8 @@ export const addBadgeEntry = async (entry: Omit<BadgeEntry, 'id'>): Promise<Badg
   return {
     id: data.id,
     email: data.email,
-    date: new Date(data.date),
+    // Create date without time component to avoid timezone issues
+    date: new Date(new Date(data.date).toDateString()),
     dayOfWeek: data.day_of_week,
     officeLocation: data.office_location,
     checkinTime: data.checkin_time ? new Date(data.checkin_time) : undefined,

@@ -8,7 +8,6 @@ import { getUserEntries } from './userEntries';
 import { generateWeeklyStats } from '@/lib/data/statsGenerator';
 import { currentUser } from '@/lib/data/currentUser';
 import { deleteUserEntry } from './userEntries';
-import { startOfDay } from 'date-fns';
 
 // Get all entries in Entry format (for compatibility with current components)
 export const getAllEntries = async (): Promise<Entry[]> => {
@@ -18,7 +17,8 @@ export const getAllEntries = async (): Promise<Entry[]> => {
   // Convert badge entries to Entry format
   const officeVisits: Entry[] = badgeEntries.map(badge => ({
     id: badge.id,
-    date: startOfDay(new Date(badge.date)), // Use startOfDay to normalize the date
+    // Using date directly - it's already normalized in getBadgeEntries
+    date: badge.date,
     type: 'office-visit',
     userId: badge.email === currentUser.email ? currentUser.id : badge.email,
     officeLocation: badge.officeLocation || 'Unknown', // Include the office location
@@ -28,7 +28,8 @@ export const getAllEntries = async (): Promise<Entry[]> => {
   // Convert user entries to Entry format
   const otherEntries: Entry[] = userEntries.map(entry => ({
     id: entry.id,
-    date: startOfDay(new Date(entry.date)), // Use startOfDay to normalize the date
+    // Using date directly - it's already normalized in getUserEntries
+    date: entry.date,
     type: entry.type,
     note: entry.note,
     userId: entry.email === currentUser.email ? currentUser.id : entry.email,

@@ -2,7 +2,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { Entry, UserEntry } from '@/lib/types';
 import { supabase } from '@/integrations/supabase/client';
-import { startOfDay } from 'date-fns';
 
 // Get user entries from Supabase
 export const getUserEntries = async (): Promise<UserEntry[]> => {
@@ -19,7 +18,8 @@ export const getUserEntries = async (): Promise<UserEntry[]> => {
     return (data || []).map(entry => ({
       id: entry.id,
       email: entry.email,
-      date: startOfDay(new Date(entry.date)), // Normalize the date
+      // Create date without time component to avoid timezone issues
+      date: new Date(new Date(entry.date).toDateString()),
       dayOfWeek: entry.day_of_week,
       type: entry.type as UserEntry['type'],
       note: entry.note || undefined,
@@ -47,7 +47,8 @@ export const getUserEntriesByEmail = async (email: string): Promise<UserEntry[]>
     return (data || []).map(entry => ({
       id: entry.id,
       email: entry.email,
-      date: startOfDay(new Date(entry.date)), // Normalize the date
+      // Create date without time component to avoid timezone issues
+      date: new Date(new Date(entry.date).toDateString()),
       dayOfWeek: entry.day_of_week,
       type: entry.type as UserEntry['type'],
       note: entry.note || undefined,

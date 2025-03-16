@@ -7,7 +7,7 @@ import { Entry } from '@/lib/types';
 import { useEntries } from './useEntries';
 import { isWeekend } from '@/components/Calendar/utils';
 import { currentUser } from '@/lib/data/currentUser';
-import { startOfDay, isSameDay } from 'date-fns';
+import { isSameDay } from 'date-fns';
 
 export const useEntriesForDate = (date: Date) => {
   const { entries, isLoading, error } = useEntries();
@@ -21,14 +21,14 @@ export const useEntriesForDate = (date: Date) => {
         return;
       }
       
-      // Normalize input date by getting start of day to avoid time issues
-      const normalizedDate = startOfDay(date);
+      // Remove time component from the input date to avoid timezone issues
+      const normalizedDate = new Date(date.toDateString());
       
       // Filter entries for the selected date and current user
-      // Using isSameDay to reliably compare dates regardless of time
+      // Using isSameDay to reliably compare dates regardless of time or timezone
       const filtered = entries.filter(entry => {
-        // Ensure we're comparing full Date objects
-        const entryDate = new Date(entry.date);
+        // Create a new Date object without time information to avoid timezone issues
+        const entryDate = new Date(new Date(entry.date).toDateString());
         return (
           (entry.userId === currentUser.id || entry.userId === currentUser.email) &&
           isSameDay(entryDate, normalizedDate)
