@@ -18,7 +18,7 @@ const TableRowItem = ({ entry }: TableRowItemProps) => {
     <TableRow key={entry.id}>
       <TableCell>{format(entryDate, 'MMM d, yyyy')}</TableCell>
       <TableCell>{format(entryDate, 'EEEE')}</TableCell>
-      <TableCell>{entry.userId === currentUser.id ? currentUser.email : entry.userId}</TableCell>
+      <TableCell>{entry.userId === currentUser.id ? 'You' : entry.userId}</TableCell>
       <TableCell>{getOfficeLocation(entry)}</TableCell>
       <TableCell>{formatEntryType(entry.type)}</TableCell>
       <TableCell className="max-w-[200px] truncate">{entry.note || '-'}</TableCell>

@@ -62,4 +62,3 @@ When deploying, make sure to set the environment variables in your hosting platf
 - **NEVER** commit your `.env` file to Git
 - **NEVER** commit the `dist` directory to Git
 - Always use environment variables for secrets
-
