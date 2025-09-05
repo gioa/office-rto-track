@@ -10,7 +10,7 @@ import { initializeStorage } from "./initialize";
 export const getBadgeEntries = async (): Promise<BadgeEntry[]> => {
   initializeStorage();
   
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('badge_entries')
     .select('*');
     
@@ -32,7 +32,7 @@ export const getBadgeEntries = async (): Promise<BadgeEntry[]> => {
 };
 
 export const getBadgeEntriesByEmail = async (email: string): Promise<BadgeEntry[]> => {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('badge_entries')
     .select('*')
     .eq('email', email);
@@ -55,7 +55,7 @@ export const getBadgeEntriesByEmail = async (email: string): Promise<BadgeEntry[
 };
 
 export const addBadgeEntry = async (entry: Omit<BadgeEntry, 'id'>): Promise<BadgeEntry> => {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('badge_entries')
     .insert({
       email: entry.email,

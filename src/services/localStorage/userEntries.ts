@@ -6,7 +6,7 @@ import { supabase } from '@/integrations/supabase/client';
 // Get user entries from Supabase
 export const getUserEntries = async (): Promise<UserEntry[]> => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('user_entries')
       .select('*');
     
@@ -34,7 +34,7 @@ export const getUserEntries = async (): Promise<UserEntry[]> => {
 
 export const getUserEntriesByEmail = async (email: string): Promise<UserEntry[]> => {
   try {
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('user_entries')
       .select('*')
       .eq('email', email);
@@ -76,7 +76,7 @@ export const addUserEntry = async (entry: Omit<UserEntry, 'id'>): Promise<UserEn
       note: entry.note,
     };
     
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('user_entries')
       .insert([dbEntry])
       .select('*')
@@ -107,7 +107,7 @@ export const addUserEntry = async (entry: Omit<UserEntry, 'id'>): Promise<UserEn
 export const deleteUserEntry = async (entryId: string): Promise<void> => {
   try {
     // Using Supabase to delete the entry
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('user_entries')
       .delete()
       .eq('id', entryId);
@@ -132,7 +132,7 @@ export const updateUserEntry = async (entryId: string, updates: Partial<Omit<Use
     if (updates.type) dbUpdates.type = updates.type;
     if (updates.note !== undefined) dbUpdates.note = updates.note;
     
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('user_entries')
       .update(dbUpdates)
       .eq('id', entryId)

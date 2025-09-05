@@ -25,7 +25,7 @@ const TopOfficesCard = ({ dateRange }: TopOfficesCardProps) => {
       setIsLoading(true);
       try {
         // Build the query with all filters
-        let query = supabase
+        let query = (supabase as any)
           .from('badge_entries')
           .select('office_location')
           .not('office_location', 'is', null)

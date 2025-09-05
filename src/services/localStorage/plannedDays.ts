@@ -10,7 +10,7 @@ import { initializeStorage } from "./initialize";
 export const getUserPlannedDays = async (): Promise<UserPlannedDays[]> => {
   initializeStorage();
   
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('user_planned_days')
     .select('*');
     
@@ -30,7 +30,7 @@ export const getUserPlannedDays = async (): Promise<UserPlannedDays[]> => {
 };
 
 export const getUserPlannedDaysByUserId = async (userId: string): Promise<UserPlannedDays | undefined> => {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('user_planned_days')
     .select('*')
     .eq('user_id', userId)
@@ -54,7 +54,7 @@ export const getUserPlannedDaysByUserId = async (userId: string): Promise<UserPl
 };
 
 export const getUserPlannedDaysByEmail = async (email: string): Promise<UserPlannedDays | undefined> => {
-  const { data, error } = await supabase
+  const { data, error } = await (supabase as any)
     .from('user_planned_days')
     .select('*')
     .eq('email', email)
@@ -89,7 +89,7 @@ export const saveUserPlannedDays = async (
   
   if (existingPlan) {
     // Update existing plan
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('user_planned_days')
       .update({
         planned_days: plannedDays,
@@ -115,7 +115,7 @@ export const saveUserPlannedDays = async (
     };
   } else {
     // Create new plan
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('user_planned_days')
       .insert({
         user_id: userId,
