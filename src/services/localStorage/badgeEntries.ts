@@ -22,8 +22,8 @@ export const getBadgeEntries = async (): Promise<BadgeEntry[]> => {
   return (data || []).map(entry => ({
     id: entry.id,
     email: entry.email,
-    // Create date without time component to avoid timezone issues
-    date: new Date(new Date(entry.date).toDateString()),
+    // Parse date string directly to avoid timezone shifts
+    date: new Date(entry.date + 'T00:00:00'),
     dayOfWeek: entry.day_of_week,
     officeLocation: entry.office_location,
     checkinTime: entry.checkin_time ? new Date(entry.checkin_time) : undefined,
@@ -45,8 +45,8 @@ export const getBadgeEntriesByEmail = async (email: string): Promise<BadgeEntry[
   return (data || []).map(entry => ({
     id: entry.id,
     email: entry.email,
-    // Create date without time component to avoid timezone issues
-    date: new Date(new Date(entry.date).toDateString()),
+    // Parse date string directly to avoid timezone shifts
+    date: new Date(entry.date + 'T00:00:00'),
     dayOfWeek: entry.day_of_week,
     officeLocation: entry.office_location,
     checkinTime: entry.checkin_time ? new Date(entry.checkin_time) : undefined,
@@ -76,8 +76,8 @@ export const addBadgeEntry = async (entry: Omit<BadgeEntry, 'id'>): Promise<Badg
   return {
     id: data.id,
     email: data.email,
-    // Create date without time component to avoid timezone issues
-    date: new Date(new Date(data.date).toDateString()),
+    // Parse date string directly to avoid timezone shifts
+    date: new Date(data.date + 'T00:00:00'),
     dayOfWeek: data.day_of_week,
     officeLocation: data.office_location,
     checkinTime: data.checkin_time ? new Date(data.checkin_time) : undefined,

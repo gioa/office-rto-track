@@ -10,9 +10,8 @@ interface TableRowItemProps {
 }
 
 const TableRowItem = ({ entry }: TableRowItemProps) => {
-  // Create a new Date object without time information to avoid timezone issues
-  // This ensures we're displaying the date as stored in the database without timezone shifts
-  const entryDate = new Date(new Date(entry.date).toDateString());
+  // Use the date directly since it's already timezone-corrected in the data layer
+  const entryDate = entry.date;
   
   return (
     <TableRow key={entry.id}>

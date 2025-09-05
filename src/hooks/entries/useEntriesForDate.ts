@@ -21,17 +21,12 @@ export const useEntriesForDate = (date: Date) => {
         return;
       }
       
-      // Remove time component from the input date to avoid timezone issues
-      const normalizedDate = new Date(date.toDateString());
-      
       // Filter entries for the selected date and current user
-      // Using isSameDay to reliably compare dates regardless of time or timezone
+      // Use isSameDay to reliably compare dates
       const filtered = entries.filter(entry => {
-        // Create a new Date object without time information to avoid timezone issues
-        const entryDate = new Date(new Date(entry.date).toDateString());
         return (
           (entry.userId === currentUser.id || entry.userId === currentUser.email) &&
-          isSameDay(entryDate, normalizedDate)
+          isSameDay(entry.date, date)
         );
       });
       

@@ -18,8 +18,8 @@ export const getUserEntries = async (): Promise<UserEntry[]> => {
     return (data || []).map(entry => ({
       id: entry.id,
       email: entry.email,
-      // Create date without time component to avoid timezone issues
-      date: new Date(new Date(entry.date).toDateString()),
+      // Parse date string directly to avoid timezone shifts
+      date: new Date(entry.date + 'T00:00:00'),
       dayOfWeek: entry.day_of_week,
       type: entry.type as UserEntry['type'],
       note: entry.note || undefined,
@@ -47,8 +47,8 @@ export const getUserEntriesByEmail = async (email: string): Promise<UserEntry[]>
     return (data || []).map(entry => ({
       id: entry.id,
       email: entry.email,
-      // Create date without time component to avoid timezone issues
-      date: new Date(new Date(entry.date).toDateString()),
+      // Parse date string directly to avoid timezone shifts
+      date: new Date(entry.date + 'T00:00:00'),
       dayOfWeek: entry.day_of_week,
       type: entry.type as UserEntry['type'],
       note: entry.note || undefined,
@@ -90,7 +90,7 @@ export const addUserEntry = async (entry: Omit<UserEntry, 'id'>): Promise<UserEn
     return {
       id: data.id,
       email: data.email,
-      date: new Date(data.date),
+      date: new Date(data.date + 'T00:00:00'),
       dayOfWeek: data.day_of_week,
       type: data.type as UserEntry['type'],
       note: data.note || undefined,
@@ -147,7 +147,7 @@ export const updateUserEntry = async (entryId: string, updates: Partial<Omit<Use
     return {
       id: data.id,
       email: data.email,
-      date: new Date(data.date),
+      date: new Date(data.date + 'T00:00:00'),
       dayOfWeek: data.day_of_week,
       type: data.type as UserEntry['type'],
       note: data.note || undefined,

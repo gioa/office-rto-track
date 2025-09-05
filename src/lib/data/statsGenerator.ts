@@ -29,7 +29,7 @@ export const generateWeeklyStats = (entries: Entry[], weekStartDates?: Date[]): 
     
     // Count days in office for this week (including events as office visits)
     const daysInOffice = entries.filter(entry => {
-      const entryDate = new Date(entry.date);
+      const entryDate = entry.date;
       const dayOfWeek = entryDate.getDay(); // 0 = Sunday, 6 = Saturday
       
       return (entry.type === 'office-visit' || entry.type === 'event') && 
@@ -40,7 +40,7 @@ export const generateWeeklyStats = (entries: Entry[], weekStartDates?: Date[]): 
     
     // Count sick days for this week
     const sickDays = entries.filter(entry => {
-      const entryDate = new Date(entry.date);
+      const entryDate = entry.date;
       const dayOfWeek = entryDate.getDay();
       
       return entry.type === 'sick' && 
@@ -51,7 +51,7 @@ export const generateWeeklyStats = (entries: Entry[], weekStartDates?: Date[]): 
     
     // Count PTO days for this week
     const ptoDays = entries.filter(entry => {
-      const entryDate = new Date(entry.date);
+      const entryDate = entry.date;
       const dayOfWeek = entryDate.getDay();
       
       return entry.type === 'pto' && 
@@ -62,7 +62,7 @@ export const generateWeeklyStats = (entries: Entry[], weekStartDates?: Date[]): 
     
     // Count event days for this week (still track separately for stats display)
     const eventDays = entries.filter(entry => {
-      const entryDate = new Date(entry.date);
+      const entryDate = entry.date;
       const dayOfWeek = entryDate.getDay();
       
       return entry.type === 'event' && 
@@ -73,7 +73,7 @@ export const generateWeeklyStats = (entries: Entry[], weekStartDates?: Date[]): 
     
     // Count holiday days for this week
     const holidayDays = entries.filter(entry => {
-      const entryDate = new Date(entry.date);
+      const entryDate = entry.date;
       const dayOfWeek = entryDate.getDay();
       
       return entry.type === 'holiday' && 
